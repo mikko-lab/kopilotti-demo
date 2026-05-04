@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kopilotti — Saka</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #f5f5f3;
+    --white: #ffffff;
+    --surface: #ffffff;
+    --surface2: #f0f0ee;
+    --border: #e2e2de;
+    --orange: #e85d00;
+    --orange-light: #fff0e8;
+    --orange-dark: #a03d00;
+    --navy: #1a1a2e;
+    --text: #1a1a2e;
+    --text2: #4a4a5a;
+    --muted: #696978;
+    --green: #177a42;
+    --green-light: #e8f7ee;
+    --blue: #1a5fa8;
+    --blue-light: #e8f0fb;
+    --yellow: #8a5600;
+    --yellow-light: #fff8e8;
+    --red: #c42020;
+    --red-light: #fef0f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 34px;
+    height: 34px;
+    background: var(--orange-dark);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+
+  .logo-texts {
+    line-height: 1.2;
+  }
+
+  .logo-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .header-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+  }
+
+  /* App body */
+  .app {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .card-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--white);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Consent */
+  .consent-box {
+    margin: 14px;
+    background: var(--orange-light);
+    border: 1px solid rgba(232,93,0,0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .consent-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--orange-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .consent-text {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .consent-btns {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Status row */
+  .status-row {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .status-dot.active {
+    background: var(--green);
+    box-shadow: 0 0 0 3px rgba(26,138,74,0.15);
+    animation: dotpulse 2s infinite;
+  }
+
+  @keyframes dotpulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(26,138,74,0.15); }
+    50% { box-shadow: 0 0 0 6px rgba(26,138,74,0.08); }
+  }
+
+  .status-info strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1px;
+  }
+
+  .status-info span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .wave {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 18px;
+  }
+
+  .wave-bar {
+    width: 3px;
+    border-radius: 2px;
+    background: var(--orange);
+    animation: waveani 1.2s ease-in-out infinite;
+  }
+  .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+  .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+  .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+  .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+  @keyframes waveani {
+    0%, 100% { height: 4px; opacity: 0.3; }
+    50% { height: 16px; opacity: 1; }
+  }
+
+  /* Buttons */
+  .btn-row {
+    padding: 0 16px 14px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 10px 18px;
+    border-radius: 9px;
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--orange-dark);
+    color: white;
+    flex: 1;
+    justify-content: center;
+  }
+  .btn-primary:hover { background: #7d2f00; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-outline {
+    background: white;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--orange-dark); color: var(--orange-dark); }
+
+  .btn-danger {
+    background: var(--red-light);
+    color: var(--red);
+    border: 1px solid rgba(196,32,32,0.15);
+    flex: 1;
+    justify-content: center;
+  }
+
+  .btn-sm {
+    padding: 7px 14px;
+    font-size: 12px;
+    border-radius: 7px;
+  }
+
+  /* Demo scenarios */
+  .scenario-bar {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .scenario-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    width: 100%;
+    margin-bottom: 2px;
+  }
+
+  .scenario-btn {
+    padding: 7px 12px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .scenario-btn:hover, .scenario-btn:active {
+    border-color: var(--orange-dark);
+    color: var(--orange-dark);
+    background: var(--orange-light);
+  }
+
+  /* Transcript */
+  .transcript {
+    padding: 14px 16px;
+    min-height: 80px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text2);
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .transcript-placeholder {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  /* Analyse */
+  .analyze-row {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .analyzing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--orange);
+    display: none;
+  }
+  .analyzing.visible { display: flex; }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(232,93,0,0.2);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Meter */
+  .meter-inner {
+    padding: 14px 16px;
+  }
+
+  .meter-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .meter-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .meter-desc {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    max-width: 160px;
+    line-height: 1.3;
+  }
+
+  .meter-bar {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #e85d00, #ff8c42);
+    border-radius: 100px;
+    transition: width 1s cubic-bezier(0.16,1,0.3,1);
+    width: 0%;
+  }
+
+  .meter-sublabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* Stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+
+  .stat-cell {
+    background: var(--white);
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+
+  .stat-lbl {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
+  /* Hints */
+  .hints-list {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .empty-hints {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
+  .empty-text { font-size: 13px; }
+
+  .hint-card {
+    border-radius: 10px;
+    padding: 12px 14px;
+    border-left: 3px solid transparent;
+    animation: slideup 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  @keyframes slideup {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hint-card.green { background: var(--green-light); border-left-color: var(--green); }
+  .hint-card.blue { background: var(--blue-light); border-left-color: var(--blue); }
+  .hint-card.yellow { background: var(--yellow-light); border-left-color: var(--yellow); }
+  .hint-card.red { background: var(--red-light); border-left-color: var(--red); }
+
+  .hint-type {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .hint-card.green .hint-type { color: var(--green); }
+  .hint-card.blue .hint-type { color: var(--blue); }
+  .hint-card.yellow .hint-type { color: var(--yellow); }
+  .hint-card.red .hint-type { color: var(--red); }
+
+  .hint-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .hint-footer {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .hint-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: white;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all 0.15s;
+  }
+
+  .hint-btn:active { opacity: 0.7; }
+
+  /* Cars */
+  .car-list {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .car-card {
+    padding: 11px 13px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .car-card:active, .car-card.selected {
+    border-color: var(--orange);
+    background: var(--orange-light);
+  }
+
+  .car-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .car-info { flex: 1; min-width: 0; }
+
+  .car-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .car-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .car-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--orange-dark);
+    flex-shrink: 0;
+  }
+
+  .cars-placeholder {
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* CRM Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,26,46,0.5);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(2px);
+  }
+
+  .modal-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal-box {
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .modal-overlay.visible .modal-box { transform: translateY(0); }
+
+  .modal-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 12px auto 0;
+  }
+
+  .modal-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .modal-body { padding: 16px 20px; }
+
+  .crm-section { margin-bottom: 16px; }
+
+  .crm-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .crm-value {
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+
+  .modal-actions {
+    padding: 12px 20px 20px;
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--navy);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+    z-index: 200;
+    white-space: nowrap;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .hidden { display: none !important; }
+
+  /* Desktop */
+  @media (min-width: 768px) {
+    .app {
+      max-width: 1000px;
+      padding: 20px;
+    }
+
+    .main-cols {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 10px;
+    }
+
+    .modal-overlay { align-items: center; }
+    .modal-box {
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      transform: translateY(20px) scale(0.98);
+    }
+    .modal-overlay.visible .modal-box { transform: translateY(0) scale(1); }
+    .modal-handle { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">S</div>
+    <div class="logo-texts">
+      <div class="logo-name">Kopilotti</div>
+      <div class="logo-sub">Myyjän co-pilot</div>
+    </div>
+  </div>
+  <div class="header-badge">👤 Janne K.</div>
+</header>
+
+<div class="app">
+<div class="main-cols">
+
+  <!-- Left / main -->
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <!-- Session card -->
+    <div class="card">
+
+      <!-- Consent -->
+      <div class="consent-box" id="consentBox">
+        <div class="consent-label">🛡 Asiakkaan suostumus</div>
+        <div class="consent-text">Pyydä asiakkaalta lupa ennen sessiota. Ääntä ei tallenneta — vain teksti analysoidaan.</div>
+        <div class="consent-btns">
+          <button class="btn btn-outline btn-sm" onclick="denyConsent()">Kieltäytyi</button>
+          <button class="btn btn-primary btn-sm" onclick="giveConsent()">✓ Asiakas hyväksyi</button>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="status-row">
+        <div class="status-dot" id="statusDot"></div>
+        <div class="status-info">
+          <strong id="statusTitle">Odottaa aloitusta</strong>
+          <span id="statusSub">Pyydä suostumus ensin</span>
+        </div>
+        <div class="wave hidden" id="wave">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+      </div>
+
+      <!-- Btns -->
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnStart" onclick="startSession()" disabled>▶ Aloita</button>
+        <button class="btn btn-danger hidden" id="btnStop" onclick="stopSession()">⬛ Lopeta</button>
+        <button class="btn btn-outline hidden" id="btnCRM" onclick="showCRM()">📋 CRM</button>
+      </div>
+
+      <!-- Scenarios -->
+      <div class="scenario-bar">
+        <div class="scenario-label">Demo-skenaariot</div>
+        <button class="scenario-btn" onclick="runScenario('hinta')">💬 Hintaepäily</button>
+        <button class="scenario-btn" onclick="runScenario('rahoitus')">💳 Rahoitus</button>
+        <button class="scenario-btn" onclick="runScenario('perhe')">👨‍👩‍👧 Perhe</button>
+        <button class="scenario-btn" onclick="runScenario('osto')">🤝 Ostovalmis</button>
+        <button class="scenario-btn" onclick="runScenario('vaihto')">🔄 Vaihto</button>
+      </div>
+
+      <!-- Transcript -->
+      <div class="transcript" id="transcriptArea">
+        <div class="transcript-placeholder" id="transcriptPlaceholder">Kuuntelu ei käynnissä. Valitse skenaario tai aloita sessio.</div>
+        <div id="transcriptText" class="hidden"></div>
+      </div>
+
+      <!-- Analyze -->
+      <div class="analyze-row">
+        <button class="btn btn-outline btn-sm" id="btnAnalyze" onclick="analyzeNow()" disabled>🧠 Analysoi</button>
+        <div class="analyzing" id="analyzing">
+          <div class="spinner"></div> Claude analysoi...
+        </div>
+      </div>
+    </div>
+
+    <!-- Hints -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Kopilotti-vihjeet</span>
+        <span id="hintCount" style="font-size:12px;color:var(--muted);font-weight:600;">0</span>
+      </div>
+      <div class="hints-list" id="hintsList">
+        <div class="empty-hints">
+          <div class="empty-icon">💡</div>
+          <div class="empty-text">Vihjeet ilmestyvät kun sessio on käynnissä</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right sidebar -->
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <!-- Meter -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Ostohalukkuus</span>
+      </div>
+      <div class="meter-inner">
+        <div class="meter-top">
+          <div class="meter-value" id="meterVal">—</div>
+          <div class="meter-desc" id="meterDesc" style="color:var(--muted)">Sessio ei käynnissä</div>
+        </div>
+        <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
+        <div class="meter-sublabels"><span>Matala</span><span>Korkea</span></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-val" id="statTime">0:00</div>
+          <div class="stat-lbl">Kesto</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val" id="statHints">0</div>
+          <div class="stat-lbl">Vihjettä</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val" id="statSig">0</div>
+          <div class="stat-lbl">Signaalia</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val" id="statCar" style="font-size:12px;">—</div>
+          <div class="stat-lbl">Kiinnostus</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cars -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Ehdotetut autot</span>
+      </div>
+      <div id="carList">
+        <div class="cars-placeholder">Autoehdotukset ilmestyvät analyysin jälkeen</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- CRM Modal -->
+<div class="modal-overlay" id="crmModal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">CRM-yhteenveto</div>
+      <button class="btn btn-outline btn-sm" onclick="closeCRM()">✕</button>
+    </div>
+    <div class="modal-body" id="crmBody">
+      <div class="analyzing visible" style="padding:20px 0;">
+        <div class="spinner"></div> Generoidaan...
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveAndClose()" style="flex:1;">💾 Tallenna CRM:ään</button>
+      <button class="btn btn-outline" onclick="closeCRM()">Peruuta</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCENARIOS = {
+  hinta: {
+    text: 'No tää hinta tuntuu vähän korkeelta... Netissä katsoin että vastaavia on halvemmalla. En tiedä onko tää auton arvoinen.',
+    hints: [
+      { type: 'blue', icon: '📊', title: 'HINTAVERTAILU', text: 'Markkinalla ei vastaavaa alle 32 500 € tällä varustelulla. Näytä vertailu asiakkaalle.', action: 'Näytä vertailu' },
+      { type: 'yellow', icon: '⚠️', title: 'VASTAVÄITE', text: 'Asiakas vertaa eri varustelutasoon — kysy mitä autoja hän on katsonut.', action: 'Kysy lisää' },
+    ],
+    meter: 38, meterDesc: 'Epävarma — hintaepäily', cars: [1,3,4], signal: 'Hintaepäily'
+  },
+  rahoitus: {
+    text: 'Meillä on jo yksi auto lainassa. Pitäisi katsoa onko järkevä kuukausierä. Rahoitushan teillä onnistuu?',
+    hints: [
+      { type: 'green', icon: '💳', title: 'RAHOITUSMAHDOLLISUUS', text: 'Asiakas haluaa osamaksun. Ehdota SakaVarma + rahoituspaketti — kuukausierä alkaen 289 €/kk.', action: 'Laske erä' },
+      { type: 'blue', icon: '🛡️', title: 'YHDISTELMÄTARJOUS', text: 'SakaVarma 2v + rahoitus = vahva paketti. Poistaa viimeisimmät epäilykset.', action: 'Näytä paketti' },
+    ],
+    meter: 62, meterDesc: 'Kiinnostunut — rahoitus auki', cars: [3,2,6], signal: 'Rahoituskiinnostus'
+  },
+  perhe: {
+    text: 'Meillä on kolme lasta, nuorin on 2-vuotias. Pitää olla tilaa ja turvalliset turvavyöt takapenkillä. Käydään kesällä mökillä usein.',
+    hints: [
+      { type: 'green', icon: '👨‍👩‍👧', title: 'PERHEAUTO', text: 'ISOFIX + 3 turvavyötä taka. Volvo XC60 ja RAV4 sopivat täydellisesti — tarkista saatavuus.', action: 'Näytä perheautot' },
+      { type: 'yellow', icon: '🏕️', title: 'MÖKKIMATKAT', text: 'Mökkiajelu mainittiin — kysy tarvitaanko vetokoukku. Lisää myyntivaltti.', action: 'Kysy vetokoukusta' },
+    ],
+    meter: 71, meterDesc: 'Vahva tarve — sopivat autot olemassa', cars: [1,2,6], signal: 'Perhetarve'
+  },
+  osto: {
+    text: 'Kyllä tää tuntuu hyvältä. Tää on just semmonen mitä hain. Pitää kattoo vielä vakuutukset mutta muuten näyttää selvältä.',
+    hints: [
+      { type: 'green', icon: '🤝', title: 'OSTOVALMIS', text: 'Asiakas on lähellä päätöstä. Ehdota koeajoa nyt — älä anna lähteä ilman sitoutumisenmerkkiä.', action: 'Ehdota koeajoa' },
+      { type: 'blue', icon: '🛡️', title: 'VAKUUTUS', text: 'Saka tarjoaa valmiiksi kilpailutetun SakaKaskon. Ota puheeksi heti — poistaa viimeisen esteen.', action: 'Esitä SakaKasko' },
+    ],
+    meter: 89, meterDesc: 'Erittäin korkea — toimi nyt', cars: [1,5,2], signal: 'Ostosignaali'
+  },
+  vaihto: {
+    text: 'Meillä on se vanha Passat mikä pitäisi saada vaihdossa. 2017 malli, noin 140 000 kilometriä. Se on ihan ok kunnossa.',
+    hints: [
+      { type: 'yellow', icon: '🔄', title: 'VAIHTOAUTO', text: 'Kysy heti: moottori, huoltohistoria, onko vahinkoja? Tarvitset tiedot hyvityshinnan laskemiseen.', action: 'Kysy lisätiedot' },
+      { type: 'blue', icon: '📉', title: 'PASSAT 2017 ARVO', text: 'Passat -17 / 140tkm markkina-arvo n. 9 500–11 500 € kunnosta riippuen. Aloita 9 800 €:sta.', action: 'Laske hyvitys' },
+    ],
+    meter: 54, meterDesc: 'Harkitsee — vaihtokauppa avain', cars: [3,4,1], signal: 'Vaihtoauto'
+  }
+};
+
+const CARS = [
+  { id:1, name:'Volvo XC60 B4 AWD', year:2021, km:58, price:34900, icon:'🚙' },
+  { id:2, name:'Toyota RAV4 Hybrid', year:2020, km:72, price:28900, icon:'🚗' },
+  { id:3, name:'Skoda Octavia Combi', year:2022, km:41, price:21900, icon:'🚗' },
+  { id:4, name:'VW Passat Variant', year:2019, km:89, price:17500, icon:'🚘' },
+  { id:5, name:'BMW 320d Touring', year:2021, km:61, price:29500, icon:'🚘' },
+  { id:6, name:'Ford Kuga PHEV', year:2022, km:38, price:27900, icon:'🚙' },
+];
+
+let sessionActive=false, consentGiven=false, timer=null, secs=0;
+let hints=[], signals=0, currentTranscript='', currentScenario=null;
+let recognition=null, selectedCar=null;
+
+function giveConsent() {
+  consentGiven=true;
+  document.getElementById('consentBox').style.display='none';
+  document.getElementById('btnStart').disabled=false;
+  document.getElementById('statusSub').textContent='Suostumus saatu — valmis';
+  showToast('✅ Suostumus kirjattu');
+}
+
+function denyConsent() {
+  showToast('❌ Suostumus kieltäytyi — sessio peruutettu');
+}
+
+function startSession() {
+  sessionActive=true;
+  document.getElementById('statusDot').classList.add('active');
+  document.getElementById('statusTitle').textContent='Sessio käynnissä';
+  document.getElementById('statusSub').textContent='Kuuntelen...';
+  document.getElementById('btnStart').classList.add('hidden');
+  document.getElementById('btnStop').classList.remove('hidden');
+  document.getElementById('btnCRM').classList.remove('hidden');
+  document.getElementById('btnAnalyze').disabled=false;
+  document.getElementById('wave').classList.remove('hidden');
+
+  timer=setInterval(()=>{
+    secs++;
+    const m=Math.floor(secs/60), s=secs%60;
+    document.getElementById('statTime').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  },1000);
+
+  if ('SpeechRecognition' in window||'webkitSpeechRecognition' in window) {
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    recognition=new SR();
+    recognition.lang='fi-FI'; recognition.continuous=true; recognition.interimResults=true;
+    recognition.onresult=(e)=>{
+      let interim='';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        if(e.results[i].isFinal) currentTranscript+=e.results[i][0].transcript+' ';
+        else interim=e.results[i][0].transcript;
+      }
+      showTranscript(currentTranscript+interim);
+    };
+    recognition.start();
+  }
+}
+
+function stopSession() {
+  sessionActive=false;
+  clearInterval(timer);
+  if(recognition) recognition.stop();
+  document.getElementById('statusDot').classList.remove('active');
+  document.getElementById('statusTitle').textContent='Sessio päättynyt';
+  document.getElementById('statusSub').textContent=`Kesto: ${document.getElementById('statTime').textContent}`;
+  document.getElementById('btnStop').classList.add('hidden');
+  document.getElementById('wave').classList.add('hidden');
+  showToast('Sessio lopetettu');
+}
+
+function showTranscript(text) {
+  document.getElementById('transcriptPlaceholder').classList.add('hidden');
+  const t=document.getElementById('transcriptText');
+  t.classList.remove('hidden');
+  t.textContent=text;
+}
+
+async function runScenario(key) {
+  if(!sessionActive){ if(!consentGiven) giveConsent(); startSession(); }
+  currentScenario=key;
+  const s=SCENARIOS[key];
+  currentTranscript='';
+  showTranscript('');
+  const words=s.text.split(' ');
+  let i=0;
+  const iv=setInterval(()=>{
+    if(i<words.length){ currentTranscript=words.slice(0,i+1).join(' ')+' '; showTranscript(currentTranscript); i++; }
+    else { clearInterval(iv); setTimeout(()=>analyzeScenario(s),500); }
+  },70);
+}
+
+async function analyzeScenario(s) {
+  document.getElementById('analyzing').classList.add('visible');
+  document.getElementById('btnAnalyze').disabled=true;
+  await new Promise(r=>setTimeout(r,1200));
+  document.getElementById('analyzing').classList.remove('visible');
+  document.getElementById('btnAnalyze').disabled=false;
+
+  // Tyhjennetään vanhat vihjeet ennen uutta analyysia
+  hints=[]; signals=0;
+  document.getElementById('hintsList').innerHTML='';
+  document.getElementById('hintCount').textContent='0';
+  document.getElementById('statHints').textContent='0';
+
+  s.hints.forEach((h,i)=>setTimeout(()=>addHint(h),i*350));
+  setTimeout(()=>{ updateMeter(s.meter,s.meterDesc); signals++; document.getElementById('statSig').textContent=signals; },200);
+  setTimeout(()=>showCars(s.cars),300);
+  const car=CARS.find(c=>c.id===s.cars[0]);
+  if(car) document.getElementById('statCar').textContent=car.name.split(' ').slice(0,2).join(' ');
+}
+
+async function analyzeNow() {
+  if(currentScenario) { analyzeScenario(SCENARIOS[currentScenario]); return; }
+  if(currentTranscript.length<10) return;
+  document.getElementById('analyzing').classList.add('visible');
+  document.getElementById('btnAnalyze').disabled=true;
+  await new Promise(r=>setTimeout(r,1100));
+
+  const t=currentTranscript.toLowerCase();
+  const hints=[];
+  if(/hinta|kallis|halv|euro|budjetti/.test(t))
+    hints.push({type:'yellow',icon:'💰',title:'HINTAKESKUSTELU',text:'Asiakas pohtii hintaa — kysy budjetti ja tarjoa rahoituslaskelma.',action:'Laske rahoitus'});
+  if(/rahoitus|osamaksu|kuukausierä|laina/.test(t))
+    hints.push({type:'green',icon:'💳',title:'RAHOITUSKIINNOSTUS',text:'Rahoitus puheenaiheena — ehdota SakaVarma-paketti + rahoitus.',action:'Näytä paketti'});
+  if(/vaihto|vanha|passat|toyota|ford|auto meillä/.test(t))
+    hints.push({type:'blue',icon:'🔄',title:'VAIHTOAUTO',text:'Kysy heti: merkki, vuosi, km-lukema ja kunto hyvityshinnan arvioimiseksi.',action:'Kysy lisätiedot'});
+  if(/lapsi|perhe|isofix|tilaa|tavaratila|mökki/.test(t))
+    hints.push({type:'green',icon:'👨‍👩‍👧',title:'PERHETARPEET',text:'Perheauto — nosta esiin ISOFIX, tavaratilan koko ja vetokoukku.',action:'Näytä perheautot'});
+  if(/koeajo|kokeilla|testata|istua|tuntuma/.test(t))
+    hints.push({type:'green',icon:'🚗',title:'KOEAJOPYYNTÖ',text:'Asiakas haluaa koeajon — varaa aika heti, se sitouttaa.',action:'Varaa koeajo'});
+  if(/vakuutus|kasko|liikenne/.test(t))
+    hints.push({type:'blue',icon:'🛡️',title:'VAKUUTUS',text:'Mainitse SakaKasko — valmiiksi kilpailutettu, poistaa viimeisen esteen.',action:'Esitä SakaKasko'});
+  if(!hints.length)
+    hints.push({type:'blue',icon:'👂',title:'KUUNTELE',text:'Ei selkeää signaalia vielä — kysy avoimia kysymyksiä: "Mihin käyttöön auto tulee?"',action:'Kysy lisää'});
+
+  const empty=document.querySelector('.empty-hints');
+  if(empty) empty.remove();
+  hints.forEach((h,i)=>setTimeout(()=>addHint(h),i*350));
+  const meter=(/osto|selvä|hyvä|sopii|otetaan/.test(t)?82:/rahoitus|koeajo/.test(t)?63:/hinta|kallis/.test(t)?38:50);
+  setTimeout(()=>{ updateMeter(meter, meter>70?'Vahva ostosignaali':meter>55?'Kiinnostunut':'Harkitsee vielä'); signals++; document.getElementById('statSig').textContent=signals; },200);
+
+  document.getElementById('analyzing').classList.remove('visible');
+  document.getElementById('btnAnalyze').disabled=false;
+}
+
+function addHint(h) {
+  const list=document.getElementById('hintsList');
+  const c=document.createElement('div');
+  c.className=`hint-card ${h.type}`;
+  c.innerHTML=`<div class="hint-type">${h.icon} ${h.title}</div><div class="hint-text">${h.text}</div><div class="hint-footer"><button class="hint-btn" onclick="markDone(this)">${h.action} →</button></div>`;
+  list.appendChild(c);
+  hints.push(h);
+  document.getElementById('hintCount').textContent=hints.length;
+  document.getElementById('statHints').textContent=hints.length;
+}
+
+function markDone(btn) {
+  btn.textContent='✓ Tehty';
+  btn.style.color='var(--green)';
+  btn.style.borderColor='var(--green)';
+  btn.disabled=true;
+}
+
+function updateMeter(val,desc) {
+  document.getElementById('meterFill').style.width=val+'%';
+  document.getElementById('meterVal').textContent=val+'%';
+  document.getElementById('meterDesc').textContent=desc;
+  document.getElementById('meterDesc').style.color=val>70?'var(--green)':val>50?'var(--yellow)':'var(--muted)';
+}
+
+function showCars(ids) {
+  const list=document.getElementById('carList');
+  list.innerHTML='<div class="car-list">'+ids.map(id=>{
+    const car=CARS.find(c=>c.id===id);
+    if(!car) return '';
+    return `<div class="car-card${selectedCar===id?' selected':''}" onclick="selectCar(${id},this)">
+      <div class="car-icon">${car.icon}</div>
+      <div class="car-info">
+        <div class="car-name">${car.name}</div>
+        <div class="car-meta">${car.year} · ${car.km}tkm</div>
+      </div>
+      <div class="car-price">${car.price.toLocaleString('fi-FI')} €</div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function selectCar(id,el) {
+  selectedCar=id;
+  document.querySelectorAll('.car-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  const car=CARS.find(c=>c.id===id);
+  document.getElementById('statCar').textContent=car.name.split(' ').slice(0,2).join(' ');
+}
+
+async function showCRM() {
+  document.getElementById('crmModal').classList.add('visible');
+  await new Promise(r=>setTimeout(r,900));
+  const car=selectedCar?CARS.find(c=>c.id===selectedCar):CARS[0];
+  const hintLines=hints.map(h=>`• ${h.text}`).join('\n');
+  document.getElementById('crmBody').innerHTML=`
+    <div class="crm-section"><div class="crm-label">Kohtaaminen</div><div class="crm-value">Kesto: ${document.getElementById('statTime').textContent} · Vihjettä: ${hints.length} · Signaalia: ${signals}</div></div>
+    <div class="crm-section"><div class="crm-label">Kiinnostuksen kohde</div><div class="crm-value">${car?`${car.name} (${car.year}) — ${car.price.toLocaleString('fi-FI')} €`:'Ei valittu'}</div></div>
+    <div class="crm-section"><div class="crm-label">Ostohalukkuus</div><div class="crm-value">${document.getElementById('meterVal').textContent} — ${document.getElementById('meterDesc').textContent}</div></div>
+    <div class="crm-section"><div class="crm-label">Kopilotti-havainnot</div><div class="crm-value">${hints.length?hintLines:'Ei havaintoja'}</div></div>
+    <div class="crm-section"><div class="crm-label">Suositellut toimet</div><div class="crm-value">Seuranta 48h kuluessa.${car?' Lähetä tarjous: '+car.name+'.':''}</div></div>
+  `;
+}
+
+function closeCRM() { document.getElementById('crmModal').classList.remove('visible'); }
+function saveAndClose() { closeCRM(); showToast('✅ Tallennettu CRM:ään'); }
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
