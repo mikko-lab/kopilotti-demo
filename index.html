@@ -1175,6 +1175,18 @@ function selectCar(id,el) {
   document.getElementById('statCar').textContent=car.name.split(' ').slice(0,2).join(' ');
 }
 
+function buildTriggers() {
+  const meter = parseInt(document.getElementById('meterVal').textContent) || 0;
+  const triggers = [];
+  if (meter >= 70) triggers.push({ trigger: 'high_intent', action: 'create_followup_task', priority: 'high', assignee: 'myyjä' });
+  const hasFinance = hints.some(h => h.title?.includes('RAHOITUS'));
+  if (hasFinance) triggers.push({ trigger: 'finance_interest', action: 'prefill_offer', template: 'sakavarma_rahoitus' });
+  const hasTrade = hints.some(h => h.title?.includes('VAIHTO'));
+  if (hasTrade) triggers.push({ trigger: 'trade_in', action: 'start_valuation', system: 'ERP' });
+  if (triggers.length === 0) triggers.push({ trigger: 'none', action: 'log_visit_only' });
+  return JSON.stringify({ timestamp: new Date().toISOString(), triggers }, null, 2);
+}
+
 async function showCRM() {
   document.getElementById('crmModal').classList.add('visible');
   await new Promise(r=>setTimeout(r,900));
@@ -1185,7 +1197,7 @@ async function showCRM() {
     <div class="crm-section"><div class="crm-label">Kiinnostuksen kohde</div><div class="crm-value">${car?`${car.name} (${car.year}) — ${car.price.toLocaleString('fi-FI')} €`:'Ei valittu'}</div></div>
     <div class="crm-section"><div class="crm-label">Ostohalukkuus</div><div class="crm-value">${document.getElementById('meterVal').textContent} — ${document.getElementById('meterDesc').textContent}</div></div>
     <div class="crm-section"><div class="crm-label">Kopilotti-havainnot</div><div class="crm-value">${hints.length?hintLines:'Ei havaintoja'}</div></div>
-    <div class="crm-section"><div class="crm-label">Suositellut toimet</div><div class="crm-value">Seuranta 48h kuluessa.${car?' Lähetä tarjous: '+car.name+'.':''}</div></div>
+    <div class="crm-section"><div class="crm-label">⚡ Integraatiotriggerit</div><div class="crm-value" style="font-family:monospace;font-size:12px;white-space:pre;">${buildTriggers()}</div></div>
   `;
 }
 
