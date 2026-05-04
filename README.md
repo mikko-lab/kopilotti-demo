@@ -55,6 +55,27 @@ Rakennettu API-pohjaisena arkkitehtuurina, jossa LLM-analyysi toimii erillisenä
 
 ---
 
+## Kehityssuunnitelma
+
+### Arkkitehtuuri
+LLM-analyysi siirretään selaimesta backendiin — Node.js-mikropalvelu ottaa transkription vastaan, ajaa analyysin ja palauttaa strukturoidun JSONin. API-avain pysyy palvelimella ja logiikka on testattavissa.
+
+### Oikeat integraatiot
+Mock-triggerit korvataan oikeilla API-kutsuilla integraatioalustan (Workato / Frends) kautta:
+- **CRM webhook** → follow-up task syntyy automaattisesti
+- **ERP-kutsu** → tarjouspohja esitäytetään rahoitusnumerolla
+- **Varastonhallinta** → reaaliaikainen saatavuus ehdotetuille autoille
+
+### Data ja oppiminen
+Jokaisesta kohtaamisesta kertyy dataa — ostohalukkuus, signaaliyhdistelmät, konversio. Ajan myötä tunnistettavissa esim. että "vaihtoauto + rahoituskiinnostus" konvertoi 40% paremmin kuin muut. Datan avulla mallia voidaan finetunata.
+
+### Tietosuoja
+- GDPR-dokumentaatio ja datan retentio-policy
+- Suostumuskirjaus lokiin — ei pelkkä UI-nappi
+- Ääntä ei tallenneta missään vaiheessa (speech-to-text tapahtuu selaimessa)
+
+---
+
 ## Kokeile demoa
 
 1. Avaa [https://mikko-lab.github.io/kopilotti-demo/](https://mikko-lab.github.io/kopilotti-demo/)
