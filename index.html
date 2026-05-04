@@ -712,6 +712,36 @@
 
   .hidden { display: none !important; }
 
+  /* Skip link */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 16px;
+    background: var(--navy);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 0 0 8px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 999;
+    text-decoration: none;
+  }
+  .skip-link:focus { top: 0; }
+
+  /* Focus-tyylit kaikille interaktiivisille elementeille */
+  :focus-visible {
+    outline: 2px solid var(--orange-dark);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Autokortti buttonina — override button defaults */
+  .car-card {
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+
   /* Desktop */
   @media (min-width: 768px) {
     .app {
@@ -739,6 +769,8 @@
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Siirry pääsisältöön</a>
+
 <!-- Header -->
 <header class="header">
   <div class="logo">
@@ -751,7 +783,7 @@
   <div class="header-badge">👤 Janne K.</div>
 </header>
 
-<div class="app">
+<main class="app" id="main-content">
 <div class="main-cols">
 
   <!-- Left / main -->
@@ -795,7 +827,7 @@
 
       <!-- Scenarios -->
       <div class="scenario-bar">
-        <div class="scenario-label">Demo-skenaariot</div>
+        <h2 class="scenario-label">Demo-skenaariot</h2>
         <button class="scenario-btn" onclick="runScenario('hinta')">💬 Hintaepäily</button>
         <button class="scenario-btn" onclick="runScenario('rahoitus')">💳 Rahoitus</button>
         <button class="scenario-btn" onclick="runScenario('perhe')">👨‍👩‍👧 Perhe</button>
@@ -821,7 +853,7 @@
     <!-- Hints -->
     <div class="card">
       <div class="card-header">
-        <span class="card-title">Kopilotti-vihjeet</span>
+        <h2 class="card-title">Kopilotti-vihjeet</h2>
         <span id="hintCount" style="font-size:12px;color:var(--muted);font-weight:600;">0</span>
       </div>
       <div class="hints-list" id="hintsList">
@@ -839,7 +871,7 @@
     <!-- Meter -->
     <div class="card">
       <div class="card-header">
-        <span class="card-title">Ostohalukkuus</span>
+        <h2 class="card-title">Ostohalukkuus</h2>
       </div>
       <div class="meter-inner">
         <div class="meter-top">
@@ -872,7 +904,7 @@
     <!-- Cars -->
     <div class="card">
       <div class="card-header">
-        <span class="card-title">Ehdotetut autot</span>
+        <h2 class="card-title">Ehdotetut autot</h2>
       </div>
       <div id="carList">
         <div class="cars-placeholder">Autoehdotukset ilmestyvät analyysin jälkeen</div>
@@ -881,7 +913,7 @@
 
   </div>
 </div>
-</div>
+</main>
 
 <!-- CRM Modal -->
 <div class="modal-overlay" id="crmModal">
@@ -1124,14 +1156,14 @@ function showCars(ids) {
   list.innerHTML='<div class="car-list">'+ids.map(id=>{
     const car=CARS.find(c=>c.id===id);
     if(!car) return '';
-    return `<div class="car-card${selectedCar===id?' selected':''}" onclick="selectCar(${id},this)">
-      <div class="car-icon">${car.icon}</div>
-      <div class="car-info">
-        <div class="car-name">${car.name}</div>
-        <div class="car-meta">${car.year} · ${car.km}tkm</div>
-      </div>
-      <div class="car-price">${car.price.toLocaleString('fi-FI')} €</div>
-    </div>`;
+    return `<button class="car-card${selectedCar===id?' selected':''}" onclick="selectCar(${id},this)" aria-pressed="${selectedCar===id}">
+      <span class="car-icon" aria-hidden="true">${car.icon}</span>
+      <span class="car-info">
+        <span class="car-name">${car.name}</span>
+        <span class="car-meta">${car.year} · ${car.km}tkm</span>
+      </span>
+      <span class="car-price">${car.price.toLocaleString('fi-FI')} €</span>
+    </button>`;
   }).join('')+'</div>';
 }
 
