@@ -994,6 +994,8 @@ let sessionActive=false, consentGiven=false, timer=null, secs=0;
 let hints=[], signals=0, currentTranscript='', currentScenario=null;
 let recognition=null, selectedCar=null;
 
+const BACKEND_URL = ''; // Täytä Railway-URL: esim. 'https://kopilotti.up.railway.app'
+
 function giveConsent() {
   consentGiven=true;
   document.getElementById('consentBox').style.display='none';
@@ -1073,18 +1075,19 @@ async function runScenario(key) {
 }
 
 async function analyzeScenario(s) {
-  document.getElementById('analyzing').classList.add('visible');
-  document.getElementById('btnAnalyze').disabled=true;
-  await new Promise(r=>setTimeout(r,1200));
-  document.getElementById('analyzing').classList.remove('visible');
-  document.getElementById('btnAnalyze').disabled=false;
-
-  // Tyhjennetään vanhat vihjeet ennen uutta analyysia
   hints=[]; signals=0;
   document.getElementById('hintsList').innerHTML='';
   document.getElementById('hintCount').textContent='0';
   document.getElementById('statHints').textContent='0';
 
+  if (BACKEND_URL && await analyzeWithSSE(s.text)) return;
+
+  // Paikallinen fallback
+  document.getElementById('analyzing').classList.add('visible');
+  document.getElementById('btnAnalyze').disabled=true;
+  await new Promise(r=>setTimeout(r,1200));
+  document.getElementById('analyzing').classList.remove('visible');
+  document.getElementById('btnAnalyze').disabled=false;
   s.hints.forEach((h,i)=>setTimeout(()=>addHint(h),i*350));
   setTimeout(()=>{ updateMeter(s.meter,s.meterDesc); signals++; document.getElementById('statSig').textContent=signals; },200);
   setTimeout(()=>showCars(s.cars),300);
@@ -1095,35 +1098,102 @@ async function analyzeScenario(s) {
 async function analyzeNow() {
   if(currentScenario) { analyzeScenario(SCENARIOS[currentScenario]); return; }
   if(currentTranscript.length<10) return;
+
+  hints=[]; signals=0;
+  document.getElementById('hintsList').innerHTML='';
+  document.getElementById('hintCount').textContent='0';
+  document.getElementById('statHints').textContent='0';
+
+  if (BACKEND_URL && await analyzeWithSSE(currentTranscript)) return;
+
+  // Paikallinen fallback
   document.getElementById('analyzing').classList.add('visible');
   document.getElementById('btnAnalyze').disabled=true;
   await new Promise(r=>setTimeout(r,1100));
-
   const t=currentTranscript.toLowerCase();
-  const hints=[];
+  const localHints=[];
   if(/hinta|kallis|halv|euro|budjetti/.test(t))
-    hints.push({type:'yellow',icon:'💰',title:'HINTAKESKUSTELU',text:'Asiakas pohtii hintaa — kysy budjetti ja tarjoa rahoituslaskelma.',action:'Laske rahoitus'});
+    localHints.push({type:'yellow',icon:'💰',title:'HINTAKESKUSTELU',text:'Asiakas pohtii hintaa — kysy budjetti ja tarjoa rahoituslaskelma.',action:'Laske rahoitus'});
   if(/rahoitus|osamaksu|kuukausierä|laina/.test(t))
-    hints.push({type:'green',icon:'💳',title:'RAHOITUSKIINNOSTUS',text:'Rahoitus puheenaiheena — ehdota SakaVarma-paketti + rahoitus.',action:'Näytä paketti'});
+    localHints.push({type:'green',icon:'💳',title:'RAHOITUSKIINNOSTUS',text:'Rahoitus puheenaiheena — ehdota SakaVarma-paketti + rahoitus.',action:'Näytä paketti'});
   if(/vaihto|vanha|passat|toyota|ford|auto meillä/.test(t))
-    hints.push({type:'blue',icon:'🔄',title:'VAIHTOAUTO',text:'Kysy heti: merkki, vuosi, km-lukema ja kunto hyvityshinnan arvioimiseksi.',action:'Kysy lisätiedot'});
+    localHints.push({type:'blue',icon:'🔄',title:'VAIHTOAUTO',text:'Kysy heti: merkki, vuosi, km-lukema ja kunto hyvityshinnan arvioimiseksi.',action:'Kysy lisätiedot'});
   if(/lapsi|perhe|isofix|tilaa|tavaratila|mökki/.test(t))
-    hints.push({type:'green',icon:'👨‍👩‍👧',title:'PERHETARPEET',text:'Perheauto — nosta esiin ISOFIX, tavaratilan koko ja vetokoukku.',action:'Näytä perheautot'});
+    localHints.push({type:'green',icon:'👨‍👩‍👧',title:'PERHETARPEET',text:'Perheauto — nosta esiin ISOFIX, tavaratilan koko ja vetokoukku.',action:'Näytä perheautot'});
   if(/koeajo|kokeilla|testata|istua|tuntuma/.test(t))
-    hints.push({type:'green',icon:'🚗',title:'KOEAJOPYYNTÖ',text:'Asiakas haluaa koeajon — varaa aika heti, se sitouttaa.',action:'Varaa koeajo'});
+    localHints.push({type:'green',icon:'🚗',title:'KOEAJOPYYNTÖ',text:'Asiakas haluaa koeajon — varaa aika heti, se sitouttaa.',action:'Varaa koeajo'});
   if(/vakuutus|kasko|liikenne/.test(t))
-    hints.push({type:'blue',icon:'🛡️',title:'VAKUUTUS',text:'Mainitse SakaKasko — valmiiksi kilpailutettu, poistaa viimeisen esteen.',action:'Esitä SakaKasko'});
-  if(!hints.length)
-    hints.push({type:'blue',icon:'👂',title:'KUUNTELE',text:'Ei selkeää signaalia vielä — kysy avoimia kysymyksiä: "Mihin käyttöön auto tulee?"',action:'Kysy lisää'});
-
+    localHints.push({type:'blue',icon:'🛡️',title:'VAKUUTUS',text:'Mainitse SakaKasko — valmiiksi kilpailutettu, poistaa viimeisen esteen.',action:'Esitä SakaKasko'});
+  if(!localHints.length)
+    localHints.push({type:'blue',icon:'👂',title:'KUUNTELE',text:'Ei selkeää signaalia vielä — kysy avoimia kysymyksiä: "Mihin käyttöön auto tulee?"',action:'Kysy lisää'});
   const empty=document.querySelector('.empty-hints');
   if(empty) empty.remove();
-  hints.forEach((h,i)=>setTimeout(()=>addHint(h),i*350));
+  localHints.forEach((h,i)=>setTimeout(()=>addHint(h),i*350));
   const meter=(/osto|selvä|hyvä|sopii|otetaan/.test(t)?82:/rahoitus|koeajo/.test(t)?63:/hinta|kallis/.test(t)?38:50);
   setTimeout(()=>{ updateMeter(meter, meter>70?'Vahva ostosignaali':meter>55?'Kiinnostunut':'Harkitsee vielä'); signals++; document.getElementById('statSig').textContent=signals; },200);
-
   document.getElementById('analyzing').classList.remove('visible');
   document.getElementById('btnAnalyze').disabled=false;
+}
+
+async function analyzeWithSSE(transcript) {
+  document.getElementById('analyzing').classList.add('visible');
+  document.getElementById('btnAnalyze').disabled=true;
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/analyze`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({transcript})
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, {stream: true});
+      const messages = buffer.split('\n\n');
+      buffer = messages.pop();
+      for (const msg of messages) {
+        let type='', data='';
+        for (const line of msg.trim().split('\n')) {
+          if (line.startsWith('event: ')) type = line.slice(7).trim();
+          if (line.startsWith('data: ')) data = line.slice(6).trim();
+        }
+        if (type && data) { try { handleSSEEvent(type, JSON.parse(data)); } catch(_) {} }
+      }
+    }
+    return true;
+  } catch(err) {
+    console.warn('Backend ei tavoitettavissa, käytetään paikallista analyysiä:', err.message);
+    return false;
+  } finally {
+    document.getElementById('analyzing').classList.remove('visible');
+    document.getElementById('btnAnalyze').disabled=false;
+  }
+}
+
+function handleSSEEvent(type, data) {
+  switch(type) {
+    case 'hint': {
+      const empty=document.querySelector('.empty-hints');
+      if(empty) empty.remove();
+      addHint(data);
+      break;
+    }
+    case 'meter':
+      updateMeter(data.value, data.desc);
+      signals++;
+      document.getElementById('statSig').textContent=signals;
+      break;
+    case 'cars':
+      if(Array.isArray(data) && data.length) {
+        showCars(data);
+        const car=CARS.find(c=>c.id===data[0]);
+        if(car) document.getElementById('statCar').textContent=car.name.split(' ').slice(0,2).join(' ');
+      }
+      break;
+  }
 }
 
 function addHint(h) {
