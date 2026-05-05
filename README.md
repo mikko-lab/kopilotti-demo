@@ -90,5 +90,4 @@ Jokaisesta kohtaamisesta kertyy dataa — ostohalukkuus, signaaliyhdistelmät, k
 
 ---
 
-*Rakennettu osana Saka Finland Oy:n fullstack developer -hakemusta.*  
 *Tekijä: [Mikko Tarkiainen](https://www.linkedin.com/in/mikko-tarkiainen-accessibility/)*
