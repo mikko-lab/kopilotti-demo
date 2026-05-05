@@ -51,16 +51,17 @@ Soveltuu laajennettavaksi integraatioalustoihin kuten **Workato**, **Dell Boomi*
 
 Rakennettu API-pohjaisena arkkitehtuurina, jossa LLM-analyysi toimii erillisenä palveluna ja integroituu backendiin. Käyttöliittymä on tarkoituksella kevyt — logiikka on integraatiokerroksessa, ei UI:ssa.
 
-**Stack:** Vanilla JS · Web Speech API · LLM intent analysis · JSON output
+**Stack:** Vanilla JS · Web Speech API · Node.js · Express · Server-Sent Events · Claude API · Railway
 
 ---
 
 ## Kehityssuunnitelma
 
-### Arkkitehtuuri
-LLM-analyysi siirretään selaimesta backendiin — Node.js-mikropalvelu ottaa transkription vastaan, ajaa analyysin ja palauttaa strukturoidun JSONin. API-avain pysyy palvelimella ja logiikka on testattavissa.
+### ✅ Toteutettu
+- **SSE-striimaus** — LLM-analyysi pyörii Node.js-backendissä (Railway), tulokset striimautuvat Server-Sent Events -yhteydellä suoraan myyjän näytölle. API-avain palvelimella, ei selaimessa.
+- **Graceful fallback** — jos backend ei ole tavoitettavissa, UI siirtyy automaattisesti paikalliseen analyysiin ilman virheilmoituksia.
 
-### Oikeat integraatiot
+### Seuraavaksi: Oikeat integraatiot
 Mock-triggerit korvataan oikeilla API-kutsuilla integraatioalustan (Workato / Frends) kautta:
 - **CRM webhook** → follow-up task syntyy automaattisesti
 - **ERP-kutsu** → tarjouspohja esitäytetään rahoitusnumerolla
