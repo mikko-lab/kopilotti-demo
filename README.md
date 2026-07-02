@@ -92,3 +92,5 @@ Jokaisesta kohtaamisesta kertyy dataa — ostohalukkuus, signaaliyhdistelmät, k
 ---
 
 *Tekijä: [Mikko Tarkiainen](https://www.linkedin.com/in/mikko-tarkiainen-accessibility/)*
+
+© 2026 Mikko Tarkiainen. Kaikki oikeudet pidätetään. Ks. [LICENSE](LICENSE).
