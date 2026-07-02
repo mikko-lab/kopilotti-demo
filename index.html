@@ -1026,19 +1026,47 @@ function startSession() {
   },1000);
 
   if ('SpeechRecognition' in window||'webkitSpeechRecognition' in window) {
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    recognition=new SR();
-    recognition.lang='fi-FI'; recognition.continuous=true; recognition.interimResults=true;
-    recognition.onresult=(e)=>{
-      let interim='';
-      for(let i=e.resultIndex;i<e.results.length;i++){
-        if(e.results[i].isFinal) currentTranscript+=e.results[i][0].transcript+' ';
-        else interim=e.results[i][0].transcript;
-      }
-      showTranscript(currentTranscript+interim);
-    };
-    recognition.start();
+    startRecognition();
+  } else {
+    showToast('⚠️ Selain ei tue puheentunnistusta — käytä demo-skenaarioita alla');
+    document.getElementById('statusSub').textContent='Puheentunnistus ei tuettu — käytä demo-skenaarioita';
   }
+}
+
+function startRecognition() {
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();
+  recognition.lang='fi-FI'; recognition.continuous=true; recognition.interimResults=true;
+  recognition.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) currentTranscript+=e.results[i][0].transcript+' ';
+      else interim=e.results[i][0].transcript;
+    }
+    showTranscript(currentTranscript+interim);
+  };
+  recognition.onerror=(e)=>{
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+      showToast('❌ Mikrofonilupa evätty — salli mikrofoni selaimen asetuksista');
+      document.getElementById('statusSub').textContent='Mikrofonilupa puuttuu';
+    } else if(e.error==='no-speech'){
+      // Hiljaisuus on normaalia — ei näytetä virhettä, onend hoitaa uudelleenkäynnistyksen
+    } else if(e.error==='network'){
+      showToast('⚠️ Verkkovirhe puheentunnistuksessa — yritetään uudelleen');
+    } else {
+      showToast(`⚠️ Puheentunnistuksen virhe: ${e.error}`);
+    }
+  };
+  recognition.onend=()=>{
+    // Selaimet (erit. Chrome) katkaisevat tunnistuksen hiljaisuuden jälkeen —
+    // käynnistetään automaattisesti uudelleen niin kauan kuin sessio on aktiivinen.
+    if(sessionActive){
+      try { recognition.start(); }
+      catch(err) { setTimeout(()=>{ if(sessionActive) startRecognition(); },300); }
+    }
+  };
+  try { recognition.start(); }
+  catch(err) { showToast('⚠️ Puheentunnistusta ei voitu käynnistää'); }
 }
 
 function stopSession() {
