@@ -4,6 +4,8 @@ Reaaliaikainen tekoälyassistentti, joka analysoi myyjän ja asiakkaan keskustel
 
 **→ [Live demo](https://mikko-lab.github.io/kopilotti-demo/)**
 
+![Kopilotti-käyttöliittymä: sessio käynnissä, kopilotti-vihjeitä vaihtoautosta ja ostohalukkuusmittari 54%](assets/screenshot.png)
+
 ---
 
 ## Mitä se tekee
