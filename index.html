@@ -1,3 +1,7 @@
+<!--
+  Copyright (c) 2026 Mikko Tarkiainen. All rights reserved.
+  See LICENSE for terms.
+-->
 <!DOCTYPE html>
 <html lang="fi">
 <head>
@@ -915,6 +919,10 @@
 </div>
 </main>
 
+<footer style="text-align:center;padding:16px 12px;font-size:11px;color:var(--muted);">
+  © 2026 Mikko Tarkiainen. Kaikki oikeudet pidätetään.
+</footer>
+
 <!-- CRM Modal -->
 <div class="modal-overlay" id="crmModal">
   <div class="modal-box">
@@ -1077,6 +1085,7 @@ function stopSession() {
   document.getElementById('statusTitle').textContent='Sessio päättynyt';
   document.getElementById('statusSub').textContent=`Kesto: ${document.getElementById('statTime').textContent}`;
   document.getElementById('btnStop').classList.add('hidden');
+  document.getElementById('btnStart').classList.remove('hidden');
   document.getElementById('wave').classList.add('hidden');
   showToast('Sessio lopetettu');
 }
