@@ -723,6 +723,18 @@ body {
 
 .suggested-action-body { min-width: 0; }
 
+.suggested-action-conflict {
+  display: inline-block;
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--warning-text);
+  background: var(--warning-light);
+  border: 1px solid var(--warning);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  margin-bottom: 8px;
+}
+
 .suggested-action-title {
   font-size: var(--text-2xs);
   font-weight: 700;

@@ -44,6 +44,15 @@ const jitter = (base, pct) => Math.round(base * (1 + (rng() * 2 - 1) * pct));
 
 const CITIES = ['Helsinki', 'Espoo', 'Tampere', 'Turku', 'Oulu', 'Jyväskylä', 'Lahti'];
 
+// Weighted toward real used-car market distribution (white/black/gray/silver
+// dominate; red/blue are minority colors) — values match
+// js/vehicle-preferences.js's COLOR_RULES output exactly, since a stated
+// color preference is matched against this field verbatim.
+const COLORS = [
+  ['valkoinen', 0.24], ['musta', 0.20], ['harmaa', 0.19], ['hopea', 0.14],
+  ['sininen', 0.11], ['punainen', 0.08], ['ruskea', 0.04],
+];
+
 const FEATURE_POOL = [
   'Adaptiivinen vakionopeudensäädin', '360° peruutuskamera', 'Apple CarPlay / Android Auto',
   'Istuinlämmitys edessä', 'Istuinlämmitys takana', 'Ilmastointi', 'Navigointijärjestelmä',
@@ -114,6 +123,7 @@ function buildVehicle(id, base, year, trim, fuel) {
   const availability = pickWeighted([['available', 0.7], ['reserved', 0.2], ['incoming', 0.1]]);
   const familyFriendly = FAMILY_BODY_TYPES.has(base.bodyType);
   const dealershipLocation = pick(CITIES);
+  const color = pickWeighted(COLORS);
 
   const tags = [];
   if (base.bodyType === 'suv') tags.push('suv');
@@ -144,6 +154,7 @@ function buildVehicle(id, base, year, trim, fuel) {
     fuel,
     bodyType: base.bodyType,
     mileage,
+    color,
     transmission,
     familyFriendly,
     financeAvailable,

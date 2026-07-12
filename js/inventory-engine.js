@@ -9,6 +9,8 @@
  * asks for explicitly and which a second live call per vehicle would break.
  */
 
+import { hasAnyPreference, BODY_TYPE_LABEL_FI } from './vehicle-preferences.js';
+
 let _inventory = null;
 let _loadPromise = null;
 
@@ -42,52 +44,119 @@ const SIGNAL_LABEL_FI = {
 
 const AVAILABILITY_BONUS = { available: 0.3, reserved: 0.1, incoming: 0 };
 
-// Lists ALL matched signal types, not just the first/strongest one — a
-// vehicle matching on both financing and family tags gets a two-part
-// explanation ("rahoituskiinnostus, perhetarve"), not a single arbitrarily
-// chosen reason. matchedSignalTypes is already in a consistent order across
-// every vehicle in one scoring pass (it's filtered from the same
-// presentTypes array — see scoreVehicles), so the explanation text is
-// deterministic per signal set, not per vehicle.
-function buildExplanation(matchedSignalTypes) {
-  const labels = matchedSignalTypes.map(t => SIGNAL_LABEL_FI[t]).filter(Boolean);
-  if (!labels.length) return 'Yleinen suositus.';
-  return `Suositeltu, koska keskustelussa nousi esiin: ${labels.join(', ')}.`;
+// Shared by scoreVehicles' filtering AND checkNamedModelClaim (below) — one
+// definition of "does this vehicle satisfy the customer's hard requirements",
+// not two copies that could silently drift apart.
+function passesHardFilters(vehicle, preferences) {
+  if (preferences?.bodyType && vehicle.bodyType !== preferences.bodyType) return false;
+  if (preferences?.fuel && vehicle.fuel !== preferences.fuel) return false;
+  if (preferences?.transmission && vehicle.transmission !== preferences.transmission) return false;
+  if (preferences?.priceMin != null && vehicle.price < preferences.priceMin) return false;
+  if (preferences?.priceMax != null && vehicle.price > preferences.priceMax) return false;
+  if (preferences?.maxMileage != null && vehicle.mileage > preferences.maxMileage) return false;
+  return true;
+}
+
+// Human-readable list of which stated criteria a specific vehicle fails —
+// used to explain WHY a named-model claim doesn't hold up, not just THAT it
+// doesn't (e.g. "136 762 km (yli toivotun 100 000 km)", not just "ei täsmää").
+function describeFailedCriteria(vehicle, preferences) {
+  const reasons = [];
+  if (preferences?.bodyType && vehicle.bodyType !== preferences.bodyType) reasons.push(`korityyppi ${vehicle.bodyType}`);
+  if (preferences?.fuel && vehicle.fuel !== preferences.fuel) reasons.push(`polttoaine ${vehicle.fuel}`);
+  if (preferences?.transmission && vehicle.transmission !== preferences.transmission) reasons.push(`vaihteisto ${vehicle.transmission}`);
+  if (preferences?.priceMin != null && vehicle.price < preferences.priceMin) reasons.push(`hinta ${vehicle.price.toLocaleString('fi-FI')} €`);
+  if (preferences?.priceMax != null && vehicle.price > preferences.priceMax) reasons.push(`hinta ${vehicle.price.toLocaleString('fi-FI')} €`);
+  if (preferences?.maxMileage != null && vehicle.mileage > preferences.maxMileage) {
+    reasons.push(`${vehicle.mileage.toLocaleString('fi-FI')} km (yli toivotun ${preferences.maxMileage.toLocaleString('fi-FI')} km)`);
+  }
+  return reasons;
+}
+
+// Lists ALL matched evidence, not just the first/strongest piece — a vehicle
+// matching on both financing+family tags AND an explicit body-type/price/
+// color preference gets a full explanation, not a single arbitrarily chosen
+// reason. Root-cause fix for the "100% osuvuus, geneerinen selitys" bug:
+// stated vehicle preferences (body type, price range, color) were extracted
+// by Claude's NLU but never made it into this function's input at all
+// before — the explanation could only ever talk about the 3 buying-process
+// signal types, never what the customer actually said about the CAR.
+function buildExplanation(matchedSignalTypes, preferences, vehicle) {
+  const parts = [];
+  const signalLabels = matchedSignalTypes.map(t => SIGNAL_LABEL_FI[t]).filter(Boolean);
+  if (signalLabels.length) parts.push(`keskustelussa nousi esiin ${signalLabels.join(', ')}`);
+
+  const prefParts = [];
+  if (preferences?.bodyType) prefParts.push(`korityyppi ${BODY_TYPE_LABEL_FI[preferences.bodyType] || preferences.bodyType}`);
+  if (preferences?.fuel) prefParts.push(`polttoaine ${preferences.fuel}`);
+  if (preferences?.transmission) prefParts.push(`vaihteisto ${preferences.transmission.toLowerCase()}`);
+  if (preferences?.priceMin != null || preferences?.priceMax != null) {
+    prefParts.push(`hintahaarukka ${preferences.priceMin ?? '–'}–${preferences.priceMax ?? '–'} €`);
+  }
+  if (preferences?.color && vehicle.color === preferences.color) prefParts.push(`väritoive ${preferences.color}`);
+  if (preferences?.maxMileage != null) prefParts.push(`ajettu alle ${preferences.maxMileage.toLocaleString('fi-FI')} km`);
+  if (prefParts.length) parts.push(`täsmää asiakkaan toiveisiin: ${prefParts.join(', ')}`);
+
+  if (!parts.length) return 'Yleinen suositus.';
+  return `Suositeltu, koska ${parts.join('; ')}.`;
 }
 
 /**
- * Pure function: (inventory, signals) -> top matches with matchScore (0-100)
- * and a template-filled explanation. No network, no randomness — same
- * inputs always produce the same output.
+ * Pure function: (inventory, signals, count, preferences) -> top matches
+ * with matchScore (0-100) and a template-filled explanation. No network, no
+ * randomness — same inputs always produce the same output.
+ *
+ * `preferences` (see js/vehicle-preferences.js) are HARD filters for body
+ * type, fuel, and price range — a vehicle that doesn't match a STATED
+ * requirement is excluded outright, not merely down-scored, so "farmari,
+ * bensa, 20-30k€" never returns a 15k€ hatchback at "100% osuvuus" again.
+ * Color is a soft scoring bonus rather than a hard filter: it's a much
+ * smaller slice of the inventory (~8% per color) and excluding on it
+ * risks an empty result for an otherwise perfectly good match.
  */
-export function scoreVehicles(inventory, signals, count = 3) {
+export function scoreVehicles(inventory, signals, count = 3, preferences = null) {
   const presentTypes = [...new Set(signals.map(s => s.type))].filter(t => SIGNAL_TO_TAG[t]);
-  if (!presentTypes.length) return [];
+  const hasPrefs = hasAnyPreference(preferences);
+  if (!presentTypes.length && !hasPrefs) return [];
 
   const presentTags = [...new Set(presentTypes.map(t => SIGNAL_TO_TAG[t]))];
 
-  const scored = inventory
+  const candidates = inventory.filter(v => passesHardFilters(v, preferences));
+
+  // "Criteria considered" spans both channels so the score reflects
+  // everything that was actually asked for, not just the old 3-tag scheme:
+  // each active hard filter (already guaranteed to match, by construction,
+  // for anything still in `candidates`) + each present soft signal tag +
+  // the color bonus if a color was stated.
+  const hardFilterCount = ['bodyType', 'fuel', 'transmission'].filter(k => preferences?.[k]).length
+    + (preferences?.priceMin != null || preferences?.priceMax != null ? 1 : 0)
+    + (preferences?.maxMileage != null ? 1 : 0);
+  const colorRequested = !!preferences?.color;
+  const criteriaConsidered = hardFilterCount + presentTags.length + (colorRequested ? 1 : 0);
+
+  const scored = candidates
     .map(v => {
       const matchedTags = presentTags.filter(tag => v.tags.includes(tag));
-      if (!matchedTags.length) return null;
       const matchedSignalTypes = presentTypes.filter(t => matchedTags.includes(SIGNAL_TO_TAG[t]));
-      const rawScore = matchedTags.length + (AVAILABILITY_BONUS[v.available] || 0);
-      const matchScore = Math.round((matchedTags.length / presentTags.length) * 100);
+      const colorMatched = colorRequested && v.color === preferences.color;
+      if (!matchedTags.length && !hasPrefs) return null;
+
+      const criteriaMatched = hardFilterCount + matchedTags.length + (colorMatched ? 1 : 0);
+      const matchScore = criteriaConsidered > 0 ? Math.round((criteriaMatched / criteriaConsidered) * 100) : 100;
+      const rawScore = criteriaMatched + (AVAILABILITY_BONUS[v.available] || 0);
+
       return { vehicle: v, rawScore, matchScore, matchedSignalTypes };
     })
     .filter(Boolean);
 
   // Tie-break order, explicit rather than relying on sort stability:
-  // 1. rawScore (matched-tag count + availability bonus) — the real signal.
+  // 1. rawScore (matched-criteria count + availability bonus) — the real signal.
   // 2. price ascending — CONFIRMED business decision with the product owner
   //    (not a default-by-omission): cheapest-equally-relevant-match wins,
   //    over "most expensive first" (margin/premium framing) or "newest
   //    year first" (lower perceived risk). Chosen to minimize price-
   //    objection risk, consistent with this app's own "hinta" scenario
-  //    philosophy of addressing price concerns proactively. (No structured
-  //    budget figure is extracted from the transcript today, so "closest to
-  //    the customer's stated budget" isn't available as a tiebreaker — that
-  //    would need numeric budget extraction added to signals.js first.)
+  //    philosophy of addressing price concerns proactively.
   // 3. vehicle id — final deterministic fallback so the exact same signal
   //    set always produces the exact same top-3, never order-of-insertion
   //    dependent.
@@ -100,14 +169,68 @@ export function scoreVehicles(inventory, signals, count = 3) {
   return scored.slice(0, count).map(x => ({
     ...x.vehicle,
     matchScore: x.matchScore,
-    explanation: buildExplanation(x.matchedSignalTypes),
+    explanation: buildExplanation(x.matchedSignalTypes, preferences, x.vehicle),
   }));
 }
 
-export async function getTopMatches(signals, count = 3) {
-  if (!signals.length) return [];
+export async function getTopMatches(signals, count = 3, preferences = null) {
+  if (!signals.length && !hasAnyPreference(preferences)) return [];
   const inventory = await loadInventory();
-  return scoreVehicles(inventory, signals, count);
+  return scoreVehicles(inventory, signals, count, preferences);
+}
+
+// Synchronous accessor for callers that can tolerate "not loaded yet ->
+// null" (see checkNamedModelClaim's caller in app.js) rather than awaiting
+// loadInventory() on every single hint. In practice the inventory fetch
+// (a local static JSON file) resolves long before the first hint can
+// possibly arrive (that requires a full Claude API round-trip first), so
+// this is a soft-fail path for an edge case, not the normal one.
+export function getCachedInventory() {
+  return _inventory;
+}
+
+/**
+ * Scans `text` (a hint's title+text) for a mention of a specific brand+model
+ * that exists in `inventory`, and — if found — checks whether that model
+ * ACTUALLY satisfies the customer's stated hard-filter requirements in real
+ * stock, not just whether it sounds plausible. Claude has no grounding in
+ * the real inventory (the source spec explicitly keeps recommendations
+ * deterministic and Claude-independent — see this file's own top comment),
+ * so a hint can name a real model that happens to violate a stated
+ * requirement (e.g. "Skoda Octavia Combi täyttää kriteerit täydellisesti"
+ * when the one Octavia in stock has 136 762 km against a stated <100 000 km
+ * cap) — a claim that's verifiable, and wrong, at a glance, which is worse
+ * than an abstract category mismatch. Deliberately simple string matching
+ * against inventory's own brand+model pairs, not general NLU — scoped to
+ * the exact failure mode observed, not a new entity-recognition subsystem.
+ *
+ * @returns null if no known brand+model is mentioned in the text, otherwise
+ *   { brand, model, matchesStock, reasons, inStockAtAll }
+ */
+export function checkNamedModelClaim(text, preferences, inventory) {
+  if (!text || !inventory || !inventory.length) return null;
+  const lower = text.toLowerCase();
+  const distinctModels = [...new Map(inventory.map(v => [`${v.brand} ${v.model}`, { brand: v.brand, model: v.model }])).values()];
+  // Longest match first so e.g. "V60" (a Volvo model) doesn't shadow a
+  // longer, more specific mention if two models happen to share a substring.
+  const mentioned = distinctModels
+    .filter(({ brand, model }) => lower.includes(`${brand} ${model}`.toLowerCase()))
+    .sort((a, b) => `${b.brand}${b.model}`.length - `${a.brand}${a.model}`.length)[0];
+  if (!mentioned) return null;
+
+  const stockOfModel = inventory.filter(v => v.brand === mentioned.brand && v.model === mentioned.model);
+  const matching = stockOfModel.filter(v => passesHardFilters(v, preferences));
+  if (matching.length > 0) return { ...mentioned, matchesStock: true, reasons: [], inStockAtAll: true };
+
+  if (!stockOfModel.length) {
+    return { ...mentioned, matchesStock: false, reasons: [], inStockAtAll: false };
+  }
+  // Report against the closest candidate (fewest failed criteria), same
+  // tie-break spirit as scoreVehicles: price ascending, then id.
+  const closest = [...stockOfModel]
+    .map(v => ({ v, failed: describeFailedCriteria(v, preferences) }))
+    .sort((a, b) => a.failed.length - b.failed.length || a.v.price - b.v.price || a.v.id.localeCompare(b.v.id))[0];
+  return { ...mentioned, matchesStock: false, reasons: closest.failed, inStockAtAll: true };
 }
 
 /**
@@ -117,10 +240,23 @@ export async function getTopMatches(signals, count = 3) {
  * signals). Returns the distinct signal labels responsible when the latter
  * applies, or null otherwise — the UI uses this to show an explained empty
  * state instead of a bare placeholder that reads as broken/pending forever.
+ * A stated vehicle preference (preferences) counts as "vehicle-relevant" on
+ * its own, independent of the signals array — see hasVehiclePreferenceOnly.
  */
 export function unmatchedSignalLabels(signals) {
   if (!signals || !signals.length) return null;
   const hasVehicleRelevantSignal = signals.some(s => SIGNAL_TO_TAG[s.type]);
   if (hasVehicleRelevantSignal) return null;
   return [...new Set(signals.map(s => s.label))];
+}
+
+/**
+ * True when stated preferences exist but the hard filters excluded every
+ * vehicle in stock — a distinct, honest empty state from "nothing detected
+ * yet" (unmatchedSignalLabels) or "process signals only, not vehicle
+ * signals." Told apart in the UI so "farmari, punainen, 5000€" (unrealistic
+ * budget) reads as "ei tarkkaa osumaa varastosta", not as a stuck/broken card.
+ */
+export function preferencesExcludedEverything(vehicles, signals, preferences) {
+  return vehicles.length === 0 && hasAnyPreference(preferences) && !unmatchedSignalLabels(signals);
 }

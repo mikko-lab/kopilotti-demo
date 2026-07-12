@@ -31,7 +31,12 @@ function makeSignal({ type, label, evidence, source, weight }) {
 const LOCAL_SIGNAL_RULES = [
   { regex: /hinta|kallis|halv|euro|budjetti/, type: SIGNAL_TYPES.PRICE_SENSITIVITY, label: 'Hintaepäily', evidence: 'Hintaan liittyvä maininta transkriptiossa' },
   { regex: /rahoitus|osamaksu|kuukausierä|laina/, type: SIGNAL_TYPES.FINANCING, label: 'Rahoituskiinnostus', evidence: 'Rahoitukseen liittyvä maininta transkriptiossa' },
-  { regex: /vaihto|vanha|passat|toyota|ford|auto meillä/, type: SIGNAL_TYPES.TRADE_IN, label: 'Vaihtoauto', evidence: 'Vaihtoautoon liittyvä maininta transkriptiossa' },
+  // "vaihto" alone (without a word-boundary anchor) also matches inside
+  // "vaihtoehto"/"vaihtoehtoja" (alternative/alternatives) — an unrelated,
+  // very common Finnish word. That collision was a real bug: a hint or
+  // transcript mentioning "hybridivaihtoehtoja" incorrectly fired a
+  // trade-in signal despite no trade-in car ever being mentioned.
+  { regex: /\bvaihtoauto\w*|vanha|passat|toyota|ford|auto meillä/, type: SIGNAL_TYPES.TRADE_IN, label: 'Vaihtoauto', evidence: 'Vaihtoautoon liittyvä maininta transkriptiossa' },
   { regex: /lapsi|perhe|isofix|tilaa|tavaratila|mökki/, type: SIGNAL_TYPES.FAMILY, label: 'Perhetarve', evidence: 'Perhetarpeeseen liittyvä maininta transkriptiossa' },
   { regex: /koeajo|kokeilla|testata|istua|tuntuma/, type: SIGNAL_TYPES.PURCHASE_READY, label: 'Ostovalmius', evidence: 'Koeajo-/ostovalmiusmaininta transkriptiossa' },
   { regex: /vakuutus|kasko|liikenne/, type: SIGNAL_TYPES.INSURANCE, label: 'Vakuutuskiinnostus', evidence: 'Vakuutukseen liittyvä maininta transkriptiossa' },
@@ -50,7 +55,12 @@ export function detectLocalSignals(text) {
 // keyword matching independently.
 const HINT_TITLE_RULES = [
   { match: /RAHOITUS/, type: SIGNAL_TYPES.FINANCING },
-  { match: /VAIHTO|PASSAT/, type: SIGNAL_TYPES.TRADE_IN },
+  // \bVAIHTOAUTO\b, not bare VAIHTO — "HYBRIDIVAIHTOEHTOJA" (hybrid
+  // ALTERNATIVES) contains "VAIHTO" as a substring and was incorrectly
+  // firing a trade-in-vehicle signal despite no trade-in ever being
+  // mentioned. Confirmed root cause via a real SSE hint title from live
+  // Claude output, not a hypothetical.
+  { match: /\bVAIHTOAUTO\b|PASSAT/, type: SIGNAL_TYPES.TRADE_IN },
   { match: /PERHE|MÖKKI/, type: SIGNAL_TYPES.FAMILY },
   { match: /OSTO|KOEAJO/, type: SIGNAL_TYPES.PURCHASE_READY },
   { match: /HINTA|VASTAVÄITE/, type: SIGNAL_TYPES.PRICE_SENSITIVITY },
