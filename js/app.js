@@ -44,6 +44,20 @@ const SCENARIOS = {
       { type: 'blue', icon: '📉', title: 'PASSAT 2017 ARVO', text: 'Passat -17 / 140tkm markkina-arvo n. 9 500–11 500 € kunnosta riippuen. Aloita 9 800 €:sta.', action: 'Laske hyvitys' },
     ],
     meter: 54, meterDesc: 'Harkitsee — vaihtokauppa avain', cars: [3,4,1], signal: 'Vaihtoauto'
+  },
+  pakettiauto: {
+    text: 'Etsimme yritykselle pakettiautoa, tarvitsemme alv-vähennyskelpoisen. Budjetti noin 20-30 000 €.',
+    hints: [
+      { type: 'green', icon: '📦', title: 'PAKETTIAUTO + ALV', text: 'Asiakas etsii pakettiautoa yritykselle. ALV-vähennyskelpoisuus (ajopäiväkirjan mukaan) on vahva myyntivaltti — korosta sitä.', action: 'Näytä pakettiautot' },
+      { type: 'blue', icon: '💼', title: 'YRITYSASIAKAS', text: 'Yritysasiakkaalle kannattaa mainita myös rahoitusvaihtoehdot ja alv-vähennys hankintahinnasta.', action: 'Kerro rahoituksesta' },
+    ],
+    // No signal: mapping in SCENARIO_SIGNAL_TYPE (signals.js) — deliberately.
+    // This scenario's recommendations come from the vehicle-preferences.js
+    // bodyType=van hard filter, not the old buying-process signal-tag
+    // scheme (which has no category for "wants a van" and shouldn't be
+    // forced into one). "Budjetti" in the transcript still produces a
+    // genuine price_sensitivity signal via the local regex path.
+    meter: 68, meterDesc: 'Yritysasiakas — selkeä tarve', cars: [], signal: 'Pakettiauto'
   }
 };
 

@@ -4,7 +4,7 @@ Reaaliaikainen tekoälyassistentti, joka analysoi myyjän ja asiakkaan keskustel
 
 **→ [Live demo](https://mikko-lab.github.io/kopilotti-demo/)**
 
-![Kopilotti-käyttöliittymä: AI Insights -mittarit (ostohalukkuus 65 %, confidence 17 %), tunnistetut signaalit, suositellut autot osuvuusprosentein ja Automation Status -putki](assets/screenshot.png)
+![Kopilotti-käyttöliittymä: AI Insights -mittarit (ostohalukkuus 72 %, confidence 7 %), Suggested Next Action -kortti jossa merkintä tarkistamattomasta tekoälyehdotuksesta, ja Suositellut autot -kortti jossa jokainen tulos selittää täsmäävät kriteerit yksitellen](assets/screenshot.png)
 
 ---
 
@@ -63,7 +63,7 @@ Rakennettu API-pohjaisena arkkitehtuurina, jossa LLM-analyysi toimii erillisenä
 - **SSE-striimaus** — LLM-analyysi pyörii Node.js-backendissä (Railway), tulokset striimautuvat Server-Sent Events -yhteydellä suoraan myyjän näytölle. API-avain palvelimella, ei selaimessa.
 - **Graceful fallback** — jos backend ei ole tavoitettavissa (tai LLM-kutsu epäonnistuu palvelimella), UI siirtyy automaattisesti paikalliseen analyysiin ilman virheilmoituksia.
 - **Enterprise-käyttöliittymän uudistus** — Stripe/Linear-tason visuaalinen ilme: tumma header, uusi väripaletti, SVG-pohjaiset ostohalukkuus-/confidence-mittarit, kaksipalstainen responsiivinen layout. WCAG 2.2 AA -tasoinen saavutettavuus (kontrasti tarkistettu myös axe:n omien sokeiden pisteiden — aria-hidden-sisältö, ::after-pseudoelementit — ohi käsinlasketulla auditoinnilla; näppäimistökäyttö ja `prefers-reduced-motion` testattu).
-- **Deterministinen tekoälypohjainen varastonhaku** — 358 auton siemenpohjainen, uusittavissa oleva demovarasto (`npm run generate:inventory`), joka pisteyttää keskustelusta tunnistetut signaalit (rahoitus, perhetarve, hintaherkkyys) ja nostaa top-3 osuvinta autoa selityksineen. Tasapelit ratkeavat eksplisiittisellä säännöllä (halvin ensin, sitten auton ID) — ei riipu satunnaisuudesta tai toteutuksen yksityiskohdista.
+- **Deterministinen tekoälypohjainen varastonhaku** — 375 ajoneuvon siemenpohjainen, uusittavissa oleva demovarasto (`npm run generate:inventory`, 357 henkilöautoa + 18 pakettiautoa), joka poimii keskustelusta korityypin, polttoaineen, hinnan, vaihteiston, kilometri- ja ikärajan sekä signaalit (rahoitus, perhetarve, hintaherkkyys) — nämä ovat kovia suodattimia, ei pehmeitä tageja, joten tulos vastaa oikeasti sitä mitä asiakas sanoi. Pakettiautohaku ("etsin pakettiautoa", "onko alv-vähennyskelpoinen") näyttää vain pakettiautoja, merkittynä ALV-vähennyskelpoisuudella ehtoineen. Tasapelit ratkeavat eksplisiittisellä säännöllä (halvin ensin, sitten auton ID) — ei riipu satunnaisuudesta tai toteutuksen yksityiskohdista.
 
 ### Seuraavaksi: Oikeat integraatiot
 Mock-triggerit korvataan oikeilla API-kutsuilla integraatioalustan (Workato / Frends) kautta:
