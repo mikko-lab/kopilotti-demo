@@ -1,6 +1,7 @@
 import { detectLocalSignals, signalsFromHint, signalsFromScenario } from './signals.js';
 import { runBusinessRules } from './business-rules.js';
-import { unmatchedSignalLabels } from './inventory-engine.js';
+import { unmatchedSignalLabels, preferencesExcludedEverything, loadInventory, getCachedInventory, checkNamedModelClaim } from './inventory-engine.js';
+import { extractVehiclePreferences, preferenceConflictsInText } from './vehicle-preferences.js';
 import { createGauge } from './gauge.js';
 
 const SCENARIOS = {
@@ -80,9 +81,10 @@ async function recomputeBusinessRules() {
     signals: businessSignals,
     transcriptWordCount: currentTranscript.trim() ? currentTranscript.trim().split(/\s+/).length : 0,
     meterValue: currentPurchaseIntent,
+    transcript: currentTranscript,
   });
   console.log('[business-rules]', { signalCount: businessSignals.length, ...result });
-  renderRecommendations(result.recommendedVehicles, businessSignals);
+  renderRecommendations(result.recommendedVehicles, businessSignals, result.preferences);
   gaugeConfidence?.update(result.confidence);
   renderDetectedSignals(businessSignals);
   renderSuggestedAction(hints);
@@ -324,8 +326,28 @@ async function analyzeWithSSE(transcript) {
     // not as success, or the UI silently stalls at stale values with no
     // indication anything went wrong.
     if (sawServerError) throw new Error('server reported analysis error');
+
+    // signalsFromHint() only recognizes a fixed set of Finnish keywords in
+    // Claude's HINT titles (RAHOITUS, VAIHTOAUTO, PERHE, ...) — a real,
+    // observed transcript ("...vanhan tilalle...", "...hintaluokassa...")
+    // produced hint titles that never happened to use any of those words
+    // ("BENSIINI-AUTOMAATTI HAKU", "HUOMIO HYBRIDEISTÄ"), so businessSignals
+    // stayed empty despite the raw transcript clearly containing a trade-in
+    // and a price signal — which cascaded into an empty Detected Signals
+    // panel AND Confidence stuck at 0 (computeConfidence returns 0 for an
+    // empty signals array). detectLocalSignals() already exists and reads
+    // the raw transcript directly rather than going through Claude's lossy
+    // hint-title intermediary — previously only ever called on the offline
+    // fallback path. Running it here too, for any signal TYPE not already
+    // contributed by a Claude hint, closes that gap without double-counting
+    // the same evidence twice under two different signal types.
+    const alreadyDetectedTypes = new Set(businessSignals.map(s => s.type));
+    const supplementalSignals = detectLocalSignals(transcript).filter(s => !alreadyDetectedTypes.has(s.type));
+    if (supplementalSignals.length) businessSignals.push(...supplementalSignals);
+
     setBadgeLive('badgeClaude', true);
     logEvent('Claude-analyysi valmis', 'ok');
+    if (supplementalSignals.length) recomputeBusinessRules();
     return true;
   } catch(err) {
     console.warn('Backend ei tavoitettavissa, käytetään paikallista analyysiä:', err.message);
@@ -370,10 +392,47 @@ function handleSSEEvent(type, data) {
 // hints[] for buildTriggers()/syncToCRM(), and is used to derive the
 // Suggested Next Action shown in the AI Insights card (renderSuggestedAction
 // below) plus each entry is logged to the Live Event Timeline.
+//
+// Logged as "Myyntivihje" (sales tip), never "Aikomus tunnistettu" (customer
+// intent detected) — a HINT is Claude's sales advice given the signals so
+// far (per the backend system prompt), not a literal transcription of what
+// the customer said. Verified empirically: the same test transcript with an
+// explicit "bensa" (petrol) request produced a hybrid-alternative HINT in
+// 1 of 3 real API calls ("HYBRID-MAHDOLLISUUS") — a genuine, real, if
+// occasional, proactive-upsell behavior from Claude, not a text-parsing
+// bug. Framing it as "detected intent" would misrepresent the AI's own
+// suggestion as a fact about the customer. Checked across ALL stated
+// preference categories (fuel, body type, color, transmission — see
+// preferenceConflictsInText), not fuel only: the same non-determinism that
+// produces a fuel mismatch can just as easily produce a body-type or color
+// one, and a fuel-only patch would leave those silently undetected.
+//
+// Also checked: a hint can name a SPECIFIC real model (checkNamedModelClaim)
+// that sounds plausible but doesn't actually satisfy the customer's stated
+// hard requirements in real stock — e.g. "Skoda Octavia Combi täyttää
+// kriteerit täydellisesti" when the one Octavia in stock has 136 762 km
+// against a stated <100 000 km cap. That's a sharper, verifiable-at-a-glance
+// version of the same "Claude's suggestion isn't grounded in real inventory"
+// problem, worth flagging with the same mechanism rather than a separate one.
 function addHint(h) {
   hints.push(h);
   document.getElementById('statHints').textContent=hints.length;
-  logEvent(`Aikomus tunnistettu: ${h.title}`, 'ok');
+  const statedPrefs = extractVehiclePreferences(currentTranscript);
+  const combinedText = `${h.title || ''} ${h.text || ''}`;
+  const conflicts = preferenceConflictsInText(combinedText, statedPrefs);
+  const inventory = getCachedInventory();
+  const modelClaim = inventory ? checkNamedModelClaim(combinedText, statedPrefs, inventory) : null;
+
+  const warnings = [];
+  if (conflicts.length) warnings.push(`asiakas mainitsi ${conflicts.map(c => c.stated).join(', ')}`);
+  if (modelClaim && !modelClaim.matchesStock) {
+    const why = modelClaim.inStockAtAll ? modelClaim.reasons.join(', ') : 'ei varastossa lainkaan';
+    warnings.push(`${modelClaim.brand} ${modelClaim.model} ei täsmää varastoon: ${why}`);
+  }
+  const label = warnings.length
+    ? `Myyntivihje (tarkista ennen käyttöä — ${warnings.join('; ')}): ${h.title}`
+    : `Myyntivihje: ${h.title}`;
+  logEvent(label, 'ok');
 }
 
 // Same green/blue/yellow/red vocabulary the old hint cards used, read here
@@ -395,10 +454,36 @@ function renderSuggestedAction(hintList) {
     container.innerHTML = '<div class="signals-empty">Ei vielä ehdotuksia</div>';
     return;
   }
+  // Same generic conflict check as addHint()'s timeline entry, applied
+  // here too — this card is the highest-visibility surface in the AI
+  // Insights panel, and a Claude-proposed alternative (e.g. suggesting a
+  // hybrid, a different body type, or a different color than what the
+  // customer stated) needs to read as "our suggestion", not as if it were
+  // confirmed customer data, wherever it's shown, not just in the timeline.
+  // Also checked here: a named real model that doesn't actually satisfy the
+  // customer's stated requirements in stock (see addHint()'s own note).
+  const statedPrefs = extractVehiclePreferences(currentTranscript);
+  const combinedText = `${top.title || ''} ${top.text || ''}`;
+  const conflicts = preferenceConflictsInText(combinedText, statedPrefs);
+  const inventoryForCheck = getCachedInventory();
+  const modelClaim = inventoryForCheck ? checkNamedModelClaim(combinedText, statedPrefs, inventoryForCheck) : null;
+
+  const conflictNotes = conflicts.map(c => `${c.categoryLabel}: ${c.stated}`);
+  let modelClaimNote = null;
+  if (modelClaim && !modelClaim.matchesStock) {
+    const why = modelClaim.inStockAtAll ? modelClaim.reasons.join(', ') : 'ei varastossa lainkaan';
+    modelClaimNote = `${modelClaim.brand} ${modelClaim.model} ei täsmää varastoon (${why})`;
+  }
+  const conflictLine = [
+    conflictNotes.length ? `asiakas mainitsi ${conflictNotes.join(', ')}` : null,
+    modelClaimNote,
+  ].filter(Boolean).join(' — ');
+
   const card = document.createElement('div');
   card.className = `suggested-action ${top.type}`;
   card.innerHTML = `
     <div class="suggested-action-body">
+      ${conflictLine ? `<div class="suggested-action-conflict">⚠ Tarkista ennen käyttöä — ${conflictLine}</div>` : ''}
       <div class="suggested-action-title">${top.icon} ${top.action}</div>
       <div class="suggested-action-why"><strong>Miksi:</strong> ${top.text}</div>
     </div>
@@ -453,20 +538,32 @@ const AVAILABILITY_LABEL_FI = { available: 'Heti saatavilla', reserved: 'Varattu
 // showCars()/selectCar() pair entirely; there is no "select a car" concept
 // anymore, each render reflects the current best matches for the signals
 // collected so far.
-function renderRecommendations(vehicles, signals) {
+function renderRecommendations(vehicles, signals, preferences) {
   const list = document.getElementById('recommendedList');
   if (!vehicles || !vehicles.length) {
-    // Zero matches has two distinct causes that read very differently in a
-    // live demo: "nothing detected yet" (normal, still waiting) vs "we DID
+    // Zero matches has three distinct causes that read very differently in
+    // a live demo: "nothing detected yet" (normal, still waiting), "we DID
     // detect signals, they just don't say anything about vehicle
     // preference" (e.g. ostovalmius/vaihtoauto/vakuutus — process-stage
-    // signals, not vehicle-attribute signals). Left unexplained, the second
-    // case reads as broken to anyone skimming the demo without reading the
-    // signal badges above it.
+    // signals, not vehicle-attribute signals), or "the customer's stated
+    // requirements (body type/fuel/price/vaihteisto) are real hard filters
+    // and nothing in stock happens to satisfy all of them right now." Left
+    // unexplained, all three read as broken to anyone skimming the demo.
     const unmatched = unmatchedSignalLabels(signals);
-    list.innerHTML = unmatched
-      ? `<div class="cars-placeholder">Tunnistetut signaalit (${unmatched.join(', ')}) kertovat ostoprosessin vaiheesta, eivät automieltymyksestä — siksi ajoneuvoehdotusta ei näytetä tässä kohtaa.</div>`
-      : '<div class="cars-placeholder">Suositukset ilmestyvät kun keskustelusta on tunnistettu signaaleja</div>';
+    const excludedByPreferences = preferencesExcludedEverything(vehicles, signals, preferences);
+    if (unmatched) {
+      list.innerHTML = `<div class="cars-placeholder">Tunnistetut signaalit (${unmatched.join(', ')}) kertovat ostoprosessin vaiheesta, eivät automieltymyksestä — siksi ajoneuvoehdotusta ei näytetä tässä kohtaa.</div>`;
+    } else if (excludedByPreferences) {
+      const stated = [];
+      if (preferences.bodyType) stated.push(preferences.bodyType);
+      if (preferences.fuel) stated.push(preferences.fuel);
+      if (preferences.transmission) stated.push(preferences.transmission.toLowerCase());
+      if (preferences.priceMin != null || preferences.priceMax != null) stated.push(`${preferences.priceMin ?? '–'}–${preferences.priceMax ?? '–'} €`);
+      if (preferences.maxMileage != null) stated.push(`alle ${preferences.maxMileage.toLocaleString('fi-FI')} km`);
+      list.innerHTML = `<div class="cars-placeholder">Asiakkaan toiveilla (${stated.join(', ')}) ei löydy tarkkaa osumaa varastosta juuri nyt.</div>`;
+    } else {
+      list.innerHTML = '<div class="cars-placeholder">Suositukset ilmestyvät kun keskustelusta on tunnistettu signaaleja</div>';
+    }
     return;
   }
   list.innerHTML = '<div class="rec-list"></div>';
@@ -479,7 +576,7 @@ function renderRecommendations(vehicles, signals) {
         <span class="rec-icon" aria-hidden="true">${v.image}</span>
         <div class="rec-info">
           <div class="rec-name">${v.brand} ${v.model} ${v.trim}</div>
-          <div class="rec-meta">${v.year} · ${v.transmission} · ${v.dealershipLocation}</div>
+          <div class="rec-meta">${v.year} · ${v.transmission} · ${v.mileage.toLocaleString('fi-FI')} km · ${v.dealershipLocation}</div>
         </div>
         <div class="rec-match"><span class="rec-match-val">${v.matchScore}%</span><span class="rec-match-lbl">osuvuus</span></div>
       </div>
@@ -676,3 +773,7 @@ function initGauges() {
 
 wireEvents();
 initGauges();
+// Warm the inventory cache at load time — a hint can never arrive before at
+// least one full Claude API round-trip, so this local JSON fetch has ample
+// time to resolve before checkNamedModelClaim() (in addHint()) needs it.
+loadInventory().catch(() => {}); // failure handled by that check's own null-cache fallback, not here

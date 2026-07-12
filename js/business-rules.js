@@ -10,6 +10,7 @@
  */
 
 import { getTopMatches } from './inventory-engine.js';
+import { extractVehiclePreferences } from './vehicle-preferences.js';
 
 // Signal-type pairs that reinforce each other — seeing both together is
 // stronger evidence of a coherent, advancing conversation than either alone.
@@ -79,14 +80,16 @@ export function computePurchaseIntent(currentValue) {
   return currentValue;
 }
 
-export async function recommendVehicles(signals) {
-  return getTopMatches(signals, 3);
+export async function recommendVehicles(signals, transcript) {
+  const preferences = extractVehiclePreferences(transcript);
+  return getTopMatches(signals, 3, preferences);
 }
 
-export async function runBusinessRules({ signals, transcriptWordCount, meterValue }) {
+export async function runBusinessRules({ signals, transcriptWordCount, meterValue, transcript }) {
   return {
     purchaseIntent: computePurchaseIntent(meterValue),
     confidence: computeConfidence(signals, transcriptWordCount),
-    recommendedVehicles: await recommendVehicles(signals),
+    recommendedVehicles: await recommendVehicles(signals, transcript),
+    preferences: extractVehiclePreferences(transcript),
   };
 }
