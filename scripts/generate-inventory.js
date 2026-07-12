@@ -93,6 +93,18 @@ const BASE_MODELS = [
   { brand: 'Peugeot', model: '208', bodyType: 'hatchback', fuels: ['bensiini', 'sähkö'], trims: ['Active', 'Allure'], price: [15000, 27000], years: [2019, 2024] },
   { brand: 'Mazda', model: 'CX-5', bodyType: 'suv', fuels: ['bensiini', 'diesel'], trims: ['Prime-Line', 'Exclusive-Line'], price: [24000, 40000], years: [2018, 2024] },
   { brand: 'Mazda', model: '3', bodyType: 'hatchback', fuels: ['bensiini'], trims: ['Prime-Line', 'Exclusive-Line'], price: [17000, 29000], years: [2018, 2024] },
+
+  // Panel vans (N1-class, pakettiauto) — appended at the end rather than
+  // interleaved among the passenger-car models above, so the RNG draws
+  // already consumed for those (already-verified) models stay byte-for-byte
+  // identical on regeneration; only new draws are appended past them.
+  // Smaller variationCount (see below) targets ~15-20 units total, not the
+  // ~10-14-per-model the passenger-car catalog uses — vans are a small,
+  // distinct segment here, not a proportionally-sized one.
+  { brand: 'Volkswagen', model: 'Transporter', bodyType: 'van', fuels: ['diesel'], trims: ['Business', 'Kombi', 'L2H1'], price: [18000, 38000], years: [2017, 2024] },
+  { brand: 'Mercedes-Benz', model: 'Sprinter', bodyType: 'van', fuels: ['diesel'], trims: ['Business', 'L2H2', 'L3H2'], price: [20000, 42000], years: [2017, 2024] },
+  { brand: 'Renault', model: 'Trafic', bodyType: 'van', fuels: ['diesel', 'bensiini'], trims: ['Business', 'Grand Confort'], price: [15000, 32000], years: [2016, 2024] },
+  { brand: 'Citroën', model: 'Berlingo', bodyType: 'van', fuels: ['diesel', 'bensiini', 'sähkö'], trims: ['Live', 'Driver', 'XL'], price: [14000, 30000], years: [2018, 2024] },
 ];
 
 const FAMILY_BODY_TYPES = new Set(['suv', 'combi', 'mpv']);
@@ -124,6 +136,15 @@ function buildVehicle(id, base, year, trim, fuel) {
   const familyFriendly = FAMILY_BODY_TYPES.has(base.bodyType);
   const dealershipLocation = pick(CITIES);
   const color = pickWeighted(COLORS);
+  // ALV-vähennyskelpoisuus is a legal-category property of N1-class panel
+  // vans, not a per-vehicle variable one — every van qualifies (subject to
+  // the actual driving-log/business-use conditions, spelled out in the UI
+  // caveat text, not implied as an unconditional guarantee). Passenger cars
+  // deliberately get no equivalent field: their VAT deductibility depends
+  // entirely on how the specific owner uses the specific car (taxi, driving
+  // school, dealer demo stock...), not on anything the vehicle record itself
+  // could state truthfully.
+  const vatDeductible = base.bodyType === 'van';
 
   const tags = [];
   if (base.bodyType === 'suv') tags.push('suv');
@@ -141,7 +162,7 @@ function buildVehicle(id, base, year, trim, fuel) {
   // Emoji "icon" instead of an image file path — same offline/deterministic
   // property the schema's `image` field was meant to guarantee (no network
   // image CDN dependency), without hand-authoring a placeholder SVG set.
-  const ICONS = { suv: '🚙', combi: '🚗', sedan: '🚗', hatchback: '🚘', mpv: '🚐', coupe: '🏎️' };
+  const ICONS = { suv: '🚙', combi: '🚗', sedan: '🚗', hatchback: '🚘', mpv: '🚐', coupe: '🏎️', van: '🚐' };
 
   return {
     id: `veh-${String(id).padStart(4, '0')}`,
@@ -158,6 +179,7 @@ function buildVehicle(id, base, year, trim, fuel) {
     transmission,
     familyFriendly,
     financeAvailable,
+    vatDeductible,
     available: availability,
     dealershipLocation,
     features,
@@ -175,7 +197,7 @@ function generate() {
     // even split (e.g. exactly 36/24 per brand) reads as synthetic to
     // anyone reviewing the dataset closely. Still fully reproducible: same
     // seed, same draw from the same rng stream, same result every time.
-    const variationCount = randInt(10, 14);
+    const variationCount = base.bodyType === 'van' ? randInt(4, 5) : randInt(10, 14);
     for (let v = 0; v < variationCount; v++) {
       const year = randInt(base.years[0], base.years[1]);
       const trim = pick(base.trims);

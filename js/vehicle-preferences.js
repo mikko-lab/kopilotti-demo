@@ -21,6 +21,13 @@ const BODY_TYPE_RULES = [
   { regex: /viistoperä|hatchback/i, value: 'hatchback' },
   { regex: /sedan/i, value: 'sedan' },
   { regex: /tila-?auto|\bmpv\b/i, value: 'mpv' },
+  // A bare ALV-deductibility question ("onko alv-vähennyskelpoinen") counts
+  // as a pakettiauto request on its own, without needing "pakettiauto" to
+  // also be said — VAT deductibility-by-driving-log is specifically a
+  // panel-van (N1-class) property (see inventory-engine.js/generate-
+  // inventory.js's vatDeductible field), so asking about it is asking about
+  // that vehicle category, the same way asking for "farmari" asks for combi.
+  { regex: /pakettiauto\w*|hyötyajoneuvo\w*|alv-?vähenn\w*/i, value: 'van' },
 ];
 
 const FUEL_RULES = [
@@ -50,9 +57,24 @@ const TRANSMISSION_RULES = [
   { regex: /manuaali\w*|käsivaihte\w*/i, value: 'Manuaali' },
 ];
 
+// "Saa olla myös hybridi" (hybrid is ALSO acceptable) states that hybrid is
+// one allowed option among others, not the sole required fuel — but a plain
+// firstMatch() has no way to represent that distinction and previously
+// treated it as a hard requirement. Confirmed with real impact: on the
+// exact transcript this was found in, treating "hybridi" as required
+// dropped a real 5-vehicle match down to 0. When an optionality marker
+// appears shortly before a matched value, that match is skipped (treated
+// as absent, not as the stated requirement) rather than hard-filtered on.
+const OPTIONALITY_MARKERS = /saa olla myös|myös käy|käy myös|tai myös|voi olla myös|sopii myös/i;
+const OPTIONALITY_WINDOW = 30; // chars to look back before a candidate match
+
 function firstMatch(text, rules) {
   for (const rule of rules) {
-    if (rule.regex.test(text)) return rule.value;
+    const m = rule.regex.exec(text);
+    if (!m) continue;
+    const precedingWindow = text.slice(Math.max(0, m.index - OPTIONALITY_WINDOW), m.index);
+    if (OPTIONALITY_MARKERS.test(precedingWindow)) continue; // explicitly non-exclusive — not the stated requirement
+    return rule.value;
   }
   return null;
 }
@@ -86,17 +108,32 @@ function extractPriceRange(text) {
  * with a "000/tuhatta/t" multiplier suffix.
  */
 function extractMaxMileage(text) {
-  let m = text.match(/(?:alle|max(?:imissaan)?|korkeintaan)\s*(\d[\d\s]{2,6}\d)\s*km/i);
+  let m = text.match(/(?:alle|maksimissaan|max|korkeintaan)\s*(\d[\d\s]{2,6}\d)\s*km/i);
   if (m) return parseInt(m[1].replace(/\s/g, ''), 10);
-  m = text.match(/(?:alle|max(?:imissaan)?|korkeintaan)\s*(\d{1,3})\s*(?:000|tuhatta|t\b)\s*km/i);
+  m = text.match(/(?:alle|maksimissaan|max|korkeintaan)\s*(\d{1,3})\s*(?:000|tuhatta|t\b)\s*km/i);
   if (m) return parseInt(m[1], 10) * 1000;
   return null;
 }
 
 /**
+ * "Maksimissaan 5 vuotta vanha", "korkeintaan 3 vuotta vanha", "alle 5
+ * vuotta vanha" — an upper bound on the car's age, converted to a minimum
+ * model year (this year minus N). Symmetric to extractMaxMileage. Deliberately
+ * requires "vuotta vanha" adjacent to the number — bare "vanha" is excluded
+ * from LOCAL_SIGNAL_RULES' trade-in detection for the identical reason (see
+ * signals.js): "<N> vuotta vanha" describes the car being bought, not an
+ * existing one being traded in, and the two extractions must agree on that.
+ */
+function extractMinYear(text) {
+  const m = text.match(/(?:alle|maksimissaan|max|korkeintaan)\s*(\d{1,2})\s*vuotta\s*vanha/i);
+  if (!m) return null;
+  return new Date().getFullYear() - parseInt(m[1], 10);
+}
+
+/**
  * @returns {{bodyType: string|null, fuel: string|null, color: string|null,
  *            transmission: string|null, priceMin: number|null, priceMax: number|null,
- *            maxMileage: number|null}}
+ *            maxMileage: number|null, minYear: number|null}}
  *          Every field is null when nothing was found — never guesses.
  */
 export function extractVehiclePreferences(text) {
@@ -110,12 +147,13 @@ export function extractVehiclePreferences(text) {
     priceMin: range?.min ?? null,
     priceMax: range?.max ?? null,
     maxMileage: extractMaxMileage(t),
+    minYear: extractMinYear(t),
   };
 }
 
 export function hasAnyPreference(prefs) {
   if (!prefs) return false;
-  return !!(prefs.bodyType || prefs.fuel || prefs.color || prefs.transmission || prefs.priceMin != null || prefs.priceMax != null || prefs.maxMileage != null);
+  return !!(prefs.bodyType || prefs.fuel || prefs.color || prefs.transmission || prefs.priceMin != null || prefs.priceMax != null || prefs.maxMileage != null || prefs.minYear != null);
 }
 
 // Every categorical attribute (not price, which is a range rather than a
@@ -169,4 +207,4 @@ export function preferenceConflictsInText(text, statedPreferences) {
   return conflicts;
 }
 
-export const BODY_TYPE_LABEL_FI = { combi: 'farmari', suv: 'maasturi', hatchback: 'viistoperä', sedan: 'sedan', mpv: 'tila-auto' };
+export const BODY_TYPE_LABEL_FI = { combi: 'farmari', suv: 'maasturi', hatchback: 'viistoperä', sedan: 'sedan', mpv: 'tila-auto', van: 'pakettiauto' };

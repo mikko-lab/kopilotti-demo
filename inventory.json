@@ -14,6 +14,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -49,6 +50,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -84,6 +86,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -112,6 +115,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -142,6 +146,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -169,6 +174,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -200,6 +206,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -231,6 +238,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -260,6 +268,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -294,6 +303,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -326,6 +336,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -362,6 +373,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -391,6 +403,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -422,6 +435,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -459,6 +473,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -495,6 +510,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Lahti",
     "features": [
@@ -525,6 +541,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -559,6 +576,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -594,6 +612,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -629,6 +648,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -663,6 +683,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -696,6 +717,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -735,6 +757,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -766,6 +789,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -797,6 +821,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -831,6 +856,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -867,6 +893,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -898,6 +925,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -929,6 +957,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -958,6 +987,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -993,6 +1023,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -1021,6 +1052,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -1048,6 +1080,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Tampere",
     "features": [
@@ -1077,6 +1110,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -1105,6 +1139,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -1137,6 +1172,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -1166,6 +1202,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -1194,6 +1231,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Tampere",
     "features": [
@@ -1230,6 +1268,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -1261,6 +1300,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -1298,6 +1338,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Tampere",
     "features": [
@@ -1330,6 +1371,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -1365,6 +1407,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -1399,6 +1442,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -1433,6 +1477,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -1467,6 +1512,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -1500,6 +1546,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -1538,6 +1585,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -1570,6 +1618,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -1588,6 +1637,156 @@
   },
   {
     "id": "veh-0050",
+    "brand": "Citroën",
+    "model": "Berlingo",
+    "trim": "Driver",
+    "year": 2020,
+    "price": 19721,
+    "estimatedMonthlyPayment": 380,
+    "fuel": "bensiini",
+    "bodyType": "van",
+    "mileage": 109227,
+    "color": "harmaa",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Turku",
+    "features": [
+      "Apple CarPlay / Android Auto",
+      "Langaton puhelinlaturi",
+      "Premium-äänijärjestelmä",
+      "Panoraamakatto",
+      "Adaptiivinen vakionopeudensäädin",
+      "360° peruutuskamera"
+    ],
+    "tags": [
+      "financing",
+      "budget"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0051",
+    "brand": "Citroën",
+    "model": "Berlingo",
+    "trim": "Driver",
+    "year": 2021,
+    "price": 21168,
+    "estimatedMonthlyPayment": 410,
+    "fuel": "sähkö",
+    "bodyType": "van",
+    "mileage": 86472,
+    "color": "musta",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Turku",
+    "features": [
+      "Adaptiivinen vakionopeudensäädin",
+      "Navigointijärjestelmä",
+      "Kaistavahti",
+      "360° peruutuskamera"
+    ],
+    "tags": [
+      "ev",
+      "financing",
+      "budget"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0052",
+    "brand": "Citroën",
+    "model": "Berlingo",
+    "trim": "Live",
+    "year": 2023,
+    "price": 26694,
+    "estimatedMonthlyPayment": 510,
+    "fuel": "bensiini",
+    "bodyType": "van",
+    "mileage": 47663,
+    "color": "musta",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": false,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Tampere",
+    "features": [
+      "Apple CarPlay / Android Auto",
+      "Panoraamakatto",
+      "LED-ajovalot",
+      "360° peruutuskamera",
+      "Ilmastointi"
+    ],
+    "tags": [],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0053",
+    "brand": "Citroën",
+    "model": "Berlingo",
+    "trim": "Live",
+    "year": 2023,
+    "price": 27712,
+    "estimatedMonthlyPayment": 530,
+    "fuel": "bensiini",
+    "bodyType": "van",
+    "mileage": 34119,
+    "color": "punainen",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "incoming",
+    "dealershipLocation": "Tampere",
+    "features": [
+      "Automaattinen hätäjarrutus",
+      "Langaton puhelinlaturi",
+      "Premium-äänijärjestelmä",
+      "Adaptiivinen vakionopeudensäädin"
+    ],
+    "tags": [
+      "financing"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0054",
+    "brand": "Citroën",
+    "model": "Berlingo",
+    "trim": "Driver",
+    "year": 2023,
+    "price": 29162,
+    "estimatedMonthlyPayment": 560,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 34175,
+    "color": "musta",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Jyväskylä",
+    "features": [
+      "Vetokoukku",
+      "Panoraamakatto",
+      "Istuinlämmitys edessä",
+      "Navigointijärjestelmä",
+      "Langaton puhelinlaturi"
+    ],
+    "tags": [
+      "financing"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0055",
     "brand": "Ford",
     "model": "Focus",
     "trim": "Titanium",
@@ -1601,6 +1800,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -1617,7 +1817,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0051",
+    "id": "veh-0056",
     "brand": "Ford",
     "model": "Focus",
     "trim": "Titanium",
@@ -1631,6 +1831,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -1646,7 +1847,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0052",
+    "id": "veh-0057",
     "brand": "Ford",
     "model": "Focus",
     "trim": "ST-Line",
@@ -1660,6 +1861,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -1681,7 +1883,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0053",
+    "id": "veh-0058",
     "brand": "Ford",
     "model": "Focus",
     "trim": "ST-Line",
@@ -1695,6 +1897,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -1715,7 +1918,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0054",
+    "id": "veh-0059",
     "brand": "Ford",
     "model": "Focus",
     "trim": "ST-Line",
@@ -1729,6 +1932,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -1750,7 +1954,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0055",
+    "id": "veh-0060",
     "brand": "Ford",
     "model": "Focus",
     "trim": "ST-Line",
@@ -1764,6 +1968,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -1785,7 +1990,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0056",
+    "id": "veh-0061",
     "brand": "Ford",
     "model": "Focus",
     "trim": "Titanium",
@@ -1799,6 +2004,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -1814,7 +2020,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0057",
+    "id": "veh-0062",
     "brand": "Ford",
     "model": "Focus",
     "trim": "Titanium",
@@ -1828,6 +2034,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -1843,7 +2050,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0058",
+    "id": "veh-0063",
     "brand": "Ford",
     "model": "Focus",
     "trim": "ST-Line",
@@ -1857,6 +2064,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -1877,7 +2085,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0059",
+    "id": "veh-0064",
     "brand": "Ford",
     "model": "Focus",
     "trim": "Titanium",
@@ -1891,6 +2099,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -1906,7 +2115,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0060",
+    "id": "veh-0065",
     "brand": "Ford",
     "model": "Focus",
     "trim": "Titanium",
@@ -1920,6 +2129,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -1937,7 +2147,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0061",
+    "id": "veh-0066",
     "brand": "Ford",
     "model": "Focus",
     "trim": "ST-Line",
@@ -1951,6 +2161,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -1973,7 +2184,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0062",
+    "id": "veh-0067",
     "brand": "Ford",
     "model": "Focus",
     "trim": "ST-Line",
@@ -1987,6 +2198,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -2008,7 +2220,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0063",
+    "id": "veh-0068",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "ST-Line",
@@ -2022,6 +2234,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -2047,7 +2260,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0064",
+    "id": "veh-0069",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "Titanium",
@@ -2061,6 +2274,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -2080,7 +2294,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0065",
+    "id": "veh-0070",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "Titanium",
@@ -2094,6 +2308,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -2115,7 +2330,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0066",
+    "id": "veh-0071",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "ST-Line",
@@ -2129,6 +2344,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Lahti",
     "features": [
@@ -2151,7 +2367,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0067",
+    "id": "veh-0072",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "Titanium",
@@ -2165,6 +2381,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -2182,7 +2399,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0068",
+    "id": "veh-0073",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "Titanium",
@@ -2196,6 +2413,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -2216,7 +2434,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0069",
+    "id": "veh-0074",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "ST-Line",
@@ -2230,6 +2448,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Tampere",
     "features": [
@@ -2252,7 +2471,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0070",
+    "id": "veh-0075",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "ST-Line",
@@ -2266,6 +2485,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -2289,7 +2509,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0071",
+    "id": "veh-0076",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "ST-Line",
@@ -2303,6 +2523,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -2325,7 +2546,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0072",
+    "id": "veh-0077",
     "brand": "Ford",
     "model": "Kuga",
     "trim": "ST-Line",
@@ -2339,6 +2560,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -2364,7 +2586,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0073",
+    "id": "veh-0078",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Style",
@@ -2378,6 +2600,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -2401,7 +2624,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0074",
+    "id": "veh-0079",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Comfort",
@@ -2415,6 +2638,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -2431,7 +2655,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0075",
+    "id": "veh-0080",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Style",
@@ -2445,6 +2669,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -2467,7 +2692,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0076",
+    "id": "veh-0081",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Style",
@@ -2481,6 +2706,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -2503,7 +2729,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0077",
+    "id": "veh-0082",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Comfort",
@@ -2517,6 +2743,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -2535,7 +2762,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0078",
+    "id": "veh-0083",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Comfort",
@@ -2549,6 +2776,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -2567,7 +2795,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0079",
+    "id": "veh-0084",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Style",
@@ -2581,6 +2809,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -2599,7 +2828,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0080",
+    "id": "veh-0085",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Style",
@@ -2613,6 +2842,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -2635,7 +2865,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0081",
+    "id": "veh-0086",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Style",
@@ -2649,6 +2879,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Espoo",
     "features": [
@@ -2668,7 +2899,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0082",
+    "id": "veh-0087",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Comfort",
@@ -2682,6 +2913,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -2696,7 +2928,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0083",
+    "id": "veh-0088",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Comfort",
@@ -2710,6 +2942,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -2726,7 +2959,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0084",
+    "id": "veh-0089",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Comfort",
@@ -2740,6 +2973,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -2756,7 +2990,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0085",
+    "id": "veh-0090",
     "brand": "Hyundai",
     "model": "i30",
     "trim": "Comfort",
@@ -2770,6 +3004,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -2784,7 +3019,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0086",
+    "id": "veh-0091",
     "brand": "Hyundai",
     "model": "Tucson",
     "trim": "Style",
@@ -2798,6 +3033,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -2810,172 +3046,6 @@
       "Avaimeton käynnistys",
       "360° peruutuskamera",
       "Kaistavahti",
-      "Istuinlämmitys edessä"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "hybrid",
-      "financing",
-      "safety"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0087",
-    "brand": "Hyundai",
-    "model": "Tucson",
-    "trim": "Comfort",
-    "year": 2019,
-    "price": 26894,
-    "estimatedMonthlyPayment": 520,
-    "fuel": "diesel",
-    "bodyType": "suv",
-    "mileage": 177258,
-    "color": "harmaa",
-    "transmission": "Automaatti",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "incoming",
-    "dealershipLocation": "Helsinki",
-    "features": [
-      "Navigointijärjestelmä",
-      "Istuinlämmitys takana",
-      "Premium-äänijärjestelmä",
-      "Vetokoukku",
-      "Kaistavahti",
-      "Nahkaverhoilu",
-      "Adaptiivinen vakionopeudensäädin"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "financing"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0088",
-    "brand": "Hyundai",
-    "model": "Tucson",
-    "trim": "Comfort",
-    "year": 2020,
-    "price": 28118,
-    "estimatedMonthlyPayment": 540,
-    "fuel": "hybridi",
-    "bodyType": "suv",
-    "mileage": 107126,
-    "color": "valkoinen",
-    "transmission": "Automaatti",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "reserved",
-    "dealershipLocation": "Tampere",
-    "features": [
-      "Adaptiivinen vakionopeudensäädin",
-      "360° peruutuskamera",
-      "Avaimeton käynnistys",
-      "Navigointijärjestelmä",
-      "Istuinlämmitys edessä"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "hybrid",
-      "financing"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0089",
-    "brand": "Hyundai",
-    "model": "Tucson",
-    "trim": "Comfort",
-    "year": 2022,
-    "price": 37559,
-    "estimatedMonthlyPayment": 720,
-    "fuel": "ladattava hybridi",
-    "bodyType": "suv",
-    "mileage": 69496,
-    "color": "musta",
-    "transmission": "Manuaali",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "reserved",
-    "dealershipLocation": "Turku",
-    "features": [
-      "Apple CarPlay / Android Auto",
-      "LED-ajovalot",
-      "360° peruutuskamera",
-      "Vetokoukku"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "hybrid",
-      "financing"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0090",
-    "brand": "Hyundai",
-    "model": "Tucson",
-    "trim": "Comfort",
-    "year": 2022,
-    "price": 38649,
-    "estimatedMonthlyPayment": 740,
-    "fuel": "diesel",
-    "bodyType": "suv",
-    "mileage": 76611,
-    "color": "hopea",
-    "transmission": "Manuaali",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "available",
-    "dealershipLocation": "Turku",
-    "features": [
-      "Premium-äänijärjestelmä",
-      "Adaptiivinen vakionopeudensäädin",
-      "Avaimeton käynnistys",
-      "Sähkötoiminen takaluukku",
-      "360° peruutuskamera"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "financing"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0091",
-    "brand": "Hyundai",
-    "model": "Tucson",
-    "trim": "N Line",
-    "year": 2022,
-    "price": 39177,
-    "estimatedMonthlyPayment": 750,
-    "fuel": "ladattava hybridi",
-    "bodyType": "suv",
-    "mileage": 79149,
-    "color": "harmaa",
-    "transmission": "Automaatti",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "reserved",
-    "dealershipLocation": "Lahti",
-    "features": [
-      "Ilmastointi",
-      "Langaton puhelinlaturi",
-      "Avaimeton käynnistys",
-      "Vetokoukku",
-      "Panoraamakatto",
-      "Adaptiivinen vakionopeudensäädin",
-      "360° peruutuskamera",
-      "LED-ajovalot",
-      "Navigointijärjestelmä",
-      "Istuinlämmitys takana",
       "Istuinlämmitys edessä"
     ],
     "tags": [
@@ -2992,6 +3062,177 @@
     "brand": "Hyundai",
     "model": "Tucson",
     "trim": "Comfort",
+    "year": 2019,
+    "price": 26894,
+    "estimatedMonthlyPayment": 520,
+    "fuel": "diesel",
+    "bodyType": "suv",
+    "mileage": 177258,
+    "color": "harmaa",
+    "transmission": "Automaatti",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "incoming",
+    "dealershipLocation": "Helsinki",
+    "features": [
+      "Navigointijärjestelmä",
+      "Istuinlämmitys takana",
+      "Premium-äänijärjestelmä",
+      "Vetokoukku",
+      "Kaistavahti",
+      "Nahkaverhoilu",
+      "Adaptiivinen vakionopeudensäädin"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "financing"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0093",
+    "brand": "Hyundai",
+    "model": "Tucson",
+    "trim": "Comfort",
+    "year": 2020,
+    "price": 28118,
+    "estimatedMonthlyPayment": 540,
+    "fuel": "hybridi",
+    "bodyType": "suv",
+    "mileage": 107126,
+    "color": "valkoinen",
+    "transmission": "Automaatti",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "reserved",
+    "dealershipLocation": "Tampere",
+    "features": [
+      "Adaptiivinen vakionopeudensäädin",
+      "360° peruutuskamera",
+      "Avaimeton käynnistys",
+      "Navigointijärjestelmä",
+      "Istuinlämmitys edessä"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "hybrid",
+      "financing"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0094",
+    "brand": "Hyundai",
+    "model": "Tucson",
+    "trim": "Comfort",
+    "year": 2022,
+    "price": 37559,
+    "estimatedMonthlyPayment": 720,
+    "fuel": "ladattava hybridi",
+    "bodyType": "suv",
+    "mileage": 69496,
+    "color": "musta",
+    "transmission": "Manuaali",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "reserved",
+    "dealershipLocation": "Turku",
+    "features": [
+      "Apple CarPlay / Android Auto",
+      "LED-ajovalot",
+      "360° peruutuskamera",
+      "Vetokoukku"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "hybrid",
+      "financing"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0095",
+    "brand": "Hyundai",
+    "model": "Tucson",
+    "trim": "Comfort",
+    "year": 2022,
+    "price": 38649,
+    "estimatedMonthlyPayment": 740,
+    "fuel": "diesel",
+    "bodyType": "suv",
+    "mileage": 76611,
+    "color": "hopea",
+    "transmission": "Manuaali",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "available",
+    "dealershipLocation": "Turku",
+    "features": [
+      "Premium-äänijärjestelmä",
+      "Adaptiivinen vakionopeudensäädin",
+      "Avaimeton käynnistys",
+      "Sähkötoiminen takaluukku",
+      "360° peruutuskamera"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "financing"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0096",
+    "brand": "Hyundai",
+    "model": "Tucson",
+    "trim": "N Line",
+    "year": 2022,
+    "price": 39177,
+    "estimatedMonthlyPayment": 750,
+    "fuel": "ladattava hybridi",
+    "bodyType": "suv",
+    "mileage": 79149,
+    "color": "harmaa",
+    "transmission": "Automaatti",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "reserved",
+    "dealershipLocation": "Lahti",
+    "features": [
+      "Ilmastointi",
+      "Langaton puhelinlaturi",
+      "Avaimeton käynnistys",
+      "Vetokoukku",
+      "Panoraamakatto",
+      "Adaptiivinen vakionopeudensäädin",
+      "360° peruutuskamera",
+      "LED-ajovalot",
+      "Navigointijärjestelmä",
+      "Istuinlämmitys takana",
+      "Istuinlämmitys edessä"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "hybrid",
+      "financing",
+      "safety"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0097",
+    "brand": "Hyundai",
+    "model": "Tucson",
+    "trim": "Comfort",
     "year": 2023,
     "price": 38646,
     "estimatedMonthlyPayment": 740,
@@ -3002,6 +3243,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -3019,7 +3261,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0093",
+    "id": "veh-0098",
     "brand": "Hyundai",
     "model": "Tucson",
     "trim": "Comfort",
@@ -3033,6 +3275,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -3052,7 +3295,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0094",
+    "id": "veh-0099",
     "brand": "Hyundai",
     "model": "Tucson",
     "trim": "Comfort",
@@ -3066,6 +3309,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -3085,7 +3329,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0095",
+    "id": "veh-0100",
     "brand": "Hyundai",
     "model": "Tucson",
     "trim": "Style",
@@ -3099,6 +3343,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -3120,7 +3365,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0096",
+    "id": "veh-0101",
     "brand": "Hyundai",
     "model": "Tucson",
     "trim": "Comfort",
@@ -3134,6 +3379,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -3151,7 +3397,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0097",
+    "id": "veh-0102",
     "brand": "Hyundai",
     "model": "Tucson",
     "trim": "N Line",
@@ -3165,6 +3411,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -3187,7 +3434,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0098",
+    "id": "veh-0103",
     "brand": "Kia",
     "model": "Niro",
     "trim": "Premium",
@@ -3201,6 +3448,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Lahti",
     "features": [
@@ -3211,179 +3459,6 @@
       "Panoraamakatto",
       "Istuinlämmitys takana",
       "LED-ajovalot"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "hybrid",
-      "financing",
-      "safety"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0099",
-    "brand": "Kia",
-    "model": "Niro",
-    "trim": "Motion",
-    "year": 2019,
-    "price": 25000,
-    "estimatedMonthlyPayment": 480,
-    "fuel": "ladattava hybridi",
-    "bodyType": "suv",
-    "mileage": 170945,
-    "color": "punainen",
-    "transmission": "Automaatti",
-    "familyFriendly": true,
-    "financeAvailable": false,
-    "available": "available",
-    "dealershipLocation": "Jyväskylä",
-    "features": [
-      "Panoraamakatto",
-      "Navigointijärjestelmä",
-      "Adaptiivinen vakionopeudensäädin",
-      "Avaimeton käynnistys",
-      "LED-ajovalot"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "hybrid"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0100",
-    "brand": "Kia",
-    "model": "Niro",
-    "trim": "Motion",
-    "year": 2019,
-    "price": 25000,
-    "estimatedMonthlyPayment": 480,
-    "fuel": "ladattava hybridi",
-    "bodyType": "suv",
-    "mileage": 158298,
-    "color": "harmaa",
-    "transmission": "Manuaali",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "available",
-    "dealershipLocation": "Turku",
-    "features": [
-      "Adaptiivinen vakionopeudensäädin",
-      "LED-ajovalot",
-      "Panoraamakatto",
-      "Avaimeton käynnistys"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "hybrid",
-      "financing"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0101",
-    "brand": "Kia",
-    "model": "Niro",
-    "trim": "Premium",
-    "year": 2020,
-    "price": 32088,
-    "estimatedMonthlyPayment": 620,
-    "fuel": "ladattava hybridi",
-    "bodyType": "suv",
-    "mileage": 104880,
-    "color": "punainen",
-    "transmission": "Automaatti",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "incoming",
-    "dealershipLocation": "Oulu",
-    "features": [
-      "Adaptiivinen vakionopeudensäädin",
-      "Premium-äänijärjestelmä",
-      "Nahkaverhoilu",
-      "Automaattinen hätäjarrutus",
-      "LED-ajovalot",
-      "Ilmastointi",
-      "360° peruutuskamera",
-      "Apple CarPlay / Android Auto",
-      "Navigointijärjestelmä",
-      "Sähkötoiminen takaluukku"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "hybrid",
-      "financing",
-      "safety"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0102",
-    "brand": "Kia",
-    "model": "Niro",
-    "trim": "Motion",
-    "year": 2021,
-    "price": 32069,
-    "estimatedMonthlyPayment": 610,
-    "fuel": "hybridi",
-    "bodyType": "suv",
-    "mileage": 120989,
-    "color": "valkoinen",
-    "transmission": "Manuaali",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "available",
-    "dealershipLocation": "Oulu",
-    "features": [
-      "Apple CarPlay / Android Auto",
-      "Vetokoukku",
-      "Automaattinen hätäjarrutus",
-      "Nahkaverhoilu",
-      "Navigointijärjestelmä",
-      "Istuinlämmitys takana",
-      "Ilmastointi"
-    ],
-    "tags": [
-      "suv",
-      "family",
-      "hybrid",
-      "financing"
-    ],
-    "image": "🚙"
-  },
-  {
-    "id": "veh-0103",
-    "brand": "Kia",
-    "model": "Niro",
-    "trim": "Premium",
-    "year": 2021,
-    "price": 33793,
-    "estimatedMonthlyPayment": 650,
-    "fuel": "hybridi",
-    "bodyType": "suv",
-    "mileage": 103630,
-    "color": "harmaa",
-    "transmission": "Automaatti",
-    "familyFriendly": true,
-    "financeAvailable": true,
-    "available": "incoming",
-    "dealershipLocation": "Tampere",
-    "features": [
-      "Navigointijärjestelmä",
-      "Nahkaverhoilu",
-      "Adaptiivinen vakionopeudensäädin",
-      "Kaistavahti",
-      "Langaton puhelinlaturi",
-      "360° peruutuskamera",
-      "Kuolleen kulman varoitin",
-      "Automaattinen hätäjarrutus",
-      "Istuinlämmitys edessä",
-      "Sähkötoiminen takaluukku",
-      "Apple CarPlay / Android Auto"
     ],
     "tags": [
       "suv",
@@ -3399,6 +3474,184 @@
     "brand": "Kia",
     "model": "Niro",
     "trim": "Motion",
+    "year": 2019,
+    "price": 25000,
+    "estimatedMonthlyPayment": 480,
+    "fuel": "ladattava hybridi",
+    "bodyType": "suv",
+    "mileage": 170945,
+    "color": "punainen",
+    "transmission": "Automaatti",
+    "familyFriendly": true,
+    "financeAvailable": false,
+    "vatDeductible": false,
+    "available": "available",
+    "dealershipLocation": "Jyväskylä",
+    "features": [
+      "Panoraamakatto",
+      "Navigointijärjestelmä",
+      "Adaptiivinen vakionopeudensäädin",
+      "Avaimeton käynnistys",
+      "LED-ajovalot"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "hybrid"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0105",
+    "brand": "Kia",
+    "model": "Niro",
+    "trim": "Motion",
+    "year": 2019,
+    "price": 25000,
+    "estimatedMonthlyPayment": 480,
+    "fuel": "ladattava hybridi",
+    "bodyType": "suv",
+    "mileage": 158298,
+    "color": "harmaa",
+    "transmission": "Manuaali",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "available",
+    "dealershipLocation": "Turku",
+    "features": [
+      "Adaptiivinen vakionopeudensäädin",
+      "LED-ajovalot",
+      "Panoraamakatto",
+      "Avaimeton käynnistys"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "hybrid",
+      "financing"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0106",
+    "brand": "Kia",
+    "model": "Niro",
+    "trim": "Premium",
+    "year": 2020,
+    "price": 32088,
+    "estimatedMonthlyPayment": 620,
+    "fuel": "ladattava hybridi",
+    "bodyType": "suv",
+    "mileage": 104880,
+    "color": "punainen",
+    "transmission": "Automaatti",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "incoming",
+    "dealershipLocation": "Oulu",
+    "features": [
+      "Adaptiivinen vakionopeudensäädin",
+      "Premium-äänijärjestelmä",
+      "Nahkaverhoilu",
+      "Automaattinen hätäjarrutus",
+      "LED-ajovalot",
+      "Ilmastointi",
+      "360° peruutuskamera",
+      "Apple CarPlay / Android Auto",
+      "Navigointijärjestelmä",
+      "Sähkötoiminen takaluukku"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "hybrid",
+      "financing",
+      "safety"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0107",
+    "brand": "Kia",
+    "model": "Niro",
+    "trim": "Motion",
+    "year": 2021,
+    "price": 32069,
+    "estimatedMonthlyPayment": 610,
+    "fuel": "hybridi",
+    "bodyType": "suv",
+    "mileage": 120989,
+    "color": "valkoinen",
+    "transmission": "Manuaali",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "available",
+    "dealershipLocation": "Oulu",
+    "features": [
+      "Apple CarPlay / Android Auto",
+      "Vetokoukku",
+      "Automaattinen hätäjarrutus",
+      "Nahkaverhoilu",
+      "Navigointijärjestelmä",
+      "Istuinlämmitys takana",
+      "Ilmastointi"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "hybrid",
+      "financing"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0108",
+    "brand": "Kia",
+    "model": "Niro",
+    "trim": "Premium",
+    "year": 2021,
+    "price": 33793,
+    "estimatedMonthlyPayment": 650,
+    "fuel": "hybridi",
+    "bodyType": "suv",
+    "mileage": 103630,
+    "color": "harmaa",
+    "transmission": "Automaatti",
+    "familyFriendly": true,
+    "financeAvailable": true,
+    "vatDeductible": false,
+    "available": "incoming",
+    "dealershipLocation": "Tampere",
+    "features": [
+      "Navigointijärjestelmä",
+      "Nahkaverhoilu",
+      "Adaptiivinen vakionopeudensäädin",
+      "Kaistavahti",
+      "Langaton puhelinlaturi",
+      "360° peruutuskamera",
+      "Kuolleen kulman varoitin",
+      "Automaattinen hätäjarrutus",
+      "Istuinlämmitys edessä",
+      "Sähkötoiminen takaluukku",
+      "Apple CarPlay / Android Auto"
+    ],
+    "tags": [
+      "suv",
+      "family",
+      "hybrid",
+      "financing",
+      "safety"
+    ],
+    "image": "🚙"
+  },
+  {
+    "id": "veh-0109",
+    "brand": "Kia",
+    "model": "Niro",
+    "trim": "Motion",
     "year": 2023,
     "price": 38999,
     "estimatedMonthlyPayment": 750,
@@ -3409,6 +3662,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -3428,7 +3682,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0105",
+    "id": "veh-0110",
     "brand": "Kia",
     "model": "Niro",
     "trim": "Motion",
@@ -3442,6 +3696,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -3462,7 +3717,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0106",
+    "id": "veh-0111",
     "brand": "Kia",
     "model": "Niro",
     "trim": "Premium",
@@ -3476,6 +3731,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -3499,7 +3755,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0107",
+    "id": "veh-0112",
     "brand": "Kia",
     "model": "Niro",
     "trim": "Motion",
@@ -3513,6 +3769,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -3533,7 +3790,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0108",
+    "id": "veh-0113",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Premium",
@@ -3547,6 +3804,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -3569,7 +3827,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0109",
+    "id": "veh-0114",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Motion",
@@ -3583,6 +3841,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -3601,7 +3860,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0110",
+    "id": "veh-0115",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Premium",
@@ -3615,6 +3874,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -3639,7 +3899,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0111",
+    "id": "veh-0116",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "GT-Line",
@@ -3653,6 +3913,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -3677,7 +3938,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0112",
+    "id": "veh-0117",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Motion",
@@ -3691,6 +3952,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -3707,7 +3969,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0113",
+    "id": "veh-0118",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Premium",
@@ -3721,6 +3983,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -3743,7 +4006,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0114",
+    "id": "veh-0119",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Premium",
@@ -3757,6 +4020,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -3778,7 +4042,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0115",
+    "id": "veh-0120",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "GT-Line",
@@ -3792,6 +4056,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -3816,7 +4081,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0116",
+    "id": "veh-0121",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Motion",
@@ -3830,6 +4095,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -3850,7 +4116,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0117",
+    "id": "veh-0122",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Motion",
@@ -3864,6 +4130,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -3883,7 +4150,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0118",
+    "id": "veh-0123",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "GT-Line",
@@ -3897,6 +4164,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -3917,7 +4185,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0119",
+    "id": "veh-0124",
     "brand": "Kia",
     "model": "Sportage",
     "trim": "Premium",
@@ -3931,6 +4199,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -3953,7 +4222,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0120",
+    "id": "veh-0125",
     "brand": "Mazda",
     "model": "3",
     "trim": "Prime-Line",
@@ -3967,6 +4236,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -3984,7 +4254,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0121",
+    "id": "veh-0126",
     "brand": "Mazda",
     "model": "3",
     "trim": "Prime-Line",
@@ -3998,6 +4268,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -4016,7 +4287,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0122",
+    "id": "veh-0127",
     "brand": "Mazda",
     "model": "3",
     "trim": "Exclusive-Line",
@@ -4030,6 +4301,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -4052,7 +4324,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0123",
+    "id": "veh-0128",
     "brand": "Mazda",
     "model": "3",
     "trim": "Exclusive-Line",
@@ -4066,6 +4338,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -4087,7 +4360,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0124",
+    "id": "veh-0129",
     "brand": "Mazda",
     "model": "3",
     "trim": "Prime-Line",
@@ -4101,6 +4374,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -4117,7 +4391,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0125",
+    "id": "veh-0130",
     "brand": "Mazda",
     "model": "3",
     "trim": "Exclusive-Line",
@@ -4131,6 +4405,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Tampere",
     "features": [
@@ -4150,7 +4425,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0126",
+    "id": "veh-0131",
     "brand": "Mazda",
     "model": "3",
     "trim": "Exclusive-Line",
@@ -4164,6 +4439,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -4183,7 +4459,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0127",
+    "id": "veh-0132",
     "brand": "Mazda",
     "model": "3",
     "trim": "Prime-Line",
@@ -4197,6 +4473,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Lahti",
     "features": [
@@ -4215,7 +4492,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0128",
+    "id": "veh-0133",
     "brand": "Mazda",
     "model": "3",
     "trim": "Exclusive-Line",
@@ -4229,6 +4506,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -4251,7 +4529,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0129",
+    "id": "veh-0134",
     "brand": "Mazda",
     "model": "3",
     "trim": "Prime-Line",
@@ -4265,6 +4543,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -4281,7 +4560,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0130",
+    "id": "veh-0135",
     "brand": "Mazda",
     "model": "3",
     "trim": "Exclusive-Line",
@@ -4295,6 +4574,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -4314,7 +4594,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0131",
+    "id": "veh-0136",
     "brand": "Mazda",
     "model": "3",
     "trim": "Prime-Line",
@@ -4328,6 +4608,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -4345,7 +4626,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0132",
+    "id": "veh-0137",
     "brand": "Mazda",
     "model": "3",
     "trim": "Exclusive-Line",
@@ -4359,6 +4640,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -4380,7 +4662,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0133",
+    "id": "veh-0138",
     "brand": "Mazda",
     "model": "3",
     "trim": "Prime-Line",
@@ -4394,6 +4676,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -4408,7 +4691,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0134",
+    "id": "veh-0139",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4422,6 +4705,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -4445,7 +4729,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0135",
+    "id": "veh-0140",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4459,6 +4743,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -4482,7 +4767,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0136",
+    "id": "veh-0141",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4496,6 +4781,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -4520,7 +4806,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0137",
+    "id": "veh-0142",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4534,6 +4820,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -4554,7 +4841,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0138",
+    "id": "veh-0143",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Prime-Line",
@@ -4568,6 +4855,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -4584,7 +4872,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0139",
+    "id": "veh-0144",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4598,6 +4886,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -4620,7 +4909,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0140",
+    "id": "veh-0145",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Prime-Line",
@@ -4634,6 +4923,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Tampere",
     "features": [
@@ -4650,7 +4940,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0141",
+    "id": "veh-0146",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4664,6 +4954,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -4686,7 +4977,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0142",
+    "id": "veh-0147",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Prime-Line",
@@ -4700,6 +4991,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -4718,7 +5010,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0143",
+    "id": "veh-0148",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4732,6 +5024,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -4754,7 +5047,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0144",
+    "id": "veh-0149",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4768,6 +5061,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -4792,7 +5086,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0145",
+    "id": "veh-0150",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Prime-Line",
@@ -4806,6 +5100,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -4822,7 +5117,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0146",
+    "id": "veh-0151",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Prime-Line",
@@ -4836,6 +5131,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -4855,7 +5151,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0147",
+    "id": "veh-0152",
     "brand": "Mazda",
     "model": "CX-5",
     "trim": "Exclusive-Line",
@@ -4869,6 +5165,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -4893,7 +5190,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0148",
+    "id": "veh-0153",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "AMG Line",
@@ -4907,6 +5204,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -4927,7 +5225,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0149",
+    "id": "veh-0154",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "AMG Line",
@@ -4941,6 +5239,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -4960,7 +5259,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0150",
+    "id": "veh-0155",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "Business",
@@ -4974,6 +5273,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Oulu",
     "features": [
@@ -4988,7 +5288,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0151",
+    "id": "veh-0156",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "AMG Line",
@@ -5002,6 +5302,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -5023,7 +5324,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0152",
+    "id": "veh-0157",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "AMG Line",
@@ -5037,6 +5338,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -5056,7 +5358,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0153",
+    "id": "veh-0158",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "AMG Line",
@@ -5070,6 +5372,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -5092,7 +5395,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0154",
+    "id": "veh-0159",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "Business",
@@ -5106,6 +5409,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -5121,7 +5425,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0155",
+    "id": "veh-0160",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "Business",
@@ -5135,6 +5439,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -5152,7 +5457,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0156",
+    "id": "veh-0161",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "Business",
@@ -5166,6 +5471,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -5183,7 +5489,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0157",
+    "id": "veh-0162",
     "brand": "Mercedes-Benz",
     "model": "C-Class",
     "trim": "Business",
@@ -5197,6 +5503,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -5213,7 +5520,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0158",
+    "id": "veh-0163",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "AMG Line",
@@ -5227,6 +5534,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -5248,7 +5556,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0159",
+    "id": "veh-0164",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "AMG Line",
@@ -5262,6 +5570,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -5284,7 +5593,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0160",
+    "id": "veh-0165",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "Business",
@@ -5298,6 +5607,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -5316,7 +5626,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0161",
+    "id": "veh-0166",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "Business",
@@ -5330,6 +5640,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -5349,7 +5660,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0162",
+    "id": "veh-0167",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "Business",
@@ -5363,6 +5674,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -5381,7 +5693,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0163",
+    "id": "veh-0168",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "AMG Line",
@@ -5395,6 +5707,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Espoo",
     "features": [
@@ -5415,7 +5728,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0164",
+    "id": "veh-0169",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "AMG Line",
@@ -5429,6 +5742,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -5454,7 +5768,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0165",
+    "id": "veh-0170",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "Business",
@@ -5468,6 +5782,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -5484,7 +5799,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0166",
+    "id": "veh-0171",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "Business",
@@ -5498,6 +5813,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -5518,7 +5834,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0167",
+    "id": "veh-0172",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "Business",
@@ -5532,6 +5848,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -5551,7 +5868,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0168",
+    "id": "veh-0173",
     "brand": "Mercedes-Benz",
     "model": "GLC",
     "trim": "AMG Line",
@@ -5565,6 +5882,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -5589,7 +5907,127 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0169",
+    "id": "veh-0174",
+    "brand": "Mercedes-Benz",
+    "model": "Sprinter",
+    "trim": "Business",
+    "year": 2019,
+    "price": 26551,
+    "estimatedMonthlyPayment": 510,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 115648,
+    "color": "ruskea",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": false,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Espoo",
+    "features": [
+      "Nahkaverhoilu",
+      "Automaattinen hätäjarrutus",
+      "Premium-äänijärjestelmä",
+      "LED-ajovalot"
+    ],
+    "tags": [],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0175",
+    "brand": "Mercedes-Benz",
+    "model": "Sprinter",
+    "trim": "L3H2",
+    "year": 2020,
+    "price": 28962,
+    "estimatedMonthlyPayment": 560,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 100858,
+    "color": "harmaa",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Helsinki",
+    "features": [
+      "Ilmastointi",
+      "Kuolleen kulman varoitin",
+      "Istuinlämmitys takana",
+      "Langaton puhelinlaturi",
+      "Istuinlämmitys edessä",
+      "Apple CarPlay / Android Auto",
+      "Premium-äänijärjestelmä"
+    ],
+    "tags": [
+      "financing"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0176",
+    "brand": "Mercedes-Benz",
+    "model": "Sprinter",
+    "trim": "L2H2",
+    "year": 2022,
+    "price": 33109,
+    "estimatedMonthlyPayment": 630,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 60949,
+    "color": "harmaa",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Espoo",
+    "features": [
+      "Adaptiivinen vakionopeudensäädin",
+      "Automaattinen hätäjarrutus",
+      "Navigointijärjestelmä",
+      "Istuinlämmitys takana",
+      "Istuinlämmitys edessä",
+      "Panoraamakatto"
+    ],
+    "tags": [
+      "financing"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0177",
+    "brand": "Mercedes-Benz",
+    "model": "Sprinter",
+    "trim": "Business",
+    "year": 2024,
+    "price": 42766,
+    "estimatedMonthlyPayment": 820,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 20424,
+    "color": "sininen",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Tampere",
+    "features": [
+      "Adaptiivinen vakionopeudensäädin",
+      "Ilmastointi",
+      "Panoraamakatto",
+      "Langaton puhelinlaturi",
+      "Kaistavahti"
+    ],
+    "tags": [
+      "financing"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0178",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5603,6 +6041,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -5621,7 +6060,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0170",
+    "id": "veh-0179",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5635,6 +6074,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -5654,7 +6094,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0171",
+    "id": "veh-0180",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5668,6 +6108,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -5686,7 +6127,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0172",
+    "id": "veh-0181",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5700,6 +6141,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -5715,7 +6157,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0173",
+    "id": "veh-0182",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5729,6 +6171,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -5748,7 +6191,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0174",
+    "id": "veh-0183",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5762,6 +6205,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Tampere",
     "features": [
@@ -5778,7 +6222,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0175",
+    "id": "veh-0184",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Tekna",
@@ -5792,6 +6236,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Turku",
     "features": [
@@ -5813,7 +6258,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0176",
+    "id": "veh-0185",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Tekna",
@@ -5827,6 +6272,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -5847,7 +6293,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0177",
+    "id": "veh-0186",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5861,6 +6307,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -5879,7 +6326,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0178",
+    "id": "veh-0187",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5893,6 +6340,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -5910,7 +6358,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0179",
+    "id": "veh-0188",
     "brand": "Nissan",
     "model": "Leaf",
     "trim": "Acenta",
@@ -5924,6 +6372,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -5939,7 +6388,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0180",
+    "id": "veh-0189",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Acenta",
@@ -5953,6 +6402,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -5974,7 +6424,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0181",
+    "id": "veh-0190",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Tekna",
@@ -5988,6 +6438,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -6014,7 +6465,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0182",
+    "id": "veh-0191",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Acenta",
@@ -6028,6 +6479,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -6048,7 +6500,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0183",
+    "id": "veh-0192",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Acenta",
@@ -6062,6 +6514,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -6081,7 +6534,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0184",
+    "id": "veh-0193",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Acenta",
@@ -6095,6 +6548,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -6115,7 +6569,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0185",
+    "id": "veh-0194",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Acenta",
@@ -6129,6 +6583,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -6148,7 +6603,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0186",
+    "id": "veh-0195",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Tekna",
@@ -6162,6 +6617,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -6184,7 +6640,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0187",
+    "id": "veh-0196",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Acenta",
@@ -6198,6 +6654,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -6216,7 +6673,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0188",
+    "id": "veh-0197",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Tekna",
@@ -6230,6 +6687,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -6254,7 +6712,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0189",
+    "id": "veh-0198",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Tekna",
@@ -6268,6 +6726,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -6291,7 +6750,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0190",
+    "id": "veh-0199",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Tekna",
@@ -6305,6 +6764,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Tampere",
     "features": [
@@ -6326,7 +6786,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0191",
+    "id": "veh-0200",
     "brand": "Nissan",
     "model": "Qashqai",
     "trim": "Acenta",
@@ -6340,6 +6800,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Lahti",
     "features": [
@@ -6360,7 +6821,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0192",
+    "id": "veh-0201",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Allure",
@@ -6374,6 +6835,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -6392,7 +6854,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0193",
+    "id": "veh-0202",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Allure",
@@ -6406,6 +6868,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -6424,7 +6887,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0194",
+    "id": "veh-0203",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Active",
@@ -6438,6 +6901,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -6454,7 +6918,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0195",
+    "id": "veh-0204",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Active",
@@ -6468,6 +6932,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -6482,7 +6947,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0196",
+    "id": "veh-0205",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Allure",
@@ -6496,6 +6961,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -6513,7 +6979,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0197",
+    "id": "veh-0206",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Active",
@@ -6527,6 +6993,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -6546,7 +7013,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0198",
+    "id": "veh-0207",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Active",
@@ -6560,6 +7027,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -6578,7 +7046,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0199",
+    "id": "veh-0208",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Active",
@@ -6592,6 +7060,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -6608,7 +7077,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0200",
+    "id": "veh-0209",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Active",
@@ -6622,6 +7091,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -6637,7 +7107,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0201",
+    "id": "veh-0210",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Allure",
@@ -6651,6 +7121,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Espoo",
     "features": [
@@ -6667,7 +7138,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0202",
+    "id": "veh-0211",
     "brand": "Peugeot",
     "model": "208",
     "trim": "Allure",
@@ -6681,6 +7152,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -6696,7 +7168,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0203",
+    "id": "veh-0212",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "GT",
@@ -6710,6 +7182,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -6731,7 +7204,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0204",
+    "id": "veh-0213",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "Active",
@@ -6745,6 +7218,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -6761,7 +7235,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0205",
+    "id": "veh-0214",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "GT",
@@ -6775,6 +7249,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Oulu",
     "features": [
@@ -6796,7 +7271,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0206",
+    "id": "veh-0215",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "Active",
@@ -6810,6 +7285,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -6828,7 +7304,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0207",
+    "id": "veh-0216",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "Allure",
@@ -6842,6 +7318,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -6862,7 +7339,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0208",
+    "id": "veh-0217",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "Allure",
@@ -6876,6 +7353,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Tampere",
     "features": [
@@ -6892,7 +7370,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0209",
+    "id": "veh-0218",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "Allure",
@@ -6906,6 +7384,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -6923,7 +7402,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0210",
+    "id": "veh-0219",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "GT",
@@ -6937,6 +7416,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -6960,7 +7440,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0211",
+    "id": "veh-0220",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "Allure",
@@ -6974,6 +7454,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Lahti",
     "features": [
@@ -6993,7 +7474,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0212",
+    "id": "veh-0221",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "Active",
@@ -7007,6 +7488,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -7023,7 +7505,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0213",
+    "id": "veh-0222",
     "brand": "Peugeot",
     "model": "3008",
     "trim": "GT",
@@ -7037,6 +7519,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -7060,7 +7543,163 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0214",
+    "id": "veh-0223",
+    "brand": "Renault",
+    "model": "Trafic",
+    "trim": "Grand Confort",
+    "year": 2018,
+    "price": 17772,
+    "estimatedMonthlyPayment": 340,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 99144,
+    "color": "valkoinen",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Oulu",
+    "features": [
+      "Ilmastointi",
+      "Adaptiivinen vakionopeudensäädin",
+      "Istuinlämmitys edessä",
+      "Navigointijärjestelmä"
+    ],
+    "tags": [
+      "financing",
+      "budget"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0224",
+    "brand": "Renault",
+    "model": "Trafic",
+    "trim": "Grand Confort",
+    "year": 2019,
+    "price": 22285,
+    "estimatedMonthlyPayment": 430,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 105034,
+    "color": "valkoinen",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Jyväskylä",
+    "features": [
+      "Avaimeton käynnistys",
+      "Ilmastointi",
+      "Panoraamakatto",
+      "Istuinlämmitys edessä",
+      "Kuolleen kulman varoitin"
+    ],
+    "tags": [
+      "financing",
+      "budget"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0225",
+    "brand": "Renault",
+    "model": "Trafic",
+    "trim": "Business",
+    "year": 2020,
+    "price": 22965,
+    "estimatedMonthlyPayment": 440,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 69324,
+    "color": "punainen",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "incoming",
+    "dealershipLocation": "Tampere",
+    "features": [
+      "Istuinlämmitys edessä",
+      "Langaton puhelinlaturi",
+      "Adaptiivinen vakionopeudensäädin",
+      "Vetokoukku",
+      "Kuolleen kulman varoitin",
+      "LED-ajovalot"
+    ],
+    "tags": [
+      "financing",
+      "budget"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0226",
+    "brand": "Renault",
+    "model": "Trafic",
+    "trim": "Business",
+    "year": 2021,
+    "price": 24294,
+    "estimatedMonthlyPayment": 470,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 75824,
+    "color": "hopea",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Oulu",
+    "features": [
+      "Apple CarPlay / Android Auto",
+      "360° peruutuskamera",
+      "Ilmastointi",
+      "Kaistavahti"
+    ],
+    "tags": [
+      "financing",
+      "budget"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0227",
+    "brand": "Renault",
+    "model": "Trafic",
+    "trim": "Grand Confort",
+    "year": 2021,
+    "price": 24501,
+    "estimatedMonthlyPayment": 470,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 57758,
+    "color": "hopea",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Tampere",
+    "features": [
+      "Langaton puhelinlaturi",
+      "Istuinlämmitys takana",
+      "LED-ajovalot",
+      "Ilmastointi",
+      "Panoraamakatto",
+      "Avaimeton käynnistys",
+      "Kaistavahti"
+    ],
+    "tags": [
+      "financing",
+      "budget"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0228",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Style",
@@ -7074,6 +7713,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -7093,7 +7733,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0215",
+    "id": "veh-0229",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Ambition",
@@ -7107,6 +7747,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -7124,7 +7765,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0216",
+    "id": "veh-0230",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Ambition",
@@ -7138,6 +7779,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -7153,7 +7795,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0217",
+    "id": "veh-0231",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Style",
@@ -7167,6 +7809,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -7189,7 +7832,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0218",
+    "id": "veh-0232",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Style",
@@ -7203,6 +7846,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -7223,7 +7867,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0219",
+    "id": "veh-0233",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Style",
@@ -7237,6 +7881,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -7260,7 +7905,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0220",
+    "id": "veh-0234",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Style",
@@ -7274,6 +7919,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Lahti",
     "features": [
@@ -7297,7 +7943,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0221",
+    "id": "veh-0235",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Ambition",
@@ -7311,6 +7957,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Tampere",
     "features": [
@@ -7328,7 +7975,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0222",
+    "id": "veh-0236",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Style",
@@ -7342,6 +7989,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -7361,7 +8009,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0223",
+    "id": "veh-0237",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Ambition",
@@ -7375,6 +8023,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -7391,7 +8040,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0224",
+    "id": "veh-0238",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Style",
@@ -7405,6 +8054,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -7424,7 +8074,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0225",
+    "id": "veh-0239",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Ambition",
@@ -7438,6 +8088,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -7454,7 +8105,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0226",
+    "id": "veh-0240",
     "brand": "Skoda",
     "model": "Fabia",
     "trim": "Ambition",
@@ -7468,6 +8119,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -7484,7 +8136,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0227",
+    "id": "veh-0241",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Style",
@@ -7498,6 +8150,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -7521,7 +8174,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0228",
+    "id": "veh-0242",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Sportline",
@@ -7535,6 +8188,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -7556,7 +8210,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0229",
+    "id": "veh-0243",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Style",
@@ -7570,6 +8224,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -7590,7 +8245,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0230",
+    "id": "veh-0244",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Style",
@@ -7604,6 +8259,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -7628,7 +8284,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0231",
+    "id": "veh-0245",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Style",
@@ -7642,6 +8298,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -7662,7 +8319,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0232",
+    "id": "veh-0246",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Style",
@@ -7676,6 +8333,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -7696,7 +8354,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0233",
+    "id": "veh-0247",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Sportline",
@@ -7710,6 +8368,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -7730,7 +8389,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0234",
+    "id": "veh-0248",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Style",
@@ -7744,6 +8403,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -7768,7 +8428,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0235",
+    "id": "veh-0249",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Sportline",
@@ -7782,6 +8442,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Tampere",
     "features": [
@@ -7802,7 +8463,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0236",
+    "id": "veh-0250",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Style",
@@ -7816,6 +8477,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -7836,7 +8498,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0237",
+    "id": "veh-0251",
     "brand": "Skoda",
     "model": "Kodiaq",
     "trim": "Style",
@@ -7850,6 +8512,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -7874,7 +8537,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0238",
+    "id": "veh-0252",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "RS",
@@ -7888,6 +8551,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -7909,7 +8573,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0239",
+    "id": "veh-0253",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "RS",
@@ -7923,6 +8587,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -7946,7 +8611,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0240",
+    "id": "veh-0254",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "Style",
@@ -7960,6 +8625,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -7981,7 +8647,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0241",
+    "id": "veh-0255",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "Style",
@@ -7995,6 +8661,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -8018,7 +8685,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0242",
+    "id": "veh-0256",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "Ambition",
@@ -8032,6 +8699,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -8047,7 +8715,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0243",
+    "id": "veh-0257",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "RS",
@@ -8061,6 +8729,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8082,7 +8751,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0244",
+    "id": "veh-0258",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "RS",
@@ -8096,6 +8765,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Espoo",
     "features": [
@@ -8117,7 +8787,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0245",
+    "id": "veh-0259",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "RS",
@@ -8131,6 +8801,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -8154,7 +8825,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0246",
+    "id": "veh-0260",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "Ambition",
@@ -8168,6 +8839,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -8183,7 +8855,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0247",
+    "id": "veh-0261",
     "brand": "Skoda",
     "model": "Octavia",
     "trim": "RS",
@@ -8197,6 +8869,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -8218,7 +8891,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0248",
+    "id": "veh-0262",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Style",
@@ -8232,6 +8905,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -8255,7 +8929,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0249",
+    "id": "veh-0263",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Active",
@@ -8269,6 +8943,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8285,7 +8960,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0250",
+    "id": "veh-0264",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Style",
@@ -8299,6 +8974,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -8319,7 +8995,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0251",
+    "id": "veh-0265",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Active",
@@ -8333,6 +9009,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -8350,7 +9027,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0252",
+    "id": "veh-0266",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Active",
@@ -8364,6 +9041,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8382,7 +9060,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0253",
+    "id": "veh-0267",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Style",
@@ -8396,6 +9074,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -8418,7 +9097,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0254",
+    "id": "veh-0268",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Active",
@@ -8432,6 +9111,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8448,7 +9128,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0255",
+    "id": "veh-0269",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Active",
@@ -8462,6 +9142,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -8480,7 +9161,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0256",
+    "id": "veh-0270",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Style",
@@ -8494,6 +9175,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8515,7 +9197,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0257",
+    "id": "veh-0271",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Active",
@@ -8529,6 +9211,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -8546,7 +9229,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0258",
+    "id": "veh-0272",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Style",
@@ -8560,6 +9243,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8581,7 +9265,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0259",
+    "id": "veh-0273",
     "brand": "Toyota",
     "model": "Corolla",
     "trim": "Active",
@@ -8595,6 +9279,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -8610,7 +9295,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0260",
+    "id": "veh-0274",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Active",
@@ -8624,6 +9309,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8643,7 +9329,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0261",
+    "id": "veh-0275",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Active",
@@ -8657,6 +9343,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -8674,7 +9361,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0262",
+    "id": "veh-0276",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Premium",
@@ -8688,6 +9375,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -8712,7 +9400,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0263",
+    "id": "veh-0277",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Style",
@@ -8726,6 +9414,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8750,7 +9439,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0264",
+    "id": "veh-0278",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Active",
@@ -8764,6 +9453,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -8784,7 +9474,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0265",
+    "id": "veh-0279",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Premium",
@@ -8798,6 +9488,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8822,7 +9513,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0266",
+    "id": "veh-0280",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Premium",
@@ -8836,6 +9527,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -8858,7 +9550,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0267",
+    "id": "veh-0281",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Premium",
@@ -8872,6 +9564,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -8895,7 +9588,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0268",
+    "id": "veh-0282",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Premium",
@@ -8909,6 +9602,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -8934,7 +9628,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0269",
+    "id": "veh-0283",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Style",
@@ -8948,6 +9642,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -8970,7 +9665,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0270",
+    "id": "veh-0284",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Premium",
@@ -8984,6 +9679,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -9007,7 +9703,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0271",
+    "id": "veh-0285",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Active",
@@ -9021,6 +9717,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Lahti",
     "features": [
@@ -9038,7 +9735,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0272",
+    "id": "veh-0286",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Active",
@@ -9052,6 +9749,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Tampere",
     "features": [
@@ -9071,7 +9769,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0273",
+    "id": "veh-0287",
     "brand": "Toyota",
     "model": "RAV4",
     "trim": "Active",
@@ -9085,6 +9783,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -9102,7 +9801,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0274",
+    "id": "veh-0288",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Active",
@@ -9116,6 +9815,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -9135,7 +9835,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0275",
+    "id": "veh-0289",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Style",
@@ -9149,6 +9849,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -9171,7 +9872,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0276",
+    "id": "veh-0290",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Active",
@@ -9185,6 +9886,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -9203,7 +9905,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0277",
+    "id": "veh-0291",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Active",
@@ -9217,6 +9919,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -9235,7 +9938,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0278",
+    "id": "veh-0292",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Active",
@@ -9249,6 +9952,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -9264,7 +9968,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0279",
+    "id": "veh-0293",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Style",
@@ -9278,6 +9982,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -9298,7 +10003,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0280",
+    "id": "veh-0294",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Style",
@@ -9312,6 +10017,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -9332,7 +10038,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0281",
+    "id": "veh-0295",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Active",
@@ -9346,6 +10052,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -9361,7 +10068,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0282",
+    "id": "veh-0296",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Active",
@@ -9375,6 +10082,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -9392,7 +10100,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0283",
+    "id": "veh-0297",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Active",
@@ -9406,6 +10114,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -9422,7 +10131,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0284",
+    "id": "veh-0298",
     "brand": "Toyota",
     "model": "Yaris",
     "trim": "Style",
@@ -9436,6 +10145,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -9457,7 +10167,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0285",
+    "id": "veh-0299",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Style",
@@ -9471,6 +10181,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -9491,7 +10202,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0286",
+    "id": "veh-0300",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Style",
@@ -9505,6 +10216,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -9526,7 +10238,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0287",
+    "id": "veh-0301",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Style",
@@ -9540,6 +10252,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Lahti",
     "features": [
@@ -9558,7 +10271,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0288",
+    "id": "veh-0302",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "GTI",
@@ -9572,6 +10285,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -9590,7 +10304,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0289",
+    "id": "veh-0303",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Life",
@@ -9604,6 +10318,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Lahti",
     "features": [
@@ -9621,7 +10336,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0290",
+    "id": "veh-0304",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "GTI",
@@ -9635,6 +10350,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -9653,7 +10369,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0291",
+    "id": "veh-0305",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Style",
@@ -9667,6 +10383,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -9688,7 +10405,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0292",
+    "id": "veh-0306",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Style",
@@ -9702,6 +10419,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -9721,7 +10439,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0293",
+    "id": "veh-0307",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Style",
@@ -9735,6 +10453,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -9754,7 +10473,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0294",
+    "id": "veh-0308",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Life",
@@ -9768,6 +10487,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -9783,7 +10503,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0295",
+    "id": "veh-0309",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "GTI",
@@ -9797,6 +10517,7 @@
     "transmission": "Automaatti",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -9819,7 +10540,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0296",
+    "id": "veh-0310",
     "brand": "Volkswagen",
     "model": "Golf",
     "trim": "Style",
@@ -9833,6 +10554,7 @@
     "transmission": "Manuaali",
     "familyFriendly": false,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -9855,7 +10577,7 @@
     "image": "🚘"
   },
   {
-    "id": "veh-0297",
+    "id": "veh-0311",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -9869,6 +10591,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -9892,7 +10615,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0298",
+    "id": "veh-0312",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -9906,6 +10629,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -9927,7 +10651,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0299",
+    "id": "veh-0313",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Business",
@@ -9941,6 +10665,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -9959,7 +10684,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0300",
+    "id": "veh-0314",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -9973,6 +10698,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Lahti",
     "features": [
@@ -9993,7 +10719,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0301",
+    "id": "veh-0315",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -10007,6 +10733,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -10029,7 +10756,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0302",
+    "id": "veh-0316",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -10043,6 +10770,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -10064,7 +10792,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0303",
+    "id": "veh-0317",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Business",
@@ -10078,6 +10806,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -10095,7 +10824,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0304",
+    "id": "veh-0318",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -10109,6 +10838,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -10131,7 +10861,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0305",
+    "id": "veh-0319",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -10145,6 +10875,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Lahti",
     "features": [
@@ -10167,7 +10898,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0306",
+    "id": "veh-0320",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -10181,6 +10912,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -10201,7 +10933,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0307",
+    "id": "veh-0321",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Business",
@@ -10215,6 +10947,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -10231,7 +10964,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0308",
+    "id": "veh-0322",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Business",
@@ -10245,6 +10978,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -10260,7 +10994,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0309",
+    "id": "veh-0323",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Business",
@@ -10274,6 +11008,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -10292,7 +11027,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0310",
+    "id": "veh-0324",
     "brand": "Volkswagen",
     "model": "Passat",
     "trim": "Elegance",
@@ -10306,6 +11041,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -10325,7 +11061,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0311",
+    "id": "veh-0325",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Elegance",
@@ -10339,6 +11075,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -10363,7 +11100,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0312",
+    "id": "veh-0326",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Elegance",
@@ -10377,6 +11114,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -10397,7 +11135,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0313",
+    "id": "veh-0327",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "R-Line",
@@ -10411,6 +11149,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -10433,7 +11172,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0314",
+    "id": "veh-0328",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Elegance",
@@ -10447,6 +11186,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -10468,7 +11208,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0315",
+    "id": "veh-0329",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Elegance",
@@ -10482,6 +11222,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -10504,7 +11245,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0316",
+    "id": "veh-0330",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "R-Line",
@@ -10518,6 +11259,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -10543,7 +11285,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0317",
+    "id": "veh-0331",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Life",
@@ -10557,6 +11299,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -10574,7 +11317,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0318",
+    "id": "veh-0332",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Life",
@@ -10588,6 +11331,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -10607,7 +11351,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0319",
+    "id": "veh-0333",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Elegance",
@@ -10621,6 +11365,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -10641,7 +11386,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0320",
+    "id": "veh-0334",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Elegance",
@@ -10655,6 +11400,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Tampere",
     "features": [
@@ -10679,7 +11425,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0321",
+    "id": "veh-0335",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "R-Line",
@@ -10693,6 +11439,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -10718,7 +11465,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0322",
+    "id": "veh-0336",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Elegance",
@@ -10732,6 +11479,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -10756,7 +11504,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0323",
+    "id": "veh-0337",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Life",
@@ -10770,6 +11518,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -10788,7 +11537,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0324",
+    "id": "veh-0338",
     "brand": "Volkswagen",
     "model": "Tiguan",
     "trim": "Elegance",
@@ -10802,6 +11551,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -10824,7 +11574,126 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0325",
+    "id": "veh-0339",
+    "brand": "Volkswagen",
+    "model": "Transporter",
+    "trim": "Kombi",
+    "year": 2017,
+    "price": 18000,
+    "estimatedMonthlyPayment": 350,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 130061,
+    "color": "valkoinen",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Oulu",
+    "features": [
+      "Navigointijärjestelmä",
+      "Avaimeton käynnistys",
+      "Premium-äänijärjestelmä",
+      "Adaptiivinen vakionopeudensäädin"
+    ],
+    "tags": [
+      "financing",
+      "budget"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0340",
+    "brand": "Volkswagen",
+    "model": "Transporter",
+    "trim": "Business",
+    "year": 2019,
+    "price": 25347,
+    "estimatedMonthlyPayment": 490,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 102498,
+    "color": "harmaa",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Jyväskylä",
+    "features": [
+      "Automaattinen hätäjarrutus",
+      "Sähkötoiminen takaluukku",
+      "Langaton puhelinlaturi",
+      "Adaptiivinen vakionopeudensäädin",
+      "Ilmastointi",
+      "Nahkaverhoilu"
+    ],
+    "tags": [
+      "financing"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0341",
+    "brand": "Volkswagen",
+    "model": "Transporter",
+    "trim": "L2H1",
+    "year": 2021,
+    "price": 29739,
+    "estimatedMonthlyPayment": 570,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 92211,
+    "color": "valkoinen",
+    "transmission": "Manuaali",
+    "familyFriendly": false,
+    "financeAvailable": false,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Tampere",
+    "features": [
+      "Apple CarPlay / Android Auto",
+      "Langaton puhelinlaturi",
+      "360° peruutuskamera",
+      "Premium-äänijärjestelmä",
+      "Nahkaverhoilu",
+      "LED-ajovalot"
+    ],
+    "tags": [],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0342",
+    "brand": "Volkswagen",
+    "model": "Transporter",
+    "trim": "Business",
+    "year": 2024,
+    "price": 41011,
+    "estimatedMonthlyPayment": 790,
+    "fuel": "diesel",
+    "bodyType": "van",
+    "mileage": 16068,
+    "color": "harmaa",
+    "transmission": "Automaatti",
+    "familyFriendly": false,
+    "financeAvailable": true,
+    "vatDeductible": true,
+    "available": "available",
+    "dealershipLocation": "Oulu",
+    "features": [
+      "Adaptiivinen vakionopeudensäädin",
+      "Sähkötoiminen takaluukku",
+      "Panoraamakatto",
+      "Kuolleen kulman varoitin"
+    ],
+    "tags": [
+      "financing"
+    ],
+    "image": "🚐"
+  },
+  {
+    "id": "veh-0343",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Momentum",
@@ -10838,6 +11707,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -10856,7 +11726,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0326",
+    "id": "veh-0344",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Momentum",
@@ -10870,6 +11740,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -10887,7 +11758,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0327",
+    "id": "veh-0345",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Momentum",
@@ -10901,6 +11772,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -10918,7 +11790,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0328",
+    "id": "veh-0346",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Inscription",
@@ -10932,6 +11804,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -10952,7 +11825,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0329",
+    "id": "veh-0347",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Inscription",
@@ -10966,6 +11839,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -10988,7 +11862,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0330",
+    "id": "veh-0348",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Momentum",
@@ -11002,6 +11876,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Oulu",
     "features": [
@@ -11019,7 +11894,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0331",
+    "id": "veh-0349",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Momentum",
@@ -11033,6 +11908,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -11051,7 +11927,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0332",
+    "id": "veh-0350",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Inscription",
@@ -11065,6 +11941,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -11088,7 +11965,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0333",
+    "id": "veh-0351",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Momentum",
@@ -11102,6 +11979,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -11119,7 +11997,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0334",
+    "id": "veh-0352",
     "brand": "Volvo",
     "model": "V60",
     "trim": "Momentum",
@@ -11133,6 +12011,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Turku",
     "features": [
@@ -11150,7 +12029,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0335",
+    "id": "veh-0353",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Momentum",
@@ -11164,6 +12043,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -11183,7 +12063,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0336",
+    "id": "veh-0354",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Inscription",
@@ -11197,6 +12077,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -11219,7 +12100,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0337",
+    "id": "veh-0355",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Inscription",
@@ -11233,6 +12114,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -11257,7 +12139,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0338",
+    "id": "veh-0356",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Momentum",
@@ -11271,6 +12153,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -11289,7 +12172,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0339",
+    "id": "veh-0357",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Momentum",
@@ -11303,6 +12186,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Tampere",
     "features": [
@@ -11319,7 +12203,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0340",
+    "id": "veh-0358",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Momentum",
@@ -11333,6 +12217,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -11350,7 +12235,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0341",
+    "id": "veh-0359",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Inscription",
@@ -11364,6 +12249,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Espoo",
     "features": [
@@ -11383,7 +12269,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0342",
+    "id": "veh-0360",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Momentum",
@@ -11397,6 +12283,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Oulu",
     "features": [
@@ -11412,7 +12299,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0343",
+    "id": "veh-0361",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Inscription",
@@ -11426,6 +12313,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -11446,7 +12334,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0344",
+    "id": "veh-0362",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Momentum",
@@ -11460,6 +12348,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -11478,7 +12367,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0345",
+    "id": "veh-0363",
     "brand": "Volvo",
     "model": "V90",
     "trim": "Momentum",
@@ -11492,6 +12381,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Helsinki",
     "features": [
@@ -11508,7 +12398,7 @@
     "image": "🚗"
   },
   {
-    "id": "veh-0346",
+    "id": "veh-0364",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Momentum",
@@ -11522,6 +12412,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Turku",
     "features": [
@@ -11542,7 +12433,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0347",
+    "id": "veh-0365",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Inscription",
@@ -11556,6 +12447,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Turku",
     "features": [
@@ -11580,7 +12472,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0348",
+    "id": "veh-0366",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Inscription",
@@ -11594,6 +12486,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -11619,7 +12512,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0349",
+    "id": "veh-0367",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Momentum",
@@ -11633,6 +12526,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -11653,7 +12547,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0350",
+    "id": "veh-0368",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Momentum",
@@ -11667,6 +12561,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Jyväskylä",
     "features": [
@@ -11683,7 +12578,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0351",
+    "id": "veh-0369",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Inscription",
@@ -11697,6 +12592,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Lahti",
     "features": [
@@ -11717,7 +12613,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0352",
+    "id": "veh-0370",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Momentum",
@@ -11731,6 +12627,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": false,
+    "vatDeductible": false,
     "available": "incoming",
     "dealershipLocation": "Turku",
     "features": [
@@ -11746,7 +12643,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0353",
+    "id": "veh-0371",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Momentum",
@@ -11760,6 +12657,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -11779,7 +12677,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0354",
+    "id": "veh-0372",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "R-Design",
@@ -11793,6 +12691,7 @@
     "transmission": "Manuaali",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Espoo",
     "features": [
@@ -11816,7 +12715,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0355",
+    "id": "veh-0373",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Inscription",
@@ -11830,6 +12729,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "available",
     "dealershipLocation": "Tampere",
     "features": [
@@ -11855,7 +12755,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0356",
+    "id": "veh-0374",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Momentum",
@@ -11869,6 +12769,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
@@ -11889,7 +12790,7 @@
     "image": "🚙"
   },
   {
-    "id": "veh-0357",
+    "id": "veh-0375",
     "brand": "Volvo",
     "model": "XC60",
     "trim": "Momentum",
@@ -11903,6 +12804,7 @@
     "transmission": "Automaatti",
     "familyFriendly": true,
     "financeAvailable": true,
+    "vatDeductible": false,
     "available": "reserved",
     "dealershipLocation": "Oulu",
     "features": [
