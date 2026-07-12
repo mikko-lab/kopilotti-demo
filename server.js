@@ -27,6 +27,7 @@ Säännöt:
 - type: green=mahdollisuus, blue=informaatio, yellow=varoitus, red=kiireellinen
 - METER value arvioi ostohalukkuus 0–100
 - CARS lista 1–3 sopivimmista (kaikki ovat KÄYTETTYJÄ autoja): 1=Volvo XC60 B4 AWD -21 (34900€), 2=Toyota RAV4 Hybrid -20 (28900€), 3=Skoda Octavia Combi -22 (21900€), 4=VW Passat Variant -19 (17500€), 5=BMW 320d Touring -21 (29500€), 6=Ford Kuga PHEV -22 (27900€)
+- Myyntikatalogiin kuuluu myös pakettiautoja (N1-luokka, esim. VW Transporter, Mercedes Sprinter, Renault Trafic, Citroën Berlingo) — nämä ovat ALV-vähennyskelpoisia liiketoimintakäytön ja ajopäiväkirjan perusteella, toisin kuin henkilöautot
 - Kirjoita suomeksi, ole konkreettinen
 - EI selityksiä, EI muuta tekstiä`;
 
