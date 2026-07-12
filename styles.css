@@ -1,0 +1,1274 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/*
+  Color tokens: WCAG contrast computed before implementation (not spot-checked
+  after), same "light tint bg + darkened same-hue text" pattern used
+  throughout. Ratios recorded here so the reasoning is auditable in source.
+
+  --primary #1F4DB8:  7.47:1 on white, 6.96:1 on --bg (raw color OK as text)
+  --success #16A34A:  3.30:1 on white — fails 4.5:1 normal-text AA, passes 3:1
+                       UI-component/large-text. Use raw only for icons/large
+                       elements/borders; use --success-text (#117F3A, 5.10:1
+                       on white / 4.67:1 on --success-light) for any normal text.
+  --warning #F59E0B:  2.15:1 on white — fails EVEN 3:1 UI-component AA.
+                       Never use raw warning color as the sole conveyor of
+                       meaning (text, icon fill, or border) — always pair with
+                       --warning-text (#9D6507, 4.89:1 on white / 4.59:1 on
+                       --warning-light) and/or a non-color cue (icon shape).
+  --error #DC2626:    4.83:1 on white — passes normal-text AA already; a
+                       slightly darkened --error-text (#D32424) is used only
+                       for text sitting on --error-light (4.60:1) since the
+                       raw color drops just under 4.5:1 on that specific tint.
+
+  Verification note (2026-07-12 dark-header pass): three real contrast bugs
+  found ONLY by manual/computed re-check, not by axe-core, because axe has
+  two blind spots this hit directly — (1) it skips aria-hidden content
+  entirely, and .header-pipeline's arrows are aria-hidden (decorative,
+  correctly hidden from AT); (2) it doesn't reliably evaluate ::after
+  content-generated glyphs (the automation-dot checkmark). The
+  .pipeline-arrow fix in particular goes beyond what WCAG's letter actually
+  requires — an aria-hidden element has no exposed-to-AT contrast
+  obligation under 1.4.3 — but low-vision sighted users still see it
+  regardless of aria-hidden, so it was fixed anyway. Worth stating
+  explicitly if this file's "WCAG 2.2 AA" claim ever goes into product
+  copy: some of what's here satisfies the letter, some goes past it for
+  real visual accessibility, and axe-clean alone was demonstrated to be
+  insufficient evidence for either.
+*/
+:root {
+  /* Surfaces */
+  --bg: #F5F7FA;
+  --white: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface2: #F5F7FA;
+  --border: #E5E7EB;
+
+  /* Text */
+  --text: #1A1A2E;
+  --text2: #4B5565;
+  --muted: #6B7280;
+
+  /* Brand */
+  --primary: #1F4DB8;
+  --primary-dark: #163A8C;
+  --primary-light: #EDF1F9;
+
+  /* Orange demoted to a small accent only (per spec: "brand orange only for highlights") */
+  --orange: #E85D00;
+  --orange-dark: #A03D00;
+  --orange-light: #FFF0E8;
+
+  /* Semantic */
+  --success: #16A34A;
+  --success-text: #117F3A;
+  --success-light: #ECF8F1;
+
+  --warning: #F59E0B;
+  --warning-text: #9D6507;
+  --warning-light: #FEF7EB;
+
+  --error: #DC2626;
+  --error-text: #D32424;
+  --error-light: #FCEEEE;
+
+  --shadow: 0 1px 3px rgba(17,24,39,0.06), 0 4px 12px rgba(17,24,39,0.04);
+  --shadow-lg: 0 8px 32px rgba(17,24,39,0.14);
+
+  /* Header: dark navy chrome, distinct from the light app body — computed
+     contrast: white on --header-bg = 16.85:1 (AAA), --header-text-muted on
+     --header-bg = 7.2:1 (AA, comfortably above the 4.5:1 normal-text floor). */
+  --header-bg: #101B3D;
+  --header-border: #24304F;
+  --header-text: #FFFFFF;
+  --header-text-muted: #A8B3CC;
+  --header-badge-bg: #1B2748;
+
+  /* 8px spacing grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 40px;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+
+  /* Inter type scale per spec: 30/20/16/14/12 (plus a small 11px utility step
+     for uppercase micro-labels, which predates this scale and is kept narrow) */
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 30px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* ============ Header (3-zone) ============ */
+.header {
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  padding: 0 var(--space-3);
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  flex-wrap: wrap;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-2) 0;
+}
+
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  background: var(--orange);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: var(--text-md);
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
+.logo-texts { line-height: 1.2; }
+
+.logo-name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--header-text);
+  letter-spacing: -0.2px;
+}
+
+.logo-sub {
+  font-size: var(--text-2xs);
+  color: var(--header-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.header-pipeline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--header-text-muted);
+  font-weight: 500;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.header-pipeline .pipeline-step { white-space: nowrap; }
+/* --header-border (#24304F) was a border-only token, never meant to carry
+   text — 1.29:1 on --header-bg, badly failing 4.5:1. Real bug, found by
+   manual computation: axe-core skips aria-hidden content (this breadcrumb
+   is aria-hidden, decorative) even though sighted users still see it. */
+.header-pipeline .pipeline-arrow { color: var(--header-text-muted); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.status-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.conn-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--header-text-muted);
+  padding: 4px 8px;
+  border-radius: 100px;
+  background: var(--header-badge-bg);
+  border: 1px solid var(--header-border);
+}
+
+.conn-icon {
+  font-size: 11px;
+  /* Two solid, pre-computed-safe colors — NOT opacity. An earlier version
+     used opacity:0.5 for the "not live" state as a non-color cue, which
+     silently dropped effective contrast to 2.84:1 (getComputedStyle().color
+     doesn't reflect opacity's blend with the background, so this only
+     showed up on manual on-screen inspection, not the color-only script
+     check). Real bug, found and fixed after it shipped once already. */
+  color: var(--header-text-muted);
+}
+.conn-badge.live .conn-icon { color: #6FE3A0; }
+
+.conn-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--header-border);
+  flex-shrink: 0;
+}
+.conn-badge.live .conn-dot { background: var(--success); }
+.conn-badge.live { color: #6FE3A0; }
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--header-text-muted);
+}
+.live-indicator .conn-dot { width: 8px; height: 8px; }
+.live-indicator.on { color: #6FE3A0; }
+.live-indicator.on .conn-dot {
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.25);
+  animation: dotpulse 2s infinite;
+}
+
+@keyframes dotpulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(22,163,74,0.25); }
+  50% { box-shadow: 0 0 0 6px rgba(22,163,74,0.1); }
+}
+
+.header-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--header-badge-bg);
+  border: 1px solid var(--header-border);
+  padding: 5px 12px 5px 5px;
+  border-radius: 100px;
+  font-size: var(--text-xs);
+  color: var(--header-text);
+  font-weight: 500;
+}
+
+.avatar-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.header-badge-texts { display: flex; flex-direction: column; line-height: 1.25; }
+.header-badge-name { color: var(--header-text); font-weight: 600; font-size: var(--text-xs); }
+.header-badge-role { color: var(--header-text-muted); font-size: var(--text-2xs); }
+
+/* ============ App shell / layout ============ */
+.app {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.main-cols {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.col-left, .col-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* Two compact cards side by side (CRM Integration / Vehicle Lookup) instead
+   of each taking a full-width row — collapses back to stacked on narrow
+   viewports where two columns would cramp the content. */
+.card-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+@media (max-width: 639px) {
+  .card-pair { grid-template-columns: 1fr; }
+}
+
+/* ============ Cards ============ */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--white);
+}
+
+.card-title {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ============ Consent (restyled: neutral, not orange-branded) ============ */
+.consent-box {
+  margin: var(--space-3);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+.consent-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.consent-text {
+  font-size: var(--text-xs);
+  color: var(--text2);
+  line-height: 1.5;
+  margin-bottom: var(--space-2);
+}
+
+.consent-btns {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ============ Status row ============ */
+.status-row {
+  padding: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.status-dot.active {
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.15);
+  animation: dotpulse 2s infinite;
+}
+
+.status-info strong {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1px;
+}
+
+.status-info span {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.wave {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+}
+
+.wave-bar {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--primary);
+  animation: waveani 1.2s ease-in-out infinite;
+}
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes waveani {
+  0%, 100% { height: 4px; opacity: 0.3; }
+  50% { height: 16px; opacity: 1; }
+}
+
+/* ============ Buttons ============ */
+.btn-row {
+  padding: 0 var(--space-3) var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.btn {
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  flex: 1;
+  justify-content: center;
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-outline {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+.btn-danger {
+  background: var(--error-light);
+  color: var(--error-text);
+  border: 1px solid rgba(220,38,38,0.2);
+  flex: 1;
+  justify-content: center;
+}
+
+.btn-sm {
+  padding: 7px 14px;
+  font-size: var(--text-2xs);
+  border-radius: 7px;
+}
+
+/* ============ Demo scenarios ============ */
+.scenario-bar {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.scenario-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.scenario-btn {
+  padding: 7px 12px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.scenario-btn:hover, .scenario-btn:active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+/* ============ Transcript ============ */
+.transcript {
+  padding: var(--space-3);
+  min-height: 80px;
+  font-size: var(--text-xs);
+  line-height: 1.7;
+  color: var(--text2);
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.transcript-placeholder {
+  color: var(--muted);
+  font-style: italic;
+  font-size: var(--text-xs);
+}
+
+/* ============ Analyse ============ */
+.analyze-row {
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
+.analyzing {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--primary);
+  display: none;
+}
+.analyzing.visible { display: flex; }
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(31,77,184,0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============ AI Insights: gauges ============ */
+.gauges-row {
+  display: flex;
+  padding: var(--space-4) var(--space-3);
+  gap: var(--space-3);
+}
+
+.gauge-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.gauge {
+  position: relative;
+  width: 92px;
+  height: 92px;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.gauge-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 8;
+}
+
+.gauge-progress {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+
+.gauge-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-value {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.gauge-label {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+}
+
+.gauge-qual {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ============ Detected Signals ============ */
+.signals-row {
+  padding: 0 var(--space-3) var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.signal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+}
+
+/* price_sensitivity is an objection/hesitation signal — flagged for
+   attention rather than shown as confirmed-positive evidence like the
+   other signal types. */
+.signal-badge.positive {
+  background: var(--success-light);
+  border-color: var(--success);
+  color: var(--success-text);
+}
+.signal-badge.caution {
+  background: var(--warning-light);
+  border-color: var(--warning);
+  color: var(--warning-text);
+}
+
+.signals-empty {
+  padding: 0 var(--space-3) var(--space-3);
+  font-size: var(--text-2xs);
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ============ Suggested Next Action ============ */
+.suggested-action {
+  margin: 0 var(--space-3) var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--border);
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.suggested-action.green { background: var(--success-light); border-left-color: var(--success); }
+.suggested-action.blue { background: var(--primary-light); border-left-color: var(--primary); }
+.suggested-action.yellow { background: var(--warning-light); border-left-color: var(--warning-text); }
+.suggested-action.red { background: var(--error-light); border-left-color: var(--error); }
+
+.suggested-action-body { min-width: 0; }
+
+.suggested-action-title {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text);
+}
+
+.suggested-action-why {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--text2);
+}
+
+.suggested-action-why strong { color: var(--text); font-weight: 600; }
+
+.suggested-action-use {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+.suggested-action-use:hover { background: var(--primary-dark); }
+.suggested-action-use:disabled { opacity: 0.55; cursor: default; }
+
+/* ============ Stats ============ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+}
+
+.stats-row-3 { grid-template-columns: repeat(3, 1fr); }
+
+.stat-cell {
+  background: var(--white);
+  padding: var(--space-2) 8px;
+  text-align: center;
+}
+
+.stat-val {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.stat-lbl {
+  /* Was 9px, hardcoded below the design scale's own smallest step
+     (--text-2xs: 11px) — genuinely hard to read, not just a token
+     inconsistency. Found by manual/visual review, not axe. */
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+@keyframes slideup {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.suggested-action { animation: slideup 0.35s cubic-bezier(0.16,1,0.3,1); }
+@media (prefers-reduced-motion: reduce) { .suggested-action { animation: none; } }
+
+/* ============ Recommended Vehicles (AI-powered inventory matching) ============ */
+.rec-list {
+  padding: var(--space-2) 10px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rec-card {
+  padding: 12px 13px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+}
+
+.rec-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.rec-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.rec-info { flex: 1; min-width: 0; }
+
+.rec-name {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rec-meta {
+  font-size: var(--text-2xs);
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.rec-match {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.rec-match-val {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.1;
+}
+
+.rec-match-lbl {
+  display: block;
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.rec-pricing {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.rec-price {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.rec-monthly {
+  font-size: var(--text-2xs);
+  color: var(--text2);
+}
+
+.rec-availability {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+.rec-availability.available { background: var(--success-light); color: var(--success-text); }
+.rec-availability.reserved { background: var(--warning-light); color: var(--warning-text); }
+.rec-availability.incoming { background: var(--surface2); color: var(--muted); }
+
+.rec-explanation {
+  margin-top: 6px;
+  font-size: var(--text-2xs);
+  color: var(--text2);
+  line-height: 1.4;
+}
+
+.cars-placeholder {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+/* ============ Rekisterihaku / Vehicle Lookup ============ */
+.plate-form {
+  padding: var(--space-3);
+  display: flex;
+  gap: 6px;
+}
+
+.plate-input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  color: var(--text);
+  background: var(--white);
+}
+
+.plate-input:focus-visible {
+  border-color: var(--primary);
+}
+
+.plate-result {
+  margin: 0 var(--space-3) var(--space-3);
+  padding: 11px 13px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  font-size: var(--text-xs);
+}
+
+.plate-result.loading { color: var(--text2); }
+
+.plate-result.ok {
+  border-color: rgba(22,163,74,0.3);
+  background: var(--success-light);
+  color: var(--text);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.plate-result-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.plate-result-body { min-width: 0; }
+.plate-result-title { font-size: var(--text-xs); }
+.plate-result-meta { font-size: var(--text-2xs); color: var(--text2); margin-top: 3px; }
+.plate-result-value { font-size: var(--text-2xs); color: var(--text); margin-top: 3px; }
+
+.plate-result.notfound {
+  border-color: rgba(245,158,11,0.3);
+  background: var(--warning-light);
+  color: var(--warning-text);
+  font-size: var(--text-2xs);
+}
+
+.plate-result.error {
+  border-color: rgba(220,38,38,0.2);
+  background: var(--error-light);
+  color: var(--error-text);
+  font-size: var(--text-2xs);
+}
+
+.plate-hint {
+  padding: 0 var(--space-3) var(--space-2);
+  font-size: var(--text-2xs);
+  color: var(--muted);
+}
+
+/* ============ CRM Integration (passive state, no modal) ============ */
+.crm-state {
+  padding: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crm-state-icon { font-size: 22px; flex-shrink: 0; }
+
+.crm-state-label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.crm-state-desc {
+  font-size: var(--text-2xs);
+  color: var(--muted);
+}
+
+.crm-state.pending .crm-state-label { color: var(--muted); }
+.crm-state.queued .crm-state-label { color: var(--warning-text); }
+.crm-state.synced .crm-state-label { color: var(--success-text); }
+.crm-state.failed .crm-state-label { color: var(--error-text); }
+
+.crm-details {
+  margin: 0 var(--space-3) var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
+.crm-details summary {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.crm-details pre {
+  margin-top: var(--space-2);
+  font-size: 11px;
+  font-family: ui-monospace, monospace;
+  color: var(--text2);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+/* ============ Automation Status ============ */
+.automation-steps {
+  list-style: none;
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  display: flex;
+  align-items: flex-start;
+}
+
+.automation-step {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+/* Connecting line between this step's dot and the previous one's. */
+.automation-step:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  top: 17px;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  background: var(--border);
+}
+.automation-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 17px;
+  right: 0;
+  width: 50%;
+  height: 2px;
+  background: var(--border);
+}
+
+.automation-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.automation-label { font-weight: 600; color: var(--text2); }
+.automation-sublabel { font-size: var(--text-2xs); color: var(--muted); }
+
+.automation-step.done { color: var(--text); }
+.automation-step.done .automation-dot {
+  border-color: var(--success);
+  /* Raw --success as a fill with white text/checkmark on top measures
+     3.30:1 — fails 4.5:1 (this is the exact case the color-tokens comment
+     at the top of this file already warned about; missed here because
+     axe-core doesn't reliably check ::after content-generated glyphs).
+     --success-text is the pre-computed AA-safe companion (5.10:1 on white,
+     same ratio applies symmetrically as a background under white text). */
+  background: var(--success-text);
+  color: white;
+}
+.automation-step.done .automation-dot::after { content: '✓'; }
+.automation-step.done .automation-label { color: var(--text); }
+
+.automation-step.skipped .automation-dot::after { content: '–'; color: var(--muted); }
+
+.automation-step.active { color: var(--text); font-weight: 600; }
+.automation-step.active .automation-dot {
+  border-color: var(--primary);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) { .automation-step.active .automation-dot { animation: none; } }
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(31,77,184,0.3); }
+  50% { box-shadow: 0 0 0 5px rgba(31,77,184,0); }
+}
+
+/* ============ Live Event Timeline ============ */
+.timeline-list {
+  list-style: none;
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.timeline-empty {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.timeline-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-2xs);
+  animation: slideup 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+@media (prefers-reduced-motion: reduce) { .timeline-entry { animation: none; } }
+
+.timeline-entry:last-child { border-bottom: none; }
+
+.timeline-time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.timeline-text { flex: 1; color: var(--text2); }
+
+.timeline-status {
+  flex-shrink: 0;
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 100px;
+}
+.timeline-status.ok { background: var(--success-light); color: var(--success-text); }
+.timeline-status.pending { background: var(--warning-light); color: var(--warning-text); }
+
+/* ============ Toast ============ */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--text);
+  color: white;
+  padding: 10px var(--space-3);
+  border-radius: 100px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  z-index: 200;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+}
+
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.hidden { display: none !important; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============ Skip link ============ */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-3);
+  background: var(--text);
+  color: white;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  z-index: 999;
+  text-decoration: none;
+}
+.skip-link:focus { top: 0; }
+
+/* Visible focus on every interactive element */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============ Responsive ============
+   Mobile (default, <640px): single column, conversation/session first —
+   this falls out of DOM order (.col-left, with the session/transcript card,
+   already precedes .col-right in source) without any extra reordering.
+   Tablet (640-1023px): still single column (cards stack vertically per
+   spec) but with roomier padding.
+   Desktop (>=1024px): two-column dashboard, ~60/40 split.
+*/
+@media (min-width: 640px) {
+  .app { padding: var(--space-4); gap: var(--space-4); }
+  .main-cols { gap: var(--space-4); }
+  .col-left, .col-right { gap: var(--space-4); }
+}
+
+@media (min-width: 1024px) {
+  .app { max-width: 1120px; }
+  .main-cols {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    align-items: start;
+    gap: var(--space-4);
+  }
+
+  .modal-overlay { align-items: center; }
+  .modal-box {
+    border-radius: var(--radius-lg);
+    max-width: 480px;
+    width: 100%;
+    transform: translateY(20px) scale(0.98);
+  }
+  .modal-overlay.visible .modal-box { transform: translateY(0) scale(1); }
+  .modal-handle { display: none; }
+}

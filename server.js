@@ -84,6 +84,37 @@ app.post('/api/analyze', async (req, res) => {
   res.end();
 });
 
+// Rekisterinumerohaku — MVP-mock, ei oikeaa Traficom-integraatiota.
+// Merkki/malli/vuosimalli on ainoa tietoluokka jonka voi hakea Traficomin
+// avoimesta tietopalvelusta ilman erillistä kaupallista sopimusta
+// (omistajatieto vaatii oikeutetun edun perustelun ja usein maksullisen
+// tietopalvelusopimuksen). mileage/estimatedTradeInValue ovat demo-mockia —
+// samaa tapaa kuin muukin mock-data tässä sovelluksessa (autojen hinnat,
+// rahoituslaskelmat) — ei mitään Traficomin tarjoamaa tietoa.
+//
+// ABC-123:n arvot on tarkoituksella sovitettu yhteen "vaihto"-demoskenaarion
+// (js/app.js) omien lukujen kanssa (Passat -17, ~140 000 km, markkina-arvo
+// 9 500-11 500 €, aloitushinta 9 800 €), jotta kumpikin demo-polku — canned
+// scenario ja oikea rekisterihaku — kertovat saman tarinan eivätkä ole
+// ristiriidassa jos molempia käytetään samassa esittelyssä.
+const MOCK_VEHICLES = {
+  'ABC-123': { make: 'Volkswagen', model: 'Passat Variant', year: 2017, mileage: 140000, estimatedTradeInValue: 9800 },
+  'XYZ-789': { make: 'Toyota', model: 'Avensis', year: 2015, mileage: 186000, estimatedTradeInValue: 6200 },
+  'KLM-456': { make: 'Skoda', model: 'Octavia Combi', year: 2019, mileage: 78000, estimatedTradeInValue: 15400 },
+  'DEF-321': { make: 'Volvo', model: 'V60', year: 2018, mileage: 112000, estimatedTradeInValue: 13900 },
+};
+
+app.get('/api/vehicle/:plate', (req, res) => {
+  const plate = req.params.plate.trim().toUpperCase();
+  const vehicle = MOCK_VEHICLES[plate];
+  if (!vehicle) {
+    return res.status(404).json({
+      error: 'Ajoneuvoa ei löytynyt. Demo-rekisterinumerot: ABC-123, XYZ-789, KLM-456, DEF-321'
+    });
+  }
+  res.json({ plate, ...vehicle });
+});
+
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
 app.listen(port, () => console.log(`Kopilotti backend :${port}`));

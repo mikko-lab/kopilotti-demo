@@ -4,7 +4,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "dev:static": "npx --yes serve . -l 8090",
+    "generate:inventory": "node scripts/generate-inventory.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.51.0",
