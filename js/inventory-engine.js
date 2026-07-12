@@ -54,6 +54,7 @@ function passesHardFilters(vehicle, preferences) {
   if (preferences?.priceMin != null && vehicle.price < preferences.priceMin) return false;
   if (preferences?.priceMax != null && vehicle.price > preferences.priceMax) return false;
   if (preferences?.maxMileage != null && vehicle.mileage > preferences.maxMileage) return false;
+  if (preferences?.minYear != null && vehicle.year < preferences.minYear) return false;
   return true;
 }
 
@@ -69,6 +70,9 @@ function describeFailedCriteria(vehicle, preferences) {
   if (preferences?.priceMax != null && vehicle.price > preferences.priceMax) reasons.push(`hinta ${vehicle.price.toLocaleString('fi-FI')} €`);
   if (preferences?.maxMileage != null && vehicle.mileage > preferences.maxMileage) {
     reasons.push(`${vehicle.mileage.toLocaleString('fi-FI')} km (yli toivotun ${preferences.maxMileage.toLocaleString('fi-FI')} km)`);
+  }
+  if (preferences?.minYear != null && vehicle.year < preferences.minYear) {
+    reasons.push(`vuosimalli ${vehicle.year} (vanhempi kuin toivottu ${preferences.minYear})`);
   }
   return reasons;
 }
@@ -95,6 +99,7 @@ function buildExplanation(matchedSignalTypes, preferences, vehicle) {
   }
   if (preferences?.color && vehicle.color === preferences.color) prefParts.push(`väritoive ${preferences.color}`);
   if (preferences?.maxMileage != null) prefParts.push(`ajettu alle ${preferences.maxMileage.toLocaleString('fi-FI')} km`);
+  if (preferences?.minYear != null) prefParts.push(`vuosimalli ${preferences.minYear} tai uudempi`);
   if (prefParts.length) parts.push(`täsmää asiakkaan toiveisiin: ${prefParts.join(', ')}`);
 
   if (!parts.length) return 'Yleinen suositus.';
@@ -130,7 +135,8 @@ export function scoreVehicles(inventory, signals, count = 3, preferences = null)
   // the color bonus if a color was stated.
   const hardFilterCount = ['bodyType', 'fuel', 'transmission'].filter(k => preferences?.[k]).length
     + (preferences?.priceMin != null || preferences?.priceMax != null ? 1 : 0)
-    + (preferences?.maxMileage != null ? 1 : 0);
+    + (preferences?.maxMileage != null ? 1 : 0)
+    + (preferences?.minYear != null ? 1 : 0);
   const colorRequested = !!preferences?.color;
   const criteriaConsidered = hardFilterCount + presentTags.length + (colorRequested ? 1 : 0);
 

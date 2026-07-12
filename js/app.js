@@ -1,6 +1,6 @@
 import { detectLocalSignals, signalsFromHint, signalsFromScenario } from './signals.js';
 import { runBusinessRules } from './business-rules.js';
-import { unmatchedSignalLabels, preferencesExcludedEverything, loadInventory, getCachedInventory, checkNamedModelClaim } from './inventory-engine.js';
+import { unmatchedSignalLabels, preferencesExcludedEverything, loadInventory, checkNamedModelClaim } from './inventory-engine.js';
 import { extractVehiclePreferences, preferenceConflictsInText } from './vehicle-preferences.js';
 import { createGauge } from './gauge.js';
 
@@ -414,13 +414,23 @@ function handleSSEEvent(type, data) {
 // against a stated <100 000 km cap. That's a sharper, verifiable-at-a-glance
 // version of the same "Claude's suggestion isn't grounded in real inventory"
 // problem, worth flagging with the same mechanism rather than a separate one.
-function addHint(h) {
+// async, called fire-and-forget from handleSSEEvent (hints.push() below
+// stays the first, synchronous line so anything reading the `hints` array
+// immediately after this call sees the new entry — only the log line at
+// the end waits on the inventory check). Was getCachedInventory() (a
+// synchronous cache peek, null if not loaded yet) — real-world testing
+// (fast scripted clicks, no human pause between page load and the first
+// hint) showed the very first hint of a session could genuinely arrive
+// before the background loadInventory() fetch resolved, silently skipping
+// the model-claim check for that one hint. await loadInventory() here
+// removes the race instead of relying on "there's probably enough time.”
+async function addHint(h) {
   hints.push(h);
   document.getElementById('statHints').textContent=hints.length;
   const statedPrefs = extractVehiclePreferences(currentTranscript);
   const combinedText = `${h.title || ''} ${h.text || ''}`;
   const conflicts = preferenceConflictsInText(combinedText, statedPrefs);
-  const inventory = getCachedInventory();
+  const inventory = await loadInventory().catch(() => null);
   const modelClaim = inventory ? checkNamedModelClaim(combinedText, statedPrefs, inventory) : null;
 
   const warnings = [];
@@ -447,7 +457,7 @@ function pickSuggestedAction(hintList) {
   );
 }
 
-function renderSuggestedAction(hintList) {
+async function renderSuggestedAction(hintList) {
   const container = document.getElementById('suggestedActionContainer');
   const top = pickSuggestedAction(hintList);
   if (!top) {
@@ -461,11 +471,13 @@ function renderSuggestedAction(hintList) {
   // customer stated) needs to read as "our suggestion", not as if it were
   // confirmed customer data, wherever it's shown, not just in the timeline.
   // Also checked here: a named real model that doesn't actually satisfy the
-  // customer's stated requirements in stock (see addHint()'s own note).
+  // customer's stated requirements in stock (see addHint()'s own note, and
+  // its note on why this awaits loadInventory() instead of peeking a
+  // synchronous cache that might not be warm yet for the session's first hint).
   const statedPrefs = extractVehiclePreferences(currentTranscript);
   const combinedText = `${top.title || ''} ${top.text || ''}`;
   const conflicts = preferenceConflictsInText(combinedText, statedPrefs);
-  const inventoryForCheck = getCachedInventory();
+  const inventoryForCheck = await loadInventory().catch(() => null);
   const modelClaim = inventoryForCheck ? checkNamedModelClaim(combinedText, statedPrefs, inventoryForCheck) : null;
 
   const conflictNotes = conflicts.map(c => `${c.categoryLabel}: ${c.stated}`);
@@ -479,11 +491,22 @@ function renderSuggestedAction(hintList) {
     modelClaimNote,
   ].filter(Boolean).join(' — ');
 
+  // A flagged hint's own AI-generated title/"Miksi" text often confidently
+  // asserts the exact opposite of the conflict note sitting right above it
+  // (real example: "ei täsmää varastoon (korityyppi suv)" directly followed
+  // by "täsmälleen kriteereiden mukainen" in the same green "success"-styled
+  // card) — technically correct flagging, but reads as two contradictory
+  // claims stacked in one box, worse than no flag at all. When flagged, the
+  // whole card is forced into warning styling (not whatever type/color
+  // Claude assigned) and the wording makes clear the claim below is
+  // unverified, not a second, independent, confirmed fact.
+  const isFlagged = !!conflictLine;
+  const cardType = isFlagged ? 'yellow' : top.type;
   const card = document.createElement('div');
-  card.className = `suggested-action ${top.type}`;
+  card.className = `suggested-action ${cardType}`;
   card.innerHTML = `
     <div class="suggested-action-body">
-      ${conflictLine ? `<div class="suggested-action-conflict">⚠ Tarkista ennen käyttöä — ${conflictLine}</div>` : ''}
+      ${isFlagged ? `<div class="suggested-action-conflict">⚠ AI:n ehdotus EI täsmää varastoon — ${conflictLine}. Alla oleva peruste on tekoälyn oma, tarkistamaton väite:</div>` : ''}
       <div class="suggested-action-title">${top.icon} ${top.action}</div>
       <div class="suggested-action-why"><strong>Miksi:</strong> ${top.text}</div>
     </div>
@@ -560,6 +583,7 @@ function renderRecommendations(vehicles, signals, preferences) {
       if (preferences.transmission) stated.push(preferences.transmission.toLowerCase());
       if (preferences.priceMin != null || preferences.priceMax != null) stated.push(`${preferences.priceMin ?? '–'}–${preferences.priceMax ?? '–'} €`);
       if (preferences.maxMileage != null) stated.push(`alle ${preferences.maxMileage.toLocaleString('fi-FI')} km`);
+      if (preferences.minYear != null) stated.push(`vuosimalli ${preferences.minYear}+`);
       list.innerHTML = `<div class="cars-placeholder">Asiakkaan toiveilla (${stated.join(', ')}) ei löydy tarkkaa osumaa varastosta juuri nyt.</div>`;
     } else {
       list.innerHTML = '<div class="cars-placeholder">Suositukset ilmestyvät kun keskustelusta on tunnistettu signaaleja</div>';
@@ -585,6 +609,7 @@ function renderRecommendations(vehicles, signals, preferences) {
         <span class="rec-monthly">${v.estimatedMonthlyPayment} €/kk</span>
         <span class="rec-availability ${v.available}">${AVAILABILITY_LABEL_FI[v.available] || v.available}</span>
       </div>
+      ${v.vatDeductible ? `<div class="rec-vat-badge">🧾 ALV-vähennyskelpoinen <span class="rec-vat-caveat">— edellyttää ajopäiväkirjaa ja liiketoimintakäyttöä</span></div>` : ''}
       <div class="rec-explanation">${v.explanation}</div>
     `;
     container.appendChild(card);

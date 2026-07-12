@@ -36,7 +36,24 @@ const LOCAL_SIGNAL_RULES = [
   // very common Finnish word. That collision was a real bug: a hint or
   // transcript mentioning "hybridivaihtoehtoja" incorrectly fired a
   // trade-in signal despite no trade-in car ever being mentioned.
-  { regex: /\bvaihtoauto\w*|vanha|passat|toyota|ford|auto meillä/, type: SIGNAL_TYPES.TRADE_IN, label: 'Vaihtoauto', evidence: 'Vaihtoautoon liittyvä maininta transkriptiossa' },
+  //
+  // Bare brand names (passat/toyota/ford) used to be triggers too, on the
+  // assumption that mentioning one almost always meant "my old car is a
+  // Toyota." That assumption broke once customers/Claude started discussing
+  // DESIRED brands too — "japanilainen merkki kuten Toyota" (a preference
+  // statement, per js/vehicle-preferences.js) incorrectly fired a trade-in
+  // signal via the bare "toyota" match, producing a "✓ Vaihtoauto" badge
+  // with no trade-in ever mentioned. A brand name alone is fundamentally
+  // ambiguous between "my old car" and "the brand I want" — removed as
+  // triggers.
+  //
+  // "vanha" alone has the exact same problem one level down: it also
+  // matches inside "<N> vuotta vanha" (N years old) — an AGE-LIMIT stated
+  // about the car being bought ("maksimissaan 5 vuotta vanha"), not a
+  // reference to an existing car being traded in. The negative lookbehind
+  // excludes that specific phrase shape while still matching "vanha Passat"
+  // / "vanhan tilalle" (genuine trade-in references).
+  { regex: /\bvaihtoauto\w*|(?<!\d\s?vuotta\s)vanha|auto meillä/, type: SIGNAL_TYPES.TRADE_IN, label: 'Vaihtoauto', evidence: 'Vaihtoautoon liittyvä maininta transkriptiossa' },
   { regex: /lapsi|perhe|isofix|tilaa|tavaratila|mökki/, type: SIGNAL_TYPES.FAMILY, label: 'Perhetarve', evidence: 'Perhetarpeeseen liittyvä maininta transkriptiossa' },
   { regex: /koeajo|kokeilla|testata|istua|tuntuma/, type: SIGNAL_TYPES.PURCHASE_READY, label: 'Ostovalmius', evidence: 'Koeajo-/ostovalmiusmaininta transkriptiossa' },
   { regex: /vakuutus|kasko|liikenne/, type: SIGNAL_TYPES.INSURANCE, label: 'Vakuutuskiinnostus', evidence: 'Vakuutukseen liittyvä maininta transkriptiossa' },
@@ -59,8 +76,11 @@ const HINT_TITLE_RULES = [
   // ALTERNATIVES) contains "VAIHTO" as a substring and was incorrectly
   // firing a trade-in-vehicle signal despite no trade-in ever being
   // mentioned. Confirmed root cause via a real SSE hint title from live
-  // Claude output, not a hypothetical.
-  { match: /\bVAIHTOAUTO\b|PASSAT/, type: SIGNAL_TYPES.TRADE_IN },
+  // Claude output, not a hypothetical. PASSAT (bare brand name) removed for
+  // the same reason as LOCAL_SIGNAL_RULES below — a brand mentioned in a
+  // hint title can be a suggested/compared model, not evidence of a
+  // trade-in car.
+  { match: /\bVAIHTOAUTO\b/, type: SIGNAL_TYPES.TRADE_IN },
   { match: /PERHE|MÖKKI/, type: SIGNAL_TYPES.FAMILY },
   { match: /OSTO|KOEAJO/, type: SIGNAL_TYPES.PURCHASE_READY },
   { match: /HINTA|VASTAVÄITE/, type: SIGNAL_TYPES.PRICE_SENSITIVITY },

@@ -914,6 +914,25 @@ body {
   line-height: 1.4;
 }
 
+/* Van-only (vatDeductible), never rendered for passenger cars — see
+   js/app.js's renderRecommendations and the field's own origin comment in
+   scripts/generate-inventory.js for why that split is deliberate. The
+   caveat text is part of the badge, not a tooltip, so the "requires a
+   driving log and business use" condition is never lost when skimming. */
+.rec-vat-badge {
+  margin-top: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-light);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+.rec-vat-caveat {
+  font-weight: 500;
+  color: var(--text2);
+}
+
 .cars-placeholder {
   padding: var(--space-4);
   text-align: center;
