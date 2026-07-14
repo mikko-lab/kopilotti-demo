@@ -4,7 +4,7 @@ Reaaliaikainen tekoälyassistentti, joka analysoi myyjän ja asiakkaan keskustel
 
 **→ [Live demo](https://mikko-lab.github.io/kopilotti-demo/)**
 
-![Kopilotti-käyttöliittymä: AI Insights -mittarit (ostohalukkuus 72 %, confidence 7 %), Suggested Next Action -kortti jossa merkintä tarkistamattomasta tekoälyehdotuksesta, ja Suositellut autot -kortti jossa jokainen tulos selittää täsmäävät kriteerit yksitellen](assets/screenshot.png)
+![Kopilotti-käyttöliittymä: AI Insights -mittarit (ostohalukkuus 71 %, confidence 9 %), Suggested Next Action -kortti jossa merkintä tarkistamattomasta tekoälyehdotuksesta, ja Suositellut autot -kortti jossa jokainen tulos näyttää oikean autokuvan ja selittää täsmäävät kriteerit yksitellen](assets/screenshot.png)
 
 ---
 
