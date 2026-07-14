@@ -611,7 +611,7 @@ function renderRecommendations(vehicles, signals, preferences) {
     card.className = 'rec-card';
     card.innerHTML = `
       <div class="rec-top">
-        <span class="rec-icon" aria-hidden="true">${v.image}</span>
+        <img class="rec-icon" src="${v.image}" alt="${v.brand} ${v.model}" loading="lazy">
         <div class="rec-info">
           <div class="rec-name">${v.brand} ${v.model} ${v.trim}</div>
           <div class="rec-meta">${v.year} · ${v.transmission} · ${v.mileage.toLocaleString('fi-FI')} km · ${v.dealershipLocation}</div>
