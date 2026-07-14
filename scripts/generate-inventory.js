@@ -107,6 +107,49 @@ const BASE_MODELS = [
   { brand: 'Citroën', model: 'Berlingo', bodyType: 'van', fuels: ['diesel', 'bensiini', 'sähkö'], trims: ['Live', 'Driver', 'XL'], price: [14000, 30000], years: [2018, 2024] },
 ];
 
+// Real photo per brand+model (not per vehicle — every year/trim/color
+// variation of the same model shares one illustrative photo), sourced from
+// Wikimedia Commons under free licenses and checked into assets/cars/ so the
+// demo stays offline/deterministic, same property the old emoji-icon
+// approach was protecting. See assets/cars/CREDITS.md for author/license
+// per file. Keyed by "brand|model" — verified unique across BASE_MODELS.
+const IMAGES = {
+  'Volvo|XC60': 'assets/cars/volvo-xc60.jpg',
+  'Volvo|V60': 'assets/cars/volvo-v60.jpg',
+  'Volvo|V90': 'assets/cars/volvo-v90.jpg',
+  'Toyota|RAV4': 'assets/cars/toyota-rav4.jpg',
+  'Toyota|Corolla': 'assets/cars/toyota-corolla.jpg',
+  'Toyota|Yaris': 'assets/cars/toyota-yaris.jpg',
+  'Skoda|Octavia': 'assets/cars/skoda-octavia.jpg',
+  'Skoda|Kodiaq': 'assets/cars/skoda-kodiaq.jpg',
+  'Skoda|Fabia': 'assets/cars/skoda-fabia.jpg',
+  'Volkswagen|Passat': 'assets/cars/volkswagen-passat.jpg',
+  'Volkswagen|Tiguan': 'assets/cars/volkswagen-tiguan.jpg',
+  'Volkswagen|Golf': 'assets/cars/volkswagen-golf.jpg',
+  'BMW|320': 'assets/cars/bmw-320.jpg',
+  'BMW|X3': 'assets/cars/bmw-x3.jpg',
+  'Ford|Kuga': 'assets/cars/ford-kuga.jpg',
+  'Ford|Focus': 'assets/cars/ford-focus.jpg',
+  'Kia|Niro': 'assets/cars/kia-niro.jpg',
+  'Kia|Sportage': 'assets/cars/kia-sportage.jpg',
+  'Hyundai|Tucson': 'assets/cars/hyundai-tucson.jpg',
+  'Hyundai|i30': 'assets/cars/hyundai-i30.jpg',
+  'Nissan|Qashqai': 'assets/cars/nissan-qashqai.jpg',
+  'Nissan|Leaf': 'assets/cars/nissan-leaf.jpg',
+  'Mercedes-Benz|GLC': 'assets/cars/mercedes-benz-glc.jpg',
+  'Mercedes-Benz|C-Class': 'assets/cars/mercedes-benz-c-class.jpg',
+  'Audi|Q5': 'assets/cars/audi-q5.jpg',
+  'Audi|A4': 'assets/cars/audi-a4.jpg',
+  'Peugeot|3008': 'assets/cars/peugeot-3008.jpg',
+  'Peugeot|208': 'assets/cars/peugeot-208.jpg',
+  'Mazda|CX-5': 'assets/cars/mazda-cx-5.jpg',
+  'Mazda|3': 'assets/cars/mazda-3.jpg',
+  'Volkswagen|Transporter': 'assets/cars/volkswagen-transporter.jpg',
+  'Mercedes-Benz|Sprinter': 'assets/cars/mercedes-benz-sprinter.jpg',
+  'Renault|Trafic': 'assets/cars/renault-trafic.jpg',
+  'Citroën|Berlingo': 'assets/cars/citroen-berlingo.jpg',
+};
+
 const FAMILY_BODY_TYPES = new Set(['suv', 'combi', 'mpv']);
 const HIGH_TRIM_KEYWORDS = /Inscription|R-Design|Premium|RS|Sportline|R-Line|M Sport|ST-Line|GT-Line|N Line|AMG Line|S line|GT|Exclusive-Line|Style|Elegance|Tekna/;
 
@@ -159,10 +202,8 @@ function buildVehicle(id, base, year, trim, fuel) {
   const shuffled = [...FEATURE_POOL].sort(() => rng() - 0.5);
   const features = shuffled.slice(0, featureCount);
 
-  // Emoji "icon" instead of an image file path — same offline/deterministic
-  // property the schema's `image` field was meant to guarantee (no network
-  // image CDN dependency), without hand-authoring a placeholder SVG set.
-  const ICONS = { suv: '🚙', combi: '🚗', sedan: '🚗', hatchback: '🚘', mpv: '🚐', coupe: '🏎️', van: '🚐' };
+  const image = IMAGES[`${base.brand}|${base.model}`];
+  if (!image) throw new Error(`No photo mapped for ${base.brand} ${base.model} — add it to IMAGES`);
 
   return {
     id: `veh-${String(id).padStart(4, '0')}`,
@@ -184,7 +225,7 @@ function buildVehicle(id, base, year, trim, fuel) {
     dealershipLocation,
     features,
     tags,
-    image: ICONS[base.bodyType] || '🚗',
+    image,
   };
 }
 
