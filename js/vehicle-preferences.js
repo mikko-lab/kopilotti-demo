@@ -68,15 +68,39 @@ const TRANSMISSION_RULES = [
 const OPTIONALITY_MARKERS = /saa olla myös|myös käy|käy myös|tai myös|voi olla myös|sopii myös/i;
 const OPTIONALITY_WINDOW = 30; // chars to look back before a candidate match
 
+// Returns the value of the LAST (furthest-in-text, largest match index)
+// non-optionality-marked match across ALL of `rules` — not the first rule
+// (in priority/declaration order) that happens to match anywhere in the
+// text. The previous version returned as soon as any rule matched, which
+// meant an earlier-declared rule (e.g. BODY_TYPE_RULES' combi, declared
+// before suv) would win even when the customer's actual final statement in
+// the transcript named a different category later on (e.g. "Haluaisin
+// farmarin... Itse asiassa mietin että ehkä maasturi olisikin parempi" kept
+// resolving to 'combi' because combi is checked first, regardless of where
+// in the text each word actually appeared). Scanning every rule and keeping
+// the match with the greatest `m.index` makes the most RECENT statement win
+// instead, for every category that uses this helper (bodyType, fuel, color,
+// transmission). The OPTIONALITY_MARKERS/OPTIONALITY_WINDOW check is
+// applied identically to every candidate match, unchanged from before.
 function firstMatch(text, rules) {
+  let best = null; // { index, value }
   for (const rule of rules) {
-    const m = rule.regex.exec(text);
-    if (!m) continue;
-    const precedingWindow = text.slice(Math.max(0, m.index - OPTIONALITY_WINDOW), m.index);
-    if (OPTIONALITY_MARKERS.test(precedingWindow)) continue; // explicitly non-exclusive — not the stated requirement
-    return rule.value;
+    // Use a global copy of the rule's regex so we can walk ALL occurrences
+    // in the text, not just the first — without mutating/sharing lastIndex
+    // state on the original `rule.regex` object, which is also used
+    // elsewhere (e.g. preferenceConflictsInText's rules.find(...).test()).
+    const flags = rule.regex.flags.includes('g') ? rule.regex.flags : rule.regex.flags + 'g';
+    const globalRegex = new RegExp(rule.regex.source, flags);
+    let m;
+    while ((m = globalRegex.exec(text)) !== null) {
+      const precedingWindow = text.slice(Math.max(0, m.index - OPTIONALITY_WINDOW), m.index);
+      if (!OPTIONALITY_MARKERS.test(precedingWindow)) {
+        if (!best || m.index > best.index) best = { index: m.index, value: rule.value };
+      }
+      if (m.index === globalRegex.lastIndex) globalRegex.lastIndex++; // guard against zero-length matches
+    }
   }
-  return null;
+  return best ? best.value : null;
 }
 
 /**
