@@ -8,6 +8,22 @@ Reaaliaikainen tekoälyassistentti, joka analysoi myyjän ja asiakkaan keskustel
 
 ---
 
+## Miksi Kopilotti on tehty
+
+Olen työskennellyt vaihtoautokaupassa yli 20 vuotta ja ollut mukana ostamassa ja myymässä arviolta noin 15 000 autoa. Sinä aikana ala on muuttunut perusteellisesti.
+
+Kun aloitin urani, myyjä tunsi oman liikkeensä varaston ulkoa ja asiakas kävi lähes aina paikan päällä. Nykyään suuret autotalot myyvät vaihtoautoja etänä ympäri Suomea, ja yhden toimijan varastossa voi olla samanaikaisesti tuhansia autoja useissa toimipisteissä. Yksikään myyjä ei enää pysty muistamaan koko valikoimaa tai yhdistämään sitä reaaliajassa asiakkaan tarpeisiin kesken puhelun tai chat-keskustelun.
+
+Samaan aikaan vaihtoautokaupan kannattavuus perustuu yhä enemmän lisäpalveluihin. Pelkkä auton myyntikate ei enää ratkaise, vaan merkittävä osa liiketoiminnasta muodostuu rahoituksesta, vakuutuksista, huolenpitosopimuksista ja muista lisäpalveluista. Myyjän pitäisi tunnistaa oikealla hetkellä asiakkaan ostosignaalit ja ehdottaa juuri hänelle sopivia ratkaisuja – samalla kun keskustelu etenee luonnollisesti.
+
+Kopilotti syntyi ratkaisemaan tätä ongelmaa.
+
+Se toimii tekoälypohjaisena myyntiavustajana, joka kuuntelee keskustelua reaaliajassa, tunnistaa asiakkaan tarpeet ja ostoaikeet sekä yhdistää ne ajoneuvovarastoon ja liiketoimintajärjestelmiin. Sen sijaan, että myyjä etsisi tietoa useista eri järjestelmistä tai yrittäisi muistaa tuhansien autojen valikoiman ulkoa, Kopilotti nostaa keskustelun perusteella esiin sopivimmat autot, seuraavat myyntitoimenpiteet ja CRM:ään vietävät tiedot juuri silloin, kun niitä tarvitaan.
+
+Projektin tarkoitus ei ole korvata myyjää, vaan antaa hänelle reaaliaikainen päätöksenteon tuki. Samalla se demonstroi, miten tekoäly voi toimia integraatiokerroksena keskusteluanalytiikan, ajoneuvovaraston ja CRM-/ERP-järjestelmien välillä yritysympäristössä.
+
+---
+
 ## Mitä se tekee
 
 - Tunnistaa puheesta keskeiset ostosignaalit (hintaepäily, rahoitus, vaihtoauto, perhetilanne)
@@ -66,6 +82,7 @@ Rakennettu API-pohjaisena arkkitehtuurina, jossa LLM-analyysi toimii erillisenä
 - **Deterministinen tekoälypohjainen varastonhaku** — 375 ajoneuvon siemenpohjainen, uusittavissa oleva demovarasto (`npm run generate:inventory`, 357 henkilöautoa + 18 pakettiautoa), joka poimii keskustelusta korityypin, polttoaineen, hinnan, vaihteiston, kilometri- ja ikärajan sekä signaalit (rahoitus, perhetarve, hintaherkkyys) — nämä ovat kovia suodattimia, ei pehmeitä tageja, joten tulos vastaa oikeasti sitä mitä asiakas sanoi. Pakettiautohaku ("etsin pakettiautoa", "onko alv-vähennyskelpoinen") näyttää vain pakettiautoja, merkittynä ALV-vähennyskelpoisuudella ehtoineen. Tasapelit ratkeavat eksplisiittisellä säännöllä (halvin ensin, sitten auton ID) — ei riipu satunnaisuudesta tai toteutuksen yksityiskohdista. Jokaisella merkillä/mallilla on oikea, vapaasti lisensoitu esimerkkivalokuva (Wikimedia Commons, ks. `assets/cars/CREDITS.md`) — sama kuva jaetaan kaikkien vuosimalli-/varustelu-/värivariaatioiden kesken, ei siis kuva juuri kyseisestä yksittäisestä autosta.
 - **Strukturoitu tekoälyvastaus (tool use)** — backend ei enää pyydä Claudelta vapaata tekstiä omalla rivietuliite-protokollalla, vaan pakottaa vastauksen JSON-skeeman mukaiseksi Anthropicin tool use -ominaisuudella (`emit_analysis`). Poistaa kokonaisen luokan hiljaisia parse-virheitä, joissa yksittäinen poikkeava rivi (selitysteksti, markdown-koodilohko) tiputti vihjeen jäljettömiin ilman virheilmoitusta.
 - **Automieltymysten tunnistuksen korjaus** — jos asiakas vaihtaa mieltä kesken keskustelun (esim. "farmari" → myöhemmin "maasturi"), järjestelmä poimii nyt viimeisimmän maininnan eikä jää kiinni ensimmäiseen sääntötaulukon mukaiseen osumaan. Live-mikrofonisession tila (transkriptio, tunnistetut signaalit) nollautuu myös oikein sessioiden välillä, ja saman analyysivastauksen sisällä toistuvat signaalityypit eivät enää vääristä ostohalukkuuden confidence-laskentaa keinotekoisesti.
+- **Todennettava asiakassuostumus (hash-ketjutettu audit-loki)** — asiakkaan suostumus puheen analysointiin kirjataan nyt hash-ketjutettuun lokiin (`js/audit-log.js`), jossa jokainen merkintä sitoutuu edellisen SHA-256-hashiin; jälkikäteinen muokkaus tai poisto rikkoo ketjun ja on havaittavissa. Suostumusnäkymän näkyvyys tarkistetaan `getComputedStyle`:llä ennen hyväksynnän kirjaamista — jos näkymä on esim. piilotettu CSS:llä, suostumusta ei hiljaa hyväksytä. Kieltäytyminen lukitsee session käynnistyksen oikeasti, ei vain näytä ilmoitusta.
 
 ### Seuraavaksi: Oikeat integraatiot
 Mock-triggerit korvataan oikeilla API-kutsuilla integraatioalustan (Workato / Frends) kautta:
