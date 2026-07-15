@@ -68,22 +68,35 @@ const TRANSMISSION_RULES = [
 const OPTIONALITY_MARKERS = /saa olla myös|myös käy|käy myös|tai myös|voi olla myös|sopii myös/i;
 const OPTIONALITY_WINDOW = 30; // chars to look back before a candidate match
 
-// Returns the value of the LAST (furthest-in-text, largest match index)
-// non-optionality-marked match across ALL of `rules` — not the first rule
-// (in priority/declaration order) that happens to match anywhere in the
-// text. The previous version returned as soon as any rule matched, which
-// meant an earlier-declared rule (e.g. BODY_TYPE_RULES' combi, declared
-// before suv) would win even when the customer's actual final statement in
-// the transcript named a different category later on (e.g. "Haluaisin
+// Returns the value of the LAST (furthest-in-text) DISTINCT non-optionality-
+// marked mention across ALL of `rules` — not the first rule (in
+// priority/declaration order) that happens to match anywhere in the text.
+// The original version returned as soon as any rule matched, which meant an
+// earlier-declared rule (e.g. BODY_TYPE_RULES' combi, declared before suv)
+// would win even when the customer's actual final statement in the
+// transcript named a different category later on (e.g. "Haluaisin
 // farmarin... Itse asiassa mietin että ehkä maasturi olisikin parempi" kept
 // resolving to 'combi' because combi is checked first, regardless of where
-// in the text each word actually appeared). Scanning every rule and keeping
-// the match with the greatest `m.index` makes the most RECENT statement win
-// instead, for every category that uses this helper (bodyType, fuel, color,
-// transmission). The OPTIONALITY_MARKERS/OPTIONALITY_WINDOW check is
-// applied identically to every candidate match, unchanged from before.
+// in the text each word actually appeared).
+//
+// "Distinct" matters: a candidate only overrides the current best if it
+// starts at or after the current best's match ENDS (`m.index >=
+// best.endIndex`), not merely at a greater index. Without that guard, a
+// broader/less-specific rule whose match is nested INSIDE a more specific
+// rule's match on the exact same phrase would win purely because its match
+// happens to start a few characters later in the string — e.g. "ladattava
+// hybridi" (FUEL_RULES' dedicated plug-in-hybrid rule) contains the bare
+// word "hybridi" (FUEL_RULES' generic hybrid rule) as a substring; the
+// generic rule's match starts later than the specific rule's match despite
+// both describing the SAME single customer statement, not two separate
+// mentions. Requiring the new match to start after the previous one ENDS
+// means overlapping matches on one phrase are resolved by rule
+// declaration order (more specific rules are deliberately listed first —
+// see FUEL_RULES/BODY_TYPE_RULES comments), while genuinely separate,
+// non-overlapping later statements (the actual mind-change case above)
+// still override earlier ones exactly as intended.
 function firstMatch(text, rules) {
-  let best = null; // { index, value }
+  let best = null; // { index, endIndex, value }
   for (const rule of rules) {
     // Use a global copy of the rule's regex so we can walk ALL occurrences
     // in the text, not just the first — without mutating/sharing lastIndex
@@ -95,7 +108,8 @@ function firstMatch(text, rules) {
     while ((m = globalRegex.exec(text)) !== null) {
       const precedingWindow = text.slice(Math.max(0, m.index - OPTIONALITY_WINDOW), m.index);
       if (!OPTIONALITY_MARKERS.test(precedingWindow)) {
-        if (!best || m.index > best.index) best = { index: m.index, value: rule.value };
+        const endIndex = m.index + m[0].length;
+        if (!best || m.index >= best.endIndex) best = { index: m.index, endIndex, value: rule.value };
       }
       if (m.index === globalRegex.lastIndex) globalRegex.lastIndex++; // guard against zero-length matches
     }

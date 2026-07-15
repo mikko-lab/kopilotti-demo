@@ -59,6 +59,52 @@ const SCENARIOS = {
     // forced into one). "Budjetti" in the transcript still produces a
     // genuine price_sensitivity signal via the local regex path.
     meter: 68, meterDesc: 'Yritysasiakas — selkeä tarve', cars: [], signal: 'Pakettiauto'
+  },
+  whatsapp: {
+    // Demonstrates that the analysis pipeline is channel-agnostic: this
+    // transcript never touches SpeechRecognition or the Web Speech API at
+    // all, it's a WhatsApp-style text thread (customer + myyjä turns, plus
+    // media the myyjä sends mid-conversation) fed into the exact same
+    // extractVehiclePreferences()/runBusinessRules()/inventory pipeline
+    // used for the voice scenarios above — same as a live mic session, just
+    // with `currentTranscript` populated from a chat log instead of speech.
+    // The opening line mirrors how a real dealer's "Lähetä WhatsApp-viesti"
+    // link pre-fills the customer's first message (rekisterinumero +
+    // toimipiste), which is genuinely how these conversations start today.
+    //
+    // Deliberately NOT a real WhatsApp Business API integration (no
+    // webhook, no Meta account, no live message sending) — see the
+    // "Miksi Kopilotti on tehty" section of the README for why remote,
+    // text-first sales conversations are the actual scenario this models.
+    //
+    // Media the myyjä sends (tyres, windshield, service-book page, a short
+    // video) are represented as plain transcript events, not files Claude
+    // or the local fallback actually inspects — Kopilotti flags THAT media
+    // was sent and reminds the myyjä what to verify, it does not grade the
+    // vehicle's condition from the photo itself (see KUVAT-hint below: it
+    // is a workflow reminder, not a condition verdict).
+    text: 'Hei! Minua kiinnostaa auto rekisterinumerolla: HJK-482 - Toimipiste: Tampere. Onko se vielä myynnissä? Myyjä: Hei ja kiitos viestistä! Kyllä on, Skoda Octavia Combi ladattava hybridi. Miten voin auttaa? Asiakas: Etsimme farmaria, pitää olla ladattava hybridi jos mahdollista. Hintaluokka 30-45 000 euroa, automaatti ja ajokilometrejä alle 100 000 km. Voisitko lähettää kuvia renkaista, tuulilasista ja huoltokirjasta ennen kuin tulemme koeajolle? Myyjä: Toki, hetkinen. Myyjä lähetti kuvan renkaista edestä ja takaa. Myyjä lähetti kuvan tuulilasista. Myyjä lähetti kuvan huoltokirjan viimeisimmästä sivusta. Myyjä lähetti lyhyen videon autosta. Tässä kuvat ja video, kaikki näyttää siistiltä mutta katsothan itsekin. Asiakas: Kiitos nopeasta vastauksesta, näyttää hyvältä! Paljonko kuukausierä olisi rahoituksella? Myyjä: Lasketaan heti tarjous ja lähetetään tänne. Asiakas: Hyvä, jos numerot näyttää järkeviltä niin voidaan sopia koeajo jo tällä viikolla.',
+    hints: [
+      { type: 'blue', icon: '📸', title: 'KUVAT JA VIDEO VASTAANOTETTU', text: 'Asiakas pyysi kuvia renkaista, tuulilasista ja huoltokirjasta ennen koeajoa — myyjä lähetti ne. Tarkista itse ennen lähetystä että kuvat vastaavat nykykuntoa, älä luota pelkkään AI-yhteenvetoon.', action: 'Tarkista kuvat' },
+      { type: 'green', icon: '💳', title: 'RAHOITUSKIINNOSTUS', text: 'Asiakas kysyi kuukausierää heti kuvien jälkeen — vahva ostosignaali etäkaupassa. Lähetä rahoituslaskelma samaan WhatsApp-ketjuun.', action: 'Lähetä rahoituslaskelma' },
+      { type: 'green', icon: '🤝', title: 'KOEAJOPYYNTÖ', text: 'Asiakas on jo valmis sopimaan koeajon tällä viikolla. Varaa aika heti ketjussa kiinni — älä jätä asiakasta odottamaan puhelua.', action: 'Varaa koeajo' },
+    ],
+    // Uses the existing 'Rahoituskiinnostus' scenario-tag (same string the
+    // 'rahoitus' scenario above uses) so signalsFromScenario() maps it to a
+    // real FINANCING Signal via SCENARIO_SIGNAL_TYPE (signals.js) — not a
+    // new/unmapped label. This matters here specifically: unlike
+    // pakettiauto's deliberately-unmapped 'Pakettiauto' tag (that scenario's
+    // recommendations come entirely from the bodyType=van hard filter, so an
+    // empty Detected Signals panel there is fine), THIS scenario's own
+    // meterDesc below claims a strong signal, and the demo scenario path
+    // (analyzeScenario's local fallback) never runs detectLocalSignals() or
+    // derives signals from the canned `hints` array the way live/SSE input
+    // does (see handleSSEEvent's 'hint' case) — the scenario-level tag is
+    // the ONLY source of a Signal here, exactly like every other scenario
+    // above. Financing was picked over purchase-ready because it's the more
+    // concretely stated ask in this transcript ("Paljonko kuukausierä
+    // olisi").
+    meter: 78, meterDesc: 'Vahva etäostosignaali — kuvat tarkistettu, koeajo sovittu', cars: [], signal: 'Rahoituskiinnostus'
   }
 };
 
@@ -164,6 +210,7 @@ async function giveConsent() {
   consentGiven=true;
   consentBox.style.display='none';
   document.getElementById('btnStart').disabled=false;
+  document.getElementById('btnPaste').disabled=false;
   document.getElementById('statusSub').textContent='Suostumus saatu — valmis';
   showToast('✅ Suostumus kirjattu');
 }
@@ -194,11 +241,15 @@ function startSession() {
   showTranscript('');
   document.getElementById('statHints').textContent='0';
   document.getElementById('statSig').textContent='0';
+  document.getElementById('pasteBox').classList.add('hidden');
+  document.getElementById('transcriptArea').classList.remove('hidden');
+  document.getElementById('pasteInput').value='';
 
   document.getElementById('statusDot').classList.add('active');
   document.getElementById('statusTitle').textContent='Sessio käynnissä';
   document.getElementById('statusSub').textContent='Kuuntelen...';
   document.getElementById('btnStart').classList.add('hidden');
+  document.getElementById('btnPaste').classList.add('hidden');
   document.getElementById('btnStop').classList.remove('hidden');
   document.getElementById('btnCRM').classList.remove('hidden');
   document.getElementById('btnAnalyze').disabled=false;
@@ -216,6 +267,68 @@ function startSession() {
     showToast('⚠️ Selain ei tue puheentunnistusta — käytä demo-skenaarioita alla');
     document.getElementById('statusSub').textContent='Puheentunnistus ei tuettu — käytä demo-skenaarioita';
   }
+}
+
+// Live text-conversation mode: for when the seller is ALREADY mid-conversation
+// with a customer in a real text channel (WhatsApp, web chat, SMS...) and
+// wants Kopilotti reading along as it happens, without speaking anything out
+// loud. No SpeechRecognition involved at all — the seller pastes/types the
+// growing conversation into #pasteInput themselves (see handlePasteInput()
+// below), copying new messages over from wherever the real conversation is
+// actually happening. Deliberately manual, not an automated read of any
+// external app or API — see the README's "Seuraavaksi" section for why a
+// live WhatsApp Business API webhook is a separate, much larger piece of
+// work than this.
+function startPasteSession() {
+  sessionActive=true;
+  currentScenario=null;
+
+  // Same session-state reset as startSession() above (mic path) — see that
+  // function's own comment for why this matters (stale transcript/signals
+  // otherwise carrying over from a previous session on the same page load).
+  currentTranscript='';
+  lastAutoAnalyzedTranscript='';
+  hints=[];
+  signals=0;
+  businessSignals=[];
+  document.getElementById('statHints').textContent='0';
+  document.getElementById('statSig').textContent='0';
+
+  document.getElementById('transcriptArea').classList.add('hidden');
+  document.getElementById('pasteBox').classList.remove('hidden');
+  const pasteInput = document.getElementById('pasteInput');
+  pasteInput.value='';
+  pasteInput.focus();
+
+  document.getElementById('statusDot').classList.add('active');
+  document.getElementById('statusTitle').textContent='Sessio käynnissä';
+  document.getElementById('statusSub').textContent='Liitä-tila — päivitä keskustelua tekstikenttään sitä mukaa kun se etenee';
+  document.getElementById('btnStart').classList.add('hidden');
+  document.getElementById('btnPaste').classList.add('hidden');
+  document.getElementById('btnStop').classList.remove('hidden');
+  document.getElementById('btnCRM').classList.remove('hidden');
+  document.getElementById('btnAnalyze').disabled=false;
+
+  timer=setInterval(()=>{
+    secs++;
+    const m=Math.floor(secs/60), s=secs%60;
+    document.getElementById('statTime').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  },1000);
+}
+
+// Fires on every edit to the paste box (input event: typing, paste, cut all
+// included). currentTranscript is simply SET to the box's current full
+// value rather than appended — paste-mode text is edited in place (the
+// seller may paste a new chunk in the middle, fix a typo, etc.), unlike
+// SpeechRecognition's onresult handler which only ever appends finalized
+// segments. Reuses the exact same scheduleAutoAnalyze() debounce used by
+// live mic input, so a burst of pasted text settles for
+// AUTO_ANALYZE_DEBOUNCE_MS before triggering analysis, same as speech
+// pausing.
+function handlePasteInput() {
+  currentScenario=null;
+  currentTranscript = document.getElementById('pasteInput').value;
+  scheduleAutoAnalyze();
 }
 
 function startRecognition() {
@@ -278,6 +391,7 @@ function stopSession() {
   document.getElementById('statusSub').textContent=`Kesto: ${document.getElementById('statTime').textContent}`;
   document.getElementById('btnStop').classList.add('hidden');
   document.getElementById('btnStart').classList.remove('hidden');
+  document.getElementById('btnPaste').classList.remove('hidden');
   document.getElementById('wave').classList.add('hidden');
   setBadgeLive('badgeSpeech', false);
   showToast('Sessio lopetettu');
@@ -292,6 +406,15 @@ function showTranscript(text) {
 
 async function runScenario(key) {
   if(!sessionActive){ if(!consentGiven) giveConsent(); startSession(); }
+  // Defensive, not just startSession()'s own reset: a demo scenario can be
+  // launched while a paste-mode session is already active (sessionActive
+  // true, so the startSession() call above is skipped) — without this, the
+  // scenario would type into the still-hidden transcriptArea while
+  // pasteBox stayed on screen. Cheap to always assert the scenario/mic UI
+  // state regardless of which mode was active before.
+  document.getElementById('pasteBox').classList.add('hidden');
+  document.getElementById('transcriptArea').classList.remove('hidden');
+  document.getElementById('btnPaste').classList.add('hidden');
   currentScenario=key;
   const s=SCENARIOS[key];
   currentTranscript='';
@@ -881,6 +1004,8 @@ function wireEvents() {
   document.getElementById('btnDenyConsent').addEventListener('click', denyConsent);
   document.getElementById('btnGiveConsent').addEventListener('click', giveConsent);
   document.getElementById('btnStart').addEventListener('click', startSession);
+  document.getElementById('btnPaste').addEventListener('click', startPasteSession);
+  document.getElementById('pasteInput').addEventListener('input', handlePasteInput);
   document.getElementById('btnStop').addEventListener('click', stopSession);
   document.getElementById('btnCRM').addEventListener('click', syncToCRM);
   document.getElementById('btnAnalyze').addEventListener('click', analyzeNow);
