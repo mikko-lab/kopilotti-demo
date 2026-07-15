@@ -53,17 +53,19 @@ Soveltuu laajennettavaksi integraatioalustoihin kuten **Workato**, **Dell Boomi*
 
 Rakennettu API-pohjaisena arkkitehtuurina, jossa LLM-analyysi toimii erillisenä palveluna ja integroituu backendiin. Käyttöliittymä on tarkoituksella kevyt — logiikka on integraatiokerroksessa, ei UI:ssa.
 
-**Stack:** Vanilla JS · Web Speech API · Node.js · Express · Server-Sent Events · Claude API · Railway
+**Stack:** Vanilla JS · Web Speech API · Node.js · Express · Server-Sent Events · Claude API (tool use / structured output) · Railway
 
 ---
 
 ## Kehityssuunnitelma
 
 ### ✅ Toteutettu
-- **SSE-striimaus** — LLM-analyysi pyörii Node.js-backendissä (Railway), tulokset striimautuvat Server-Sent Events -yhteydellä suoraan myyjän näytölle. API-avain palvelimella, ei selaimessa.
+- **SSE-striimaus** — LLM-analyysi pyörii Node.js-backendissä (Railway), tulokset striimautuvat Server-Sent Events -yhteydellä suoraan myyjän näytölle. API-avain palvelimella, ei selaimessa. **Huom:** Railway-backend ei ole tällä hetkellä käynnissä (kokeilujakso päättynyt) — [live-demo](https://mikko-lab.github.io/kopilotti-demo/) toimii tästä huolimatta täysin normaalisti alla kuvatun graceful fallbackin varassa, sillä demo-skenaariot eivät ylipäätään tarvitse backendiä (ks. seuraava kohta).
 - **Graceful fallback** — jos backend ei ole tavoitettavissa (tai LLM-kutsu epäonnistuu palvelimella), UI siirtyy automaattisesti paikalliseen analyysiin ilman virheilmoituksia.
 - **Enterprise-käyttöliittymän uudistus** — Stripe/Linear-tason visuaalinen ilme: tumma header, uusi väripaletti, SVG-pohjaiset ostohalukkuus-/confidence-mittarit, kaksipalstainen responsiivinen layout. WCAG 2.2 AA -tasoinen saavutettavuus (kontrasti tarkistettu myös axe:n omien sokeiden pisteiden — aria-hidden-sisältö, ::after-pseudoelementit — ohi käsinlasketulla auditoinnilla; näppäimistökäyttö ja `prefers-reduced-motion` testattu).
 - **Deterministinen tekoälypohjainen varastonhaku** — 375 ajoneuvon siemenpohjainen, uusittavissa oleva demovarasto (`npm run generate:inventory`, 357 henkilöautoa + 18 pakettiautoa), joka poimii keskustelusta korityypin, polttoaineen, hinnan, vaihteiston, kilometri- ja ikärajan sekä signaalit (rahoitus, perhetarve, hintaherkkyys) — nämä ovat kovia suodattimia, ei pehmeitä tageja, joten tulos vastaa oikeasti sitä mitä asiakas sanoi. Pakettiautohaku ("etsin pakettiautoa", "onko alv-vähennyskelpoinen") näyttää vain pakettiautoja, merkittynä ALV-vähennyskelpoisuudella ehtoineen. Tasapelit ratkeavat eksplisiittisellä säännöllä (halvin ensin, sitten auton ID) — ei riipu satunnaisuudesta tai toteutuksen yksityiskohdista. Jokaisella merkillä/mallilla on oikea, vapaasti lisensoitu esimerkkivalokuva (Wikimedia Commons, ks. `assets/cars/CREDITS.md`) — sama kuva jaetaan kaikkien vuosimalli-/varustelu-/värivariaatioiden kesken, ei siis kuva juuri kyseisestä yksittäisestä autosta.
+- **Strukturoitu tekoälyvastaus (tool use)** — backend ei enää pyydä Claudelta vapaata tekstiä omalla rivietuliite-protokollalla, vaan pakottaa vastauksen JSON-skeeman mukaiseksi Anthropicin tool use -ominaisuudella (`emit_analysis`). Poistaa kokonaisen luokan hiljaisia parse-virheitä, joissa yksittäinen poikkeava rivi (selitysteksti, markdown-koodilohko) tiputti vihjeen jäljettömiin ilman virheilmoitusta.
+- **Automieltymysten tunnistuksen korjaus** — jos asiakas vaihtaa mieltä kesken keskustelun (esim. "farmari" → myöhemmin "maasturi"), järjestelmä poimii nyt viimeisimmän maininnan eikä jää kiinni ensimmäiseen sääntötaulukon mukaiseen osumaan. Live-mikrofonisession tila (transkriptio, tunnistetut signaalit) nollautuu myös oikein sessioiden välillä, ja saman analyysivastauksen sisällä toistuvat signaalityypit eivät enää vääristä ostohalukkuuden confidence-laskentaa keinotekoisesti.
 
 ### Seuraavaksi: Oikeat integraatiot
 Mock-triggerit korvataan oikeilla API-kutsuilla integraatioalustan (Workato / Frends) kautta:
