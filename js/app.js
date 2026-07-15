@@ -3,6 +3,7 @@ import { runBusinessRules } from './business-rules.js';
 import { unmatchedSignalLabels, preferencesExcludedEverything, loadInventory, checkNamedModelClaim } from './inventory-engine.js';
 import { extractVehiclePreferences, preferenceConflictsInText } from './vehicle-preferences.js';
 import { createGauge } from './gauge.js';
+import { HashChainedAuditLog } from './audit-log.js';
 
 const SCENARIOS = {
   hinta: {
@@ -113,15 +114,63 @@ const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === 
   ? 'http://localhost:3001'
   : 'https://kopilotti-demo-production.up.railway.app';
 
-function giveConsent() {
+// Hash-chained so a tampered/removed entry is detectable after the fact
+// (verifyChain()) — makes "Suostumus kirjattu" an actual provable claim
+// instead of a toast asserting something no one can check. See
+// js/audit-log.js and the ai-transparency-gate proto it's ported from.
+const consentAuditLog = new HashChainedAuditLog();
+
+function renderConsentAuditLog() {
+  document.getElementById('consentAuditJson').textContent = consentAuditLog.toJSON();
+}
+
+// Verifies — via computed style, not trust — that the consent notice was
+// actually exposed to the salesperson before treating the obligation as
+// satisfied. Mirrors ai-transparency-gate's checkExposedToAssistiveTech():
+// host-page CSS, an aria-hidden ancestor, or a zero-size box can all
+// silently defeat a consent box that "looks correct" in the markup.
+function checkConsentBoxExposed(el) {
+  const reasons = [];
+  const style = getComputedStyle(el);
+  if (style.display === 'none') reasons.push('display:none');
+  if (style.visibility === 'hidden' || style.visibility === 'collapse') reasons.push('visibility:hidden');
+  if (Number(style.opacity) === 0) reasons.push('opacity:0');
+  const rect = el.getBoundingClientRect();
+  if (rect.width === 0 && rect.height === 0) reasons.push('zero-size box');
+  let node = el;
+  while (node) {
+    if (node.getAttribute('aria-hidden') === 'true') { reasons.push('aria-hidden="true" on an ancestor'); break; }
+    node = node.parentElement;
+  }
+  return { exposed: reasons.length === 0, reasons };
+}
+
+async function giveConsent() {
+  const consentBox = document.getElementById('consentBox');
+  const exposure = checkConsentBoxExposed(consentBox);
+
+  if (!exposure.exposed) {
+    // Refuse rather than silently accept a consent we can't prove was seen —
+    // same "refuse-don't-guess" stance as the other guardrail checks.
+    await consentAuditLog.append({ eventType: 'customer_consent', stage: 'CONSENT_GIVEN', verdict: 'BLOCK', payload: { reasons: exposure.reasons } });
+    renderConsentAuditLog();
+    showToast('⚠️ Suostumusnäkymä ei ollut näkyvissä — suostumusta ei voitu vahvistaa');
+    return;
+  }
+
+  await consentAuditLog.append({ eventType: 'customer_consent', stage: 'CONSENT_GIVEN', verdict: 'PASS', payload: { reasons: ['consent box exposed and acknowledged'] } });
+  renderConsentAuditLog();
+
   consentGiven=true;
-  document.getElementById('consentBox').style.display='none';
+  consentBox.style.display='none';
   document.getElementById('btnStart').disabled=false;
   document.getElementById('statusSub').textContent='Suostumus saatu — valmis';
   showToast('✅ Suostumus kirjattu');
 }
 
-function denyConsent() {
+async function denyConsent() {
+  await consentAuditLog.append({ eventType: 'customer_consent', stage: 'CONSENT_DENIED', verdict: 'BLOCK', payload: { reasons: ['asiakas kieltäytyi'] } });
+  renderConsentAuditLog();
   showToast('❌ Suostumus kieltäytyi — sessio peruutettu');
 }
 
