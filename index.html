@@ -107,6 +107,7 @@
       <!-- Btns -->
       <div class="btn-row">
         <button class="btn btn-primary" id="btnStart" type="button" disabled>▶ Aloita</button>
+        <button class="btn btn-outline" id="btnPaste" type="button" disabled>📋 Liitä keskustelu</button>
         <button class="btn btn-danger hidden" id="btnStop" type="button">⬛ Lopeta</button>
         <button class="btn btn-outline hidden" id="btnCRM" type="button">📋 Synkronoi CRM:ään</button>
       </div>
@@ -120,12 +121,26 @@
         <button class="scenario-btn" type="button" data-scenario="osto">🤝 Ostovalmis</button>
         <button class="scenario-btn" type="button" data-scenario="vaihto">🔄 Vaihto</button>
         <button class="scenario-btn" type="button" data-scenario="pakettiauto">📦 Pakettiauto</button>
+        <button class="scenario-btn" type="button" data-scenario="whatsapp">📱 WhatsApp</button>
       </div>
 
       <!-- Transcript -->
       <div class="transcript" id="transcriptArea">
         <div class="transcript-placeholder" id="transcriptPlaceholder">Kuuntelu ei käynnissä. Valitse skenaario tai aloita sessio.</div>
         <div id="transcriptText" class="hidden"></div>
+      </div>
+
+      <!-- Paste box: manual live-text input for an already-ongoing text
+           conversation (e.g. a real WhatsApp thread with a customer) —
+           the seller pastes/types the growing conversation here instead of
+           speaking into the mic. Every edit feeds the exact same
+           currentTranscript + scheduleAutoAnalyze() pipeline the mic uses
+           (see js/app.js's handlePasteInput()), so hints, Purchase Intent
+           and Suositellut autot update the same way, just from typed text
+           instead of speech. Hidden unless "📋 Liitä keskustelu" is active. -->
+      <div class="paste-box hidden" id="pasteBox">
+        <label class="visually-hidden" for="pasteInput">Liitä tai kirjoita asiakaskeskustelu</label>
+        <textarea class="paste-textarea" id="pasteInput" placeholder="Liitä tai kirjoita keskustelu tähän sitä mukaa kun se etenee (esim. kopioi uudet viestit WhatsApp Webistä). Kopilotti analysoi tekstin automaattisesti muutaman sekunnin kirjoitustauon jälkeen — täsmälleen samalla tavalla kuin puhetta."></textarea>
       </div>
 
       <!-- Analyze -->
