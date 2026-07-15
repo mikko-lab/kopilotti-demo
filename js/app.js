@@ -127,6 +127,25 @@ function denyConsent() {
 
 function startSession() {
   sessionActive=true;
+
+  // Reset live-mic session state: currentTranscript is a module-level
+  // variable initialized ONCE at page load and only ever appended to by the
+  // SpeechRecognition onresult handler (startRecognition, below) — without
+  // this reset, stopping and restarting a live-mic session on the same page
+  // load carries the previous session's transcript, hints and signals
+  // forward into the new one. runScenario()/analyzeScenario()/analyzeNow()
+  // already do the equivalent reset for the demo-scenario path (currentTranscript,
+  // hints, signals, businessSignals) — this mirrors that for the live-mic
+  // path specifically. The scenario path itself is untouched.
+  currentTranscript='';
+  lastAutoAnalyzedTranscript='';
+  hints=[];
+  signals=0;
+  businessSignals=[];
+  showTranscript('');
+  document.getElementById('statHints').textContent='0';
+  document.getElementById('statSig').textContent='0';
+
   document.getElementById('statusDot').classList.add('active');
   document.getElementById('statusTitle').textContent='Sessio käynnissä';
   document.getElementById('statusSub').textContent='Kuuntelen...';
@@ -380,7 +399,24 @@ function handleSSEEvent(type, data) {
     case 'hint': {
       addHint(data);
       const hintSignal = signalsFromHint(data);
-      if (hintSignal) { businessSignals.push(hintSignal); recomputeBusinessRules(); }
+      if (hintSignal) {
+        // Dedupe within a single analysis response: two HINT objects from
+        // the same Claude reply can map to the same signal TYPE (see
+        // signals.js's signalsFromHint()/HINT_TITLE_RULES), and pushing
+        // both would inflate computeConfidence()'s raw signals.length-based
+        // avgWeight beyond what the actual distinct signal types warrant.
+        // Mirrors the existing alreadyDetectedTypes dedup pattern in
+        // analyzeWithSSE() (used there for the local-signal supplement),
+        // applied here to Claude's own per-hint signals instead. Only the
+        // business-rules signal is deduped — addHint(data) above still runs
+        // unconditionally, so every hint Claude returns is still shown to
+        // the salesperson as its own card.
+        const alreadyHasType = businessSignals.some(s => s.type === hintSignal.type);
+        if (!alreadyHasType) {
+          businessSignals.push(hintSignal);
+          recomputeBusinessRules();
+        }
+      }
       break;
     }
     case 'meter':
