@@ -143,6 +143,16 @@ test('daemon voids expired deal, audits source, and atomically releases inventor
   assert.deepEqual(context.repository.released, ['alfa-qv-1']); assert.equal(context.repository.audits.at(-1)?.source, 'SYSTEM_DAEMON');
 });
 
+test('daemon records successful heartbeat and failed cycles without changing errors', async () => {
+  const context = fixture(); let heartbeats = 0; let errors = 0;
+  const daemon = new PaymentTimeoutDaemon({ repository: context.repository, machine: context.machine, clock: context.clock, monitor: { registerDaemonHeartbeat: () => { heartbeats += 1; }, registerDaemonError: () => { errors += 1; } } });
+  assert.deepEqual(await daemon.runOnce(), { scanned: 0, voided: 0, skipped: 0 }); assert.equal(heartbeats, 1); assert.equal(errors, 0);
+  const original = context.repository.processExpiredAwaitingPayment.bind(context.repository);
+  context.repository.processExpiredAwaitingPayment = async () => { throw Object.assign(new Error('sensitive failure'), { code: 'DATABASE_UNAVAILABLE' }); };
+  await assert.rejects(daemon.runOnce(), { code: 'DATABASE_UNAVAILABLE' }); assert.equal(heartbeats, 1); assert.equal(errors, 1);
+  context.repository.processExpiredAwaitingPayment = original;
+});
+
 test('handover requires authorization and all pinned vehicle-policy facts', async () => {
   const context = fixture(); const agreed = await priceAgreed(context);
   const awaiting = await context.machine.beginPayment({ dealId: agreed.id, expectedVersion: agreed.version, method: 'CASH', providerReference: 'payment-1' });
