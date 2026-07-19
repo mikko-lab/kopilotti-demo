@@ -150,10 +150,11 @@ async function submitPrice(event) {
 function renderDecision(decision) {
   const salesperson = PERSONAS[state.persona].name;
   if (decision.status === 'ACCEPT') {
-    addMessage('salesperson decision', `Ehdotuksesi voidaan hyväksyä. Sovittu hinta on ${formatEuro(decision.approvedAmount)}. Voit tehdä demo-varauksen nyt.`, salesperson);
+    document.getElementById('questionActions').classList.add('hidden');
+    addMessage('salesperson decision', `Hinnasta on sovittu. Olemme sopineet auton hinnaksi ${formatEuro(decision.approvedAmount)}. Seuraavaksi tutustut auton kuntoraporttiin ja valitset maksutavan.`, salesperson);
     renderDecisionActions('reserve');
   } else if (decision.status === 'COUNTER') {
-    addMessage('salesperson decision', `Voimme jatkaa kauppaa hinnalla ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja siirtyä demo-varaukseen?`, salesperson);
+    addMessage('salesperson decision', `Voimme jatkaa kauppaa hinnalla ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja tutustua seuraavaksi auton kuntoraporttiin?`, salesperson);
     renderDecisionActions('counter');
   } else if (decision.status === 'REJECT') {
     addMessage('salesperson decision', 'Emme voi edetä ehdottamallasi hinnalla. Voit jatkaa keskustelua tai ostaa auton listahinnalla.', salesperson);
@@ -206,38 +207,6 @@ function addMessage(className, text, speaker) {
   return message;
 }
 
-function showReservationDemo() {
-  setText('demoDialogTitle', 'Valitse seuraava vaihe');
-  setText('demoDialogText', 'Kuntoraportin kuittaus on tallennettu palvelimelle. Valitse konseptidemossa, haluatko jatkaa rahoitukseen vai maksamiseen. Kumpikaan valinta ei käynnistä oikeaa hakemusta tai maksua.');
-  const form = document.querySelector('#demoDialog form');
-  form.replaceChildren(
-    createDialogAction('Jatka rahoitukseen', completeReservationDemo),
-    createDialogAction('Jatka maksamiseen', completeReservationDemo),
-  );
-  document.getElementById('demoDialog').showModal();
-}
-
-function completeReservationDemo() {
-  setText('demoDialogTitle', 'Demo-varaus vahvistettu');
-  setText('demoDialogText', 'Ajoneuvo on merkitty varatuksi vain tässä käyttöliittymädemossa. Varaus ei ole sitova kauppa eikä oikea ajoneuvovaraus.');
-  const form = document.querySelector('#demoDialog form');
-  const close = document.createElement('button');
-  close.className = 'btn btn-primary';
-  close.type = 'submit';
-  close.value = 'close';
-  close.textContent = 'Ymmärrän';
-  form.replaceChildren(close);
-}
-
-function createDialogAction(label, handler) {
-  const button = document.createElement('button');
-  button.className = 'btn btn-primary';
-  button.type = 'button';
-  button.textContent = label;
-  button.addEventListener('click', handler);
-  return button;
-}
-
 async function beginPurchaseFlow(purchasePath, trigger) {
   state.conditionReturnFocus = trigger || document.activeElement;
   const step = document.getElementById('conditionReportStep');
@@ -246,6 +215,7 @@ async function beginPurchaseFlow(purchasePath, trigger) {
   step.focus();
   setConditionStatus('Kuntoraporttia ladataan…');
   if (purchasePath === PURCHASE_PATH.NEGOTIATED) {
+    document.getElementById('questionActions').classList.add('hidden');
     addMessage('salesperson', 'Ennen kuin siirrymme rahoitukseen tai maksamiseen, tutustutaan vielä auton kuntoraporttiin.', PERSONAS[state.persona].name);
   }
   try {
@@ -254,6 +224,10 @@ async function beginPurchaseFlow(purchasePath, trigger) {
       purchasePath,
       negotiationSessionId: purchasePath === PURCHASE_PATH.NEGOTIATED ? api.getSessionId() : null,
     });
+    renderPurchaseProgress('condition');
+    if (purchasePath === PURCHASE_PATH.NEGOTIATED) {
+      setPurchaseStatus('Hinnasta sovittu', `Olemme sopineet auton hinnaksi ${formatEuro(purchaseApi.session.agreedPrice)}. Seuraavaksi tutustut auton kuntoraporttiin ja valitset maksutavan.`);
+    }
     await loadConditionReport();
   } catch (error) {
     showConditionFailure(error);
@@ -321,8 +295,7 @@ async function submitConditionAcknowledgement(event) {
   setText('conditionReportError', '');
   try {
     await purchaseApi.acknowledge();
-    await purchaseApi.proceed();
-    showReservationDemo();
+    showPaymentSelection();
   } catch (error) {
     if (error.code === 'CONDITION_REPORT_CHANGED') {
       setConditionStatus('Auton kuntoraportti on päivittynyt. Tutustu uuteen versioon ennen kuin jatkat.', 'review');
@@ -332,6 +305,115 @@ async function submitConditionAcknowledgement(event) {
       setText('conditionReportError', 'Kuittausta ei voitu tallentaa. Emme siirry rahoitukseen tai maksamiseen ennen kuin palvelinyhteys toimii.');
     }
   }
+}
+
+function showPaymentSelection() {
+  document.getElementById('conditionReportStep').classList.add('hidden');
+  const journey = document.getElementById('purchaseJourney');
+  journey.classList.remove('hidden');
+  document.getElementById('paymentMethods').classList.remove('hidden');
+  document.getElementById('demoConfirmation').classList.add('hidden');
+  setText('purchaseJourneyTitle', 'Hinnasta sovittu');
+  setPurchaseStatus('Kuntoraportti kuitattu', 'Valitse, haluatko jatkaa maksamiseen vai hakea rahoitusta.');
+  renderPurchaseProgress('provider');
+  journey.focus();
+}
+
+async function selectPayment(event) {
+  const button = event.target.closest('button[data-payment-method]');
+  if (!button) return;
+  const method = button.dataset.paymentMethod;
+  document.querySelectorAll('[data-payment-method]').forEach((control) => { control.disabled = true; });
+  setPurchaseStatus(method === 'PAYMENT' ? 'Maksua käynnistetään' : 'Rahoitushakemusta käynnistetään', 'Odotetaan palveluyhteyttä…');
+  try {
+    await purchaseApi.selectPaymentMethod(method);
+    const pending = await purchaseApi.startProvider();
+    document.getElementById('paymentMethods').classList.add('hidden');
+    renderProviderStatus(pending);
+  } catch (error) {
+    const message = method === 'PAYMENT'
+      ? 'Maksupalveluun ei saatu yhteyttä. Maksua ei ole vahvistettu.'
+      : 'Rahoituspalveluun ei saatu yhteyttä. Rahoitusta ei ole vahvistettu.';
+    setPurchaseStatus('Yhteys ei onnistunut', message);
+    document.querySelectorAll('[data-payment-method]').forEach((control) => { control.disabled = false; });
+  }
+}
+
+function renderProviderStatus(session) {
+  const payment = session.paymentMethod === 'PAYMENT';
+  setText('purchaseJourneyTitle', payment ? 'Maksu odottaa' : 'Rahoitus käsittelyssä');
+  setPurchaseStatus(
+    payment ? 'Maksu odottaa vahvistusta' : 'Rahoitus käsittelyssä',
+    payment
+      ? 'Maksu odottaa vahvistusta. Jatkamme heti, kun maksupalvelu on vahvistanut maksun.'
+      : 'Rahoitushakemuksesi on käsittelyssä. Rahoituksen vahvistaa erillinen rahoitusyhtiö.',
+  );
+  renderPurchaseProgress('provider');
+  if (session.simulated) showDemoConfirmation(session.paymentMethod);
+}
+
+function showDemoConfirmation(method) {
+  const container = document.getElementById('demoConfirmation');
+  const note = document.createElement('p');
+  note.className = 'purchase-fineprint';
+  note.textContent = 'Simuloitu vahvistus on käytettävissä vain tässä konseptidemossa.';
+  const button = createAction(method === 'PAYMENT' ? 'Demon maksuvahvistus' : 'Demon rahoitusvahvistus', () => confirmDemo(method), true);
+  container.replaceChildren(note, button);
+  container.classList.remove('hidden');
+  button.focus();
+}
+
+async function confirmDemo(method) {
+  const container = document.getElementById('demoConfirmation');
+  const button = container.querySelector('button');
+  button.disabled = true;
+  try {
+    const session = await purchaseApi.confirmDemo(method);
+    container.classList.add('hidden');
+    renderConfirmedStatus(session);
+  } catch (_error) {
+    setPurchaseStatus('Vahvistus ei onnistunut', method === 'PAYMENT' ? 'Maksua ei ole vahvistettu.' : 'Rahoitusta ei ole vahvistettu.');
+    button.disabled = false;
+    button.focus();
+  }
+}
+
+function renderConfirmedStatus(session) {
+  if (session.status === 'READY_FOR_HANDOVER') {
+    setText('purchaseJourneyTitle', 'Valmis luovutukseen');
+    setPurchaseStatus('Valmis luovutukseen', 'Auton luovutuksen edellytykset ovat kunnossa. Saat seuraavaksi nouto- tai toimitusohjeet.');
+    renderPurchaseProgress('handover');
+    return;
+  }
+  const payment = session.status === 'PAYMENT_CONFIRMED';
+  setText('purchaseJourneyTitle', payment ? 'Maksu vahvistettu' : 'Rahoitus vahvistettu');
+  setPurchaseStatus(
+    payment ? 'Maksu vahvistettu' : 'Rahoitus vahvistettu',
+    payment
+      ? 'Maksu on vahvistettu. Tarkistamme seuraavaksi auton luovutuksen edellytykset.'
+      : 'Rahoitus on vahvistettu. Tarkistamme seuraavaksi auton luovutuksen edellytykset.',
+  );
+}
+
+function setPurchaseStatus(title, message) {
+  const panel = document.getElementById('purchaseStatus');
+  const heading = document.createElement('strong');
+  const text = document.createElement('span');
+  heading.textContent = title;
+  text.textContent = message;
+  panel.replaceChildren(heading, text);
+  if (!document.getElementById('purchaseJourney').classList.contains('hidden')) panel.focus();
+}
+
+function renderPurchaseProgress(current) {
+  const order = ['price', 'condition', 'provider', 'handover'];
+  const index = order.indexOf(current);
+  document.querySelectorAll('[data-progress]').forEach((item) => {
+    const itemIndex = order.indexOf(item.dataset.progress);
+    item.classList.toggle('complete', itemIndex < index);
+    item.classList.toggle('current', itemIndex === index);
+    if (itemIndex === index) item.setAttribute('aria-current', 'step'); else item.removeAttribute('aria-current');
+  });
 }
 
 function showConditionFailure(error) {
@@ -393,6 +475,10 @@ document.getElementById('conditionAcknowledgement').addEventListener('change', (
 });
 document.getElementById('conditionAcknowledgementForm').addEventListener('submit', submitConditionAcknowledgement);
 document.getElementById('btnBackFromCondition').addEventListener('click', closeConditionReport);
+document.getElementById('paymentMethods').addEventListener('click', selectPayment);
+document.getElementById('btnContactSeller').addEventListener('click', () => {
+  setPurchaseStatus('Ota yhteys myyjään', 'Tämä konseptidemo ei lähetä oikeaa yhteydenottopyyntöä. Myyjä voi auttaa poikkeustilanteissa ja lisäkysymyksissä.');
+});
 loadVehicle().catch(() => {
   setText('vehicleTitle', 'Ajoneuvotietoja ei voitu ladata');
   setText('vehicleSubtitle', 'Palaa takaisin autoihin ja yritä uudelleen.');

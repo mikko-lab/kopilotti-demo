@@ -40,10 +40,26 @@ export class PurchaseFlowApi {
     return this.session;
   }
 
-  async proceed() {
-    this.requireReport();
-    this.session = await this.request(`/api/digital-salesperson/purchase-sessions/${encodeURIComponent(this.session.id)}/proceed`, {
-      method: 'POST', body: JSON.stringify({ expectedVersion: this.session.version, ...this.reportIdentity() }),
+  async selectPaymentMethod(method) {
+    this.requireSession();
+    this.session = await this.request(`/api/digital-salesperson/purchase-sessions/${encodeURIComponent(this.session.id)}/payment-method`, {
+      method: 'POST', body: JSON.stringify({ expectedVersion: this.session.version, method }),
+    });
+    return this.session;
+  }
+
+  async startProvider() {
+    this.requireSession();
+    this.session = await this.request(`/api/digital-salesperson/purchase-sessions/${encodeURIComponent(this.session.id)}/provider/start`, {
+      method: 'POST', body: JSON.stringify({ expectedVersion: this.session.version }),
+    });
+    return this.session;
+  }
+
+  async confirmDemo(kind) {
+    this.requireSession();
+    this.session = await this.request(`/api/purchase-integrations/demo/${kind.toLowerCase()}/${encodeURIComponent(this.session.id)}/confirm`, {
+      method: 'POST', body: JSON.stringify({ idempotencyKey: crypto.randomUUID() }),
     });
     return this.session;
   }

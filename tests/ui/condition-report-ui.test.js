@@ -48,5 +48,6 @@ test('client contains no report content, authoritative timestamps, or transition
   }
   assert.match(api, /X-Correlation-Id/);
   assert.match(api, /reportCommand\('acknowledge'/);
-  assert.match(api, /\/proceed/);
+  assert.match(api, /\/payment-method/);
+  assert.match(api, /\/provider\/start/);
 });

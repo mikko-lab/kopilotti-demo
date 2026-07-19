@@ -169,15 +169,32 @@
             </form>
           </div>
         </section>
+
+        <section class="purchase-journey hidden" id="purchaseJourney" aria-labelledby="purchaseJourneyTitle" tabindex="-1">
+          <div class="flow-header">
+            <div><p class="purchase-eyebrow">Kaupan eteneminen</p><h2 id="purchaseJourneyTitle">Hinnasta sovittu</h2></div>
+          </div>
+          <div class="purchase-journey-body">
+            <ol class="purchase-progress" aria-label="Ostopolun vaiheet">
+              <li data-progress="price"><span>1</span>Hinta</li>
+              <li data-progress="condition"><span>2</span>Kuntoraportti</li>
+              <li data-progress="provider"><span>3</span>Maksu tai rahoitus</li>
+              <li data-progress="handover"><span>4</span>Luovutus</li>
+            </ol>
+            <div class="purchase-status-panel" id="purchaseStatus" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></div>
+            <div class="payment-methods" id="paymentMethods">
+              <p>Valitse, haluatko jatkaa maksamiseen vai hakea rahoitusta.</p>
+              <button class="btn btn-primary purchase-button" type="button" data-payment-method="PAYMENT">Jatka maksamiseen</button>
+              <button class="btn btn-outline purchase-button" type="button" data-payment-method="FINANCING">Hae rahoitusta</button>
+            </div>
+            <div class="demo-confirmation hidden" id="demoConfirmation"></div>
+            <button class="seller-contact" id="btnContactSeller" type="button">Ota yhteys myyjään</button>
+            <p class="purchase-fineprint">Tämä demo ei muodosta sitovaa kauppaa, maksua, rahoitussopimusta tai varausta.</p>
+          </div>
+        </section>
       </aside>
     </div>
   </main>
-
-  <dialog class="demo-dialog" id="demoDialog" aria-labelledby="demoDialogTitle">
-    <h2 id="demoDialogTitle">Demo-varaus</h2>
-    <p id="demoDialogText">Tämä on käyttöliittymäkonsepti. Varaus ei ole sitova kauppa eikä oikea ajoneuvovaraus.</p>
-    <form method="dialog"><button class="btn btn-primary" value="close">Ymmärrän</button></form>
-  </dialog>
 
   <script type="module" src="js/digital-salesperson.js"></script>
 </body>
