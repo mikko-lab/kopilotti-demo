@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const Anthropic = require('@anthropic-ai/sdk');
-const { createNegotiationService } = require('./src/bootstrap');
+const { createBackendServices } = require('./src/bootstrap');
 const { createNegotiationRouter } = require('./src/http/negotiation-routes');
 const { createDigitalSalespersonRouter } = require('./src/http/digital-salesperson-routes');
+const { createPurchaseFlowRouter } = require('./src/http/purchase-flow-routes');
 const { negotiationErrorHandler } = require('./src/http/http-response');
 require('dotenv').config();
 
@@ -20,10 +21,11 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // Backend-only negotiation boundary. It is intentionally independent of
 // browser session state and is never passed to the Claude analysis prompt.
-const negotiationService = createNegotiationService();
+const { negotiationService, purchaseFlowService } = createBackendServices();
 app.use('/api/negotiations', createNegotiationRouter(negotiationService));
 if (process.env.ENABLE_CUSTOMER_NEGOTIATION_DEMO === 'true') {
   app.use('/api/digital-salesperson', createDigitalSalespersonRouter(negotiationService));
+  app.use('/api/digital-salesperson', createPurchaseFlowRouter(purchaseFlowService));
 }
 
 const SYSTEM_PROMPT = `Olet autokaupan myyntiassistentin AI. Analysoi myyntikeskustelun transkriptio.
