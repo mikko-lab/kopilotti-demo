@@ -39,8 +39,13 @@ function createPurchaseFlowRouter(service) {
     res.json(publicPurchaseSession(session));
   }));
 
-  router.post('/purchase-sessions/:sessionId/proceed', asyncRoute(async (req, res) => {
-    const session = await service.proceed({ ...command(req), reportIdentity: parseReportIdentity(req.body) });
+  router.post('/purchase-sessions/:sessionId/payment-method', asyncRoute(async (req, res) => {
+    const session = await service.selectPaymentMethod({ ...command(req), method: req.body?.method });
+    res.json(publicPurchaseSession(session));
+  }));
+
+  router.post('/purchase-sessions/:sessionId/provider/start', asyncRoute(async (req, res) => {
+    const session = await service.startProvider(command(req));
     res.json(publicPurchaseSession(session));
   }));
   return router;

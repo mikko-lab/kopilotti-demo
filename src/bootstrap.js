@@ -9,6 +9,10 @@ const { FilePolicyRepository } = require('./infrastructure/file-policy-repositor
 const { FilePurchaseRepository } = require('./infrastructure/file-purchase-repository');
 const { FileConditionReportRepository } = require('./infrastructure/file-condition-report-repository');
 const { PurchaseFlowService } = require('./application/purchase-flow-service');
+const { FileHandoverPolicyRepository } = require('./infrastructure/file-handover-policy-repository');
+const { DisabledPaymentProvider } = require('./adapters/disabled-payment-provider');
+const { DisabledFinancingProvider } = require('./adapters/disabled-financing-provider');
+const { DeterministicDemoProvider } = require('./adapters/deterministic-demo-provider');
 
 function createNegotiationService({ projectRoot = path.join(__dirname, '..'), dataDirectory = process.env.NEGOTIATION_DATA_DIR } = {}) {
   return createBackendServices({ projectRoot, dataDirectory }).negotiationService;
@@ -29,12 +33,17 @@ function createBackendServices({ projectRoot = path.join(__dirname, '..'), dataD
     inventory,
   });
   const conditionReportPath = process.env.CONDITION_REPORT_PATH || path.join(projectRoot, 'config', 'condition-reports.json');
+  const handoverPolicyPath = process.env.HANDOVER_POLICY_PATH || path.join(projectRoot, 'config', 'handover-policy.json');
+  const simulatedProviders = process.env.ENABLE_SIMULATED_PURCHASE_PROVIDERS === 'true';
   const purchaseFlowService = new PurchaseFlowService({
     purchases: new FilePurchaseRepository(path.join(durableDirectory, 'purchase-sessions.json')),
     conditionReports: new FileConditionReportRepository(conditionReportPath),
     inventory,
     negotiations: negotiationService,
     audits,
+    handoverPolicies: new FileHandoverPolicyRepository(handoverPolicyPath),
+    paymentProvider: simulatedProviders ? new DeterministicDemoProvider({ kind: 'PAYMENT', enabled: true }) : new DisabledPaymentProvider(),
+    financingProvider: simulatedProviders ? new DeterministicDemoProvider({ kind: 'FINANCING', enabled: true }) : new DisabledFinancingProvider(),
   });
   return { negotiationService, purchaseFlowService };
 }

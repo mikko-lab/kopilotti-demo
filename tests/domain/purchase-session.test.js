@@ -47,3 +47,9 @@ test('payment confirmation cannot skip pending and handover requires readiness',
   assert.throws(() => markHandedOver(confirmed, time), { code: 'PURCHASE_TRANSITION_NOT_ALLOWED' });
   assert.equal(markHandedOver(markReady(confirmed, time), time).status, 'HANDED_OVER');
 });
+
+test('rejects a stale callback for another provider transaction', () => {
+  const acknowledged = recordAcknowledgement(recordReportDisplayed(recordReportServed(create(), report, 'c-12345678', time), report, 'c-12345678', time), report, true, 'c-12345678', time);
+  const pending = startProviderFlow(selectPaymentMethod(acknowledged, 'FINANCING', time), 'finance-current', time);
+  assert.throws(() => confirmProvider(pending, 'FINANCING', 'finance-stale', 'callback-1', time), { code: 'PROVIDER_REFERENCE_MISMATCH' });
+});

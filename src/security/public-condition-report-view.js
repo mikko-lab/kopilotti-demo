@@ -30,6 +30,9 @@ function publicPurchaseSession(session) {
     id: session.id,
     vehicleId: session.vehicleId,
     purchasePath: session.purchasePath,
+    agreedPrice: session.agreedPrice,
+    paymentMethod: session.paymentMethod,
+    simulated: session.simulated === true,
     status: session.status,
     version: session.version,
     report: session.report ? {

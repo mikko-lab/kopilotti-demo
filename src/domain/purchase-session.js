@@ -77,8 +77,32 @@ function recordAcknowledgement(session, reportIdentity, acknowledged, correlatio
 
 function selectPaymentMethod(session, method, occurredAt) { requireState(session, PURCHASE_STATUS.CONDITION_REPORT_ACKNOWLEDGED); if (!['PAYMENT','FINANCING'].includes(method)) throw new DomainValidationError('Invalid payment method','paymentMethod'); return evolve(session, { status: PURCHASE_STATUS.PAYMENT_METHOD_SELECTED, paymentMethod: method }, occurredAt); }
 function startProviderFlow(session, providerReference, occurredAt) { requireState(session, PURCHASE_STATUS.PAYMENT_METHOD_SELECTED); requireString(providerReference,'providerReference'); return evolve(session, { status: session.paymentMethod === 'PAYMENT' ? PURCHASE_STATUS.PAYMENT_PENDING : PURCHASE_STATUS.FINANCING_PENDING, providerReference }, occurredAt); }
-function confirmProvider(session, method, providerReference, idempotencyKey, occurredAt) { const expected = method === 'PAYMENT' ? PURCHASE_STATUS.PAYMENT_PENDING : PURCHASE_STATUS.FINANCING_PENDING; requireState(session, expected); if (session.providerReference !== providerReference) throw transitionError('Provider reference mismatch','PROVIDER_REFERENCE_MISMATCH'); if (session.processedCallbacks[idempotencyKey]) return session; const fact = method === 'PAYMENT' ? 'paymentConfirmed' : 'financingConfirmed'; const status = method === 'PAYMENT' ? PURCHASE_STATUS.PAYMENT_CONFIRMED : PURCHASE_STATUS.FINANCING_CONFIRMED; return evolve(session, { status, prerequisites: { ...session.prerequisites, [fact]: true }, processedCallbacks: { ...session.processedCallbacks, [idempotencyKey]: true } }, occurredAt); }
-function recordPrerequisites(session, facts, occurredAt) { return evolve(session, { prerequisites: { ...session.prerequisites, ...facts } }, occurredAt); }
+function confirmProvider(session, method, providerReference, idempotencyKey, occurredAt) {
+  const expected = method === 'PAYMENT' ? PURCHASE_STATUS.PAYMENT_PENDING : PURCHASE_STATUS.FINANCING_PENDING;
+  requireState(session, expected);
+  requireString(idempotencyKey, 'idempotencyKey');
+  if (session.providerReference !== providerReference) throw transitionError('Provider reference mismatch', 'PROVIDER_REFERENCE_MISMATCH');
+  if (session.processedCallbacks[idempotencyKey]) return session;
+  const fact = method === 'PAYMENT' ? 'paymentConfirmed' : 'financingConfirmed';
+  const status = method === 'PAYMENT' ? PURCHASE_STATUS.PAYMENT_CONFIRMED : PURCHASE_STATUS.FINANCING_CONFIRMED;
+  return evolve(session, {
+    status,
+    prerequisites: { ...session.prerequisites, [fact]: true },
+    processedCallbacks: { ...session.processedCallbacks, [idempotencyKey]: true },
+  }, occurredAt);
+}
+function recordPrerequisites(session, facts, occurredAt) {
+  const allowed = ['contractSigned', 'identityVerified', 'registrationCompleted', 'insuranceInformationReceived', 'vehiclePrepared', 'manualApproval'];
+  if (!facts || typeof facts !== 'object' || Object.keys(facts).some((key) => !allowed.includes(key) || typeof facts[key] !== 'boolean')) {
+    throw new DomainValidationError('Invalid operational prerequisites', 'facts');
+  }
+  return evolve(session, { prerequisites: { ...session.prerequisites, ...facts } }, occurredAt);
+}
+function recordProviderCallback(session, idempotencyKey, occurredAt) {
+  requireString(idempotencyKey, 'idempotencyKey');
+  if (session.processedCallbacks[idempotencyKey]) return session;
+  return evolve(session, { processedCallbacks: { ...session.processedCallbacks, [idempotencyKey]: true } }, occurredAt);
+}
 function markReady(session, occurredAt) { if (![PURCHASE_STATUS.PAYMENT_CONFIRMED,PURCHASE_STATUS.FINANCING_CONFIRMED].includes(session.status)) throw transitionError('Confirmation required'); return evolve(session,{status:PURCHASE_STATUS.READY_FOR_HANDOVER},occurredAt); }
 function markHandedOver(session, occurredAt) { requireState(session,PURCHASE_STATUS.READY_FOR_HANDOVER); return evolve(session,{status:PURCHASE_STATUS.HANDED_OVER},occurredAt); }
 function evolve(session, changes, occurredAt) { return { ...session, ...changes, version: session.version + 1, updatedAt: occurredAt }; }
@@ -123,5 +147,5 @@ function requireString(value, field) {
 module.exports = {
   PURCHASE_PATH, PURCHASE_STATUS, createPurchaseSession, recordAcknowledgement,
   confirmProvider, markHandedOver, markReady, recordHumanReviewRequired, recordPrerequisites,
-  recordReportDisplayed, recordReportServed, selectPaymentMethod, startProviderFlow,
+  recordProviderCallback, recordReportDisplayed, recordReportServed, selectPaymentMethod, startProviderFlow,
 };

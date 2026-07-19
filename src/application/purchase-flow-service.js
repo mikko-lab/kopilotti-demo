@@ -5,7 +5,7 @@ const { ApplicationError } = require('./errors');
 const {
   PURCHASE_PATH, PURCHASE_STATUS, createPurchaseSession, recordAcknowledgement,
   confirmProvider, markHandedOver, markReady, recordHumanReviewRequired, recordPrerequisites,
-  recordReportDisplayed, recordReportServed, selectPaymentMethod, startProviderFlow,
+  recordProviderCallback, recordReportDisplayed, recordReportServed, selectPaymentMethod, startProviderFlow,
 } = require('../domain/purchase-session');
 const { sameReportIdentity } = require('../domain/condition-report');
 const { readiness } = require('../domain/handover-policy');
@@ -71,6 +71,36 @@ class PurchaseFlowService {
     await this.audit('CONDITION_REPORT_ACKNOWLEDGED', updated, actorId, correlationId, occurredAt, reportPayload(current, true));
     return updated;
   }
+
+  async selectPaymentMethod({ tenantId, actorId, sessionId, expectedVersion, method, correlationId }) {
+    requireCorrelationId(correlationId); const session=await this.requireVersion(tenantId,sessionId,expectedVersion); const occurredAt=this.now();
+    const updated=selectPaymentMethod(session,method,occurredAt); await this.purchases.save(updated,expectedVersion);
+    await this.audit('PAYMENT_METHOD_SELECTED',updated,actorId,correlationId,occurredAt,{previousState:session.status,newState:updated.status,transitionSource:'CUSTOMER'}); return updated;
+  }
+
+  async startProvider({ tenantId, actorId, sessionId, expectedVersion, correlationId }) {
+    requireCorrelationId(correlationId); const session=await this.requireVersion(tenantId,sessionId,expectedVersion); const occurredAt=this.now();
+    try {
+      const result=session.paymentMethod==='PAYMENT' ? await this.paymentProvider.startPayment({sessionId,vehicleId:session.vehicleId,amount:session.agreedPrice,currency:'EUR'}) : await this.financingProvider.startApplication({sessionId,vehicleId:session.vehicleId,amount:session.agreedPrice,currency:'EUR'});
+      const updated=startProviderFlow(session,result.providerReference,occurredAt); await this.purchases.save(updated,expectedVersion);
+      await this.audit(`${session.paymentMethod}_STARTED`,updated,actorId,correlationId,occurredAt,{previousState:session.status,newState:updated.status,transitionSource:result.simulated?'SIMULATED_DEMO_PROVIDER':'PROVIDER',externalProviderReference:result.providerReference,simulated:result.simulated===true}); return {...updated,simulated:result.simulated===true};
+    } catch(error) { await this.audit(`${session.paymentMethod}_START_FAILED`,session,actorId,correlationId,occurredAt,{previousState:session.status,newState:session.status,transitionSource:'PROVIDER',success:false}); throw new ApplicationError('PROVIDER_UNAVAILABLE',session.paymentMethod==='PAYMENT'?'Maksupalveluun ei saatu yhteyttä':'Rahoituspalveluun ei saatu yhteyttä',503); }
+  }
+
+  async handleProviderCallback({ tenantId = 'demo-dealership', kind, payload, headers, actorId, correlationId }) {
+    requireCorrelationId(correlationId); const provider=kind==='PAYMENT'?this.paymentProvider:this.financingProvider; let verified;
+    try { verified=await provider.verifyCallback(payload,headers); }
+    catch (_error) { throw new ApplicationError('CALLBACK_NOT_VERIFIED','Provider callback could not be verified',401); }
+    const session=await this.requireSession(tenantId,verified.sessionId); if(session.processedCallbacks[verified.idempotencyKey]) return session;
+    if(verified.status!=='CONFIRMED') { const occurredAt=this.now(); const updated=recordProviderCallback(session,verified.idempotencyKey,occurredAt); await this.purchases.save(updated,session.version); await this.audit(`${kind}_CALLBACK_${verified.status}`,updated,actorId,correlationId,occurredAt,{previousState:session.status,newState:updated.status,transitionSource:verified.simulated?'SIMULATED_DEMO_PROVIDER':'PROVIDER',externalProviderReference:verified.providerReference,idempotencyKey:verified.idempotencyKey,success:false}); return updated; }
+    const occurredAt=this.now(); let updated=confirmProvider(session,kind,verified.providerReference,verified.idempotencyKey,occurredAt); const policy=await this.handoverPolicies.getByVersion(session.handoverPolicyVersion);
+    if(!policy) throw new ApplicationError('HANDOVER_POLICY_NOT_FOUND','Luovutuspolicy vaatii tarkistuksen',409);
+    if(readiness(policy,session.paymentMethod,updated.prerequisites).ready) updated=markReady(updated,occurredAt);
+    await this.purchases.save(updated,session.version); await this.audit(`${kind}_CONFIRMED`,updated,actorId,correlationId,occurredAt,{agreedPrice:session.agreedPrice,previousState:session.status,newState:updated.status,transitionSource:verified.simulated?'SIMULATED_DEMO_PROVIDER':'PROVIDER',externalProviderReference:verified.providerReference,idempotencyKey:verified.idempotencyKey,handoverPolicyVersion:session.handoverPolicyVersion,success:true}); return {...updated,simulated:verified.simulated===true};
+  }
+
+  async recordOperationalPrerequisites({tenantId,actorId,sessionId,expectedVersion,facts,correlationId,authorized}) { if(!authorized) throw new ApplicationError('FORBIDDEN','Valtuutus vaaditaan',403); requireCorrelationId(correlationId); const session=await this.requireVersion(tenantId,sessionId,expectedVersion); const occurredAt=this.now(); let updated=recordPrerequisites(session,facts,occurredAt); const policy=await this.handoverPolicies.getByVersion(session.handoverPolicyVersion); if(!policy) throw new ApplicationError('HANDOVER_POLICY_NOT_FOUND','Luovutuspolicy vaatii tarkistuksen',409); if(readiness(policy,session.paymentMethod,updated.prerequisites).ready&&['PAYMENT_CONFIRMED','FINANCING_CONFIRMED'].includes(updated.status)) updated=markReady(updated,occurredAt); await this.purchases.save(updated,expectedVersion); await this.audit('OPERATIONAL_PREREQUISITES_RECORDED',updated,actorId,correlationId,occurredAt,{previousState:session.status,newState:updated.status,transitionSource:'AUTHORIZED_DEALERSHIP_ACTOR',handoverPolicyVersion:session.handoverPolicyVersion,success:true}); return updated; }
+  async handOver({tenantId,actorId,sessionId,expectedVersion,correlationId,authorized}) { if(!authorized) throw new ApplicationError('FORBIDDEN','Valtuutus vaaditaan',403); requireCorrelationId(correlationId); const session=await this.requireVersion(tenantId,sessionId,expectedVersion); const occurredAt=this.now(); const updated=markHandedOver(session,occurredAt); await this.purchases.save(updated,expectedVersion); await this.audit('VEHICLE_HANDED_OVER',updated,actorId,correlationId,occurredAt,{previousState:session.status,newState:updated.status,transitionSource:'AUTHORIZED_DEALERSHIP_ACTOR'}); return updated; }
 
   async validateNegotiatedPath(tenantId, actorId, vehicleId, negotiationSessionId) {
     const negotiation = await this.negotiations.get({ tenantId, sessionId: negotiationSessionId });

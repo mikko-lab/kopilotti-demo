@@ -71,9 +71,9 @@ test('returns an accessible human-review error contract when report is missing',
 
 test('returns a closed backend failure without allowing progression', async () => {
   const { ApplicationError } = require('../../src/application/errors');
-  const service = { proceed: async () => { throw new ApplicationError('BACKEND_FAILURE', 'Palvelu ei ole käytettävissä', 500); } };
+  const service = { startProvider: async () => { throw new ApplicationError('BACKEND_FAILURE', 'Palvelu ei ole käytettävissä', 500); } };
   await withServer(service, async (baseUrl) => {
-    const response = await fetch(`${baseUrl}/api/digital-salesperson/purchase-sessions/purchase-1/proceed`, {
+    const response = await fetch(`${baseUrl}/api/digital-salesperson/purchase-sessions/purchase-1/provider/start`, {
       method: 'POST', headers: { 'content-type': 'application/json', 'x-correlation-id': 'correlation-5' },
       body: JSON.stringify({ expectedVersion: 4, reportId: 'report-1', reportVersion: 'v1', contentHash: 'a'.repeat(64) }),
     });

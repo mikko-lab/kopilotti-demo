@@ -5,6 +5,7 @@ const { createBackendServices } = require('./src/bootstrap');
 const { createNegotiationRouter } = require('./src/http/negotiation-routes');
 const { createDigitalSalespersonRouter } = require('./src/http/digital-salesperson-routes');
 const { createPurchaseFlowRouter } = require('./src/http/purchase-flow-routes');
+const { createPurchaseIntegrationRouter } = require('./src/http/purchase-integration-routes');
 const { negotiationErrorHandler } = require('./src/http/http-response');
 require('dotenv').config();
 
@@ -27,6 +28,10 @@ if (process.env.ENABLE_CUSTOMER_NEGOTIATION_DEMO === 'true') {
   app.use('/api/digital-salesperson', createDigitalSalespersonRouter(negotiationService));
   app.use('/api/digital-salesperson', createPurchaseFlowRouter(purchaseFlowService));
 }
+app.use('/api/purchase-integrations', createPurchaseIntegrationRouter(purchaseFlowService, {
+  demo: process.env.ENABLE_CUSTOMER_NEGOTIATION_DEMO === 'true' && process.env.ENABLE_SIMULATED_PURCHASE_PROVIDERS === 'true',
+  integrationSecret: process.env.PURCHASE_INTEGRATION_SECRET,
+}));
 
 const SYSTEM_PROMPT = `Olet autokaupan myyntiassistentin AI. Analysoi myyntikeskustelun transkriptio.
 
