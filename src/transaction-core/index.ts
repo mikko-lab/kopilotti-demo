@@ -1,6 +1,7 @@
 export * from './business-days.ts';
 export * from './agentTools.ts';
 export * from './AgentBridge.ts';
+export * from './AgentCoreBridge.ts';
 export * from './core-price-lock-router.ts';
 export * from './openapi-core-spec.ts';
 export * from './calendar.ts';
