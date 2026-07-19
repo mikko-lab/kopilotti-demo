@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const Anthropic = require('@anthropic-ai/sdk');
+const { createNegotiationService } = require('./src/bootstrap');
+const { createNegotiationRouter } = require('./src/http/negotiation-routes');
+const { negotiationErrorHandler } = require('./src/http/http-response');
 require('dotenv').config();
 
 const app = express();
@@ -13,6 +16,10 @@ app.use(cors({
 }));
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// Backend-only negotiation boundary. It is intentionally independent of
+// browser session state and is never passed to the Claude analysis prompt.
+app.use('/api/negotiations', createNegotiationRouter(createNegotiationService()));
 
 const SYSTEM_PROMPT = `Olet autokaupan myyntiassistentin AI. Analysoi myyntikeskustelun transkriptio.
 
@@ -192,5 +199,7 @@ app.get('/api/vehicle/:plate', (req, res) => {
 });
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
+
+app.use(negotiationErrorHandler);
 
 app.listen(port, () => console.log(`Kopilotti backend :${port}`));
