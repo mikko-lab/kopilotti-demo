@@ -36,4 +36,15 @@ function publicReasonCode(reasonCode) {
   return reasonCode;
 }
 
-module.exports = { publicDecision, publicSession };
+function publicCustomerDecision(decision, session) {
+  const result = {
+    status: decision.status,
+    sessionVersion: session.version,
+    sessionStatus: session.status,
+  };
+  if (Number.isInteger(decision.approvedAmount)) result.approvedAmount = decision.approvedAmount;
+  if (Number.isInteger(decision.counterAmount)) result.counterAmount = decision.counterAmount;
+  return result;
+}
+
+module.exports = { publicCustomerDecision, publicDecision, publicSession };

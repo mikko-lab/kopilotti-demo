@@ -112,6 +112,12 @@ Jokaisesta kohtaamisesta kertyy dataa — ostohalukkuus, signaaliyhdistelmät, k
 4. Seuraa vihjeitä sekä ostohalukkuus- ja confidence-mittareita reaaliajassa
 5. Paina **"📋 Synkronoi CRM:ään"** → näet automaattisen tilapäivityksen, Automation Status -putken ja integraatiotriggerit
 
+### Digitaalinen automyyjä — asiakaspolun konsepti
+
+Ajoneuvon asiakasnäkymä löytyy osoitteesta `vehicle.html?id=veh-0001`. Suora **Osta / Varaa** -polku säilyy listahintaisena vaihtoehtona, ja **Digitaalinen automyyjä** on sen rinnalla erillinen palvelu autosta ja hinnasta keskustelemiseen. Laura- ja Mika-persoonat muuttavat vain sanamuotoa; kaupallinen päätös tehdään aina palvelimen deterministisellä neuvottelumoottorilla.
+
+Anonyymi asiakasrajapinta on tarkoituksella pois käytöstä oletuksena. Paikallisessa konseptidemossa sen voi ottaa käyttöön asettamalla backendille `ENABLE_CUSTOMER_NEGOTIATION_DEMO=true`. Tuotantoon tarvitaan ensin oikea asiakasistunto, CSRF-suojaus ja nopeusrajoitus. Demo-varaus ei tee sitovaa kauppaa eikä oikeaa ajoneuvovarausta.
+
 ---
 
 > ⚠️ Rakennettu konseptiksi — fokus idean, käyttötapauksen ja arkkitehtuurin demonstroinnissa, ei tuotantovalmiudessa.

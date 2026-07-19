@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { publicDecision, publicSession } = require('../../src/security/public-negotiation-view');
+const { publicCustomerDecision, publicDecision, publicSession } = require('../../src/security/public-negotiation-view');
 
 test('public views cannot serialize confidential policy values', () => {
   const decision = publicDecision({
@@ -19,4 +19,12 @@ test('public views cannot serialize confidential policy values', () => {
   assert.equal(session.tenantId, undefined);
   assert.equal(session.policyVersion, undefined);
   assert.equal(session.inventoryRevision, undefined);
+});
+
+test('customer decision omits internal reason codes and commercial policy metadata', () => {
+  const view = publicCustomerDecision({
+    status: 'COUNTER', reasonCode: 'COUNTER_WITHIN_POLICY', counterAmount: 29400,
+    policyVersion: 'internal-v1', reservationEligible: true,
+  }, { version: 2, status: 'OPEN' });
+  assert.deepEqual(view, { status: 'COUNTER', counterAmount: 29400, sessionVersion: 2, sessionStatus: 'OPEN' });
 });
