@@ -1,0 +1,143 @@
+<!-- Copyright (c) 2026 Mikko Tarkiainen. Licensed under the MIT License. -->
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajoneuvo — Kopilotti</title>
+  <meta name="description" content="Tutustu ajoneuvoon, osta tai varaa suoraan tai keskustele kaupasta digitaalisen automyyjän kanssa.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/vehicle.css">
+</head>
+<body class="vehicle-page">
+  <a href="#vehicleMain" class="skip-link">Siirry ajoneuvon tietoihin</a>
+  <header class="store-header">
+    <a class="store-brand" href="index.html" aria-label="Kopilotti, etusivu">
+      <span class="logo-mark" aria-hidden="true">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.7"/>
+          <circle cx="12" cy="12" r="2.1" fill="white"/>
+          <path d="M12 3v4.3M12 16.7V21M3 12h4.3M16.7 12H21" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span><strong>Kopilotti</strong><small>Ajoneuvokauppa</small></span>
+    </a>
+    <a class="store-back" href="index.html">← Takaisin autoihin</a>
+  </header>
+
+  <main class="vehicle-shell" id="vehicleMain">
+    <nav class="vehicle-breadcrumb" aria-label="Murupolku">
+      <a href="index.html">Autot</a><span aria-hidden="true">/</span><span id="breadcrumbVehicle">Ajoneuvo</span>
+    </nav>
+
+    <div class="vehicle-layout">
+      <section class="vehicle-content" aria-labelledby="vehicleTitle">
+        <div class="vehicle-heading">
+          <div>
+            <span class="vehicle-availability" id="vehicleAvailability">Ladataan saatavuutta…</span>
+            <h1 id="vehicleTitle">Ajoneuvon tiedot</h1>
+            <p id="vehicleSubtitle">Ladataan…</p>
+          </div>
+          <div class="vehicle-heading-price" aria-label="Ajoneuvon hinta">
+            <strong id="vehiclePrice">—</strong><span id="vehicleMonthly">—</span>
+          </div>
+        </div>
+
+        <figure class="vehicle-hero">
+          <img id="vehicleImage" alt="" src="assets/cars/audi-a4.jpg">
+          <figcaption>Esimerkkikuva — ei kuva yksittäisestä ajoneuvosta</figcaption>
+        </figure>
+
+        <section class="vehicle-spec-card" aria-labelledby="specTitle">
+          <h2 id="specTitle">Ajoneuvon tiedot</h2>
+          <dl class="vehicle-spec-grid" id="vehicleSpecs"></dl>
+        </section>
+
+        <section class="vehicle-spec-card" aria-labelledby="equipmentTitle">
+          <h2 id="equipmentTitle">Keskeiset varusteet</h2>
+          <ul class="vehicle-equipment" id="vehicleEquipment"></ul>
+        </section>
+      </section>
+
+      <aside class="purchase-column" aria-label="Osto- ja varausvaihtoehdot">
+        <section class="purchase-card direct-purchase" aria-labelledby="directPurchaseTitle">
+          <p class="purchase-eyebrow">Nopea asiointi</p>
+          <h2 id="directPurchaseTitle">Osta / Varaa</h2>
+          <p>Voit edetä suoraan auton listahinnalla. Vahvista tietosi ja valitse osto tai varaus.</p>
+          <div class="purchase-price"><span>Auton hinta</span><strong id="directPrice">—</strong></div>
+          <button class="btn btn-primary purchase-button" id="btnDirectPurchase" type="button">Jatka ostoon tai varaukseen</button>
+          <p class="purchase-fineprint">Tämä konseptidemo ei tee sitovaa kauppaa tai oikeaa varausta.</p>
+        </section>
+
+        <section class="purchase-card digital-salesperson-card" aria-labelledby="digitalSalespersonTitle">
+          <div class="service-heading">
+            <span class="service-mark" aria-hidden="true">✦</span>
+            <div><p class="purchase-eyebrow">Palvelu verkossa</p><h2 id="digitalSalespersonTitle">Digitaalinen automyyjä</h2></div>
+          </div>
+          <h3>Haluatko keskustella tämän auton hinnasta?</h3>
+          <p>Keskustele kaupasta digitaalisen automyyjän kanssa. Saat vastauksen heti myös iltaisin ja viikonloppuisin.</p>
+          <ul class="service-benefits" aria-label="Palvelun mahdollisuudet">
+            <li>kysy autosta</li><li>keskustele hinnasta</li><li>varaa auto</li><li>etene kauppaan</li>
+          </ul>
+          <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-expanded="false">Aloita keskustelu</button>
+          <p class="service-promise">Digitaalinen automyyjä ei korvaa automyyjää. Se korvaa odottamisen.</p>
+        </section>
+
+        <section class="salesperson-flow hidden" id="digitalSalespersonFlow" aria-labelledby="flowTitle" tabindex="-1">
+          <div class="flow-header">
+            <div><p class="purchase-eyebrow">Digitaalinen automyyjä</p><h2 id="flowTitle">Kenen kanssa haluat keskustella?</h2></div>
+            <button class="flow-close" id="btnCloseFlow" type="button" aria-label="Sulje keskustelu">×</button>
+          </div>
+
+          <form id="personaForm">
+            <fieldset class="persona-fieldset">
+              <legend class="visually-hidden">Valitse digitaalinen automyyjä</legend>
+              <label class="persona-option">
+                <input type="radio" name="persona" value="laura" checked>
+                <span class="persona-avatar" aria-hidden="true">L</span>
+                <span><strong>Laura</strong><small>Rauhallinen, avulias ja keskusteleva</small></span>
+              </label>
+              <label class="persona-option">
+                <input type="radio" name="persona" value="mika">
+                <span class="persona-avatar" aria-hidden="true">M</span>
+                <span><strong>Mika</strong><small>Tiivis, suora ja tehokas</small></span>
+              </label>
+            </fieldset>
+            <button class="btn btn-primary purchase-button" type="submit">Jatka keskusteluun</button>
+          </form>
+
+          <section class="conversation hidden" id="conversation" aria-labelledby="conversationTitle">
+            <h3 class="visually-hidden" id="conversationTitle">Keskustelu digitaalisen automyyjän kanssa</h3>
+            <div class="conversation-status"><span class="status-dot active" aria-hidden="true"></span><span id="personaStatus">Laura palvelee nyt</span></div>
+            <div class="message-list" id="messageList" role="log" aria-live="polite" aria-relevant="additions"></div>
+            <div class="question-actions" id="questionActions" aria-label="Valmiit kysymykset">
+              <button type="button" data-question="condition">Kysy auton kunnosta</button>
+              <button type="button" data-question="finance">Kysy rahoituksesta</button>
+              <button type="button" data-question="price">Keskustele hinnasta</button>
+            </div>
+            <form class="price-discussion hidden" id="priceForm">
+              <label for="priceInput">Mistä hinnasta haluaisit keskustella?</label>
+              <div class="price-input-row">
+                <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 29 000" aria-describedby="priceHelp priceError">
+                <span aria-hidden="true">€</span>
+                <button class="btn btn-primary" type="submit">Lähetä keskusteluun</button>
+              </div>
+              <p id="priceHelp">Digitaalinen automyyjä välittää ehdotuksesi hinnoittelusta vastaavalle järjestelmälle. Alennusta ei luvata etukäteen.</p>
+              <p class="form-error" id="priceError" role="alert"></p>
+            </form>
+            <div class="decision-actions hidden" id="decisionActions"></div>
+          </section>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <dialog class="demo-dialog" id="demoDialog" aria-labelledby="demoDialogTitle">
+    <h2 id="demoDialogTitle">Demo-varaus</h2>
+    <p id="demoDialogText">Tämä on käyttöliittymäkonsepti. Varaus ei ole sitova kauppa eikä oikea ajoneuvovaraus.</p>
+    <form method="dialog"><button class="btn btn-primary" value="close">Ymmärrän</button></form>
+  </dialog>
+
+  <script type="module" src="js/digital-salesperson.js"></script>
+</body>
+</html>

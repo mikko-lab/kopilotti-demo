@@ -833,6 +833,7 @@ function renderRecommendations(vehicles, signals, preferences) {
       </div>
       ${v.vatDeductible ? `<div class="rec-vat-badge">🧾 ALV-vähennyskelpoinen <span class="rec-vat-caveat">— edellyttää ajopäiväkirjaa ja liiketoimintakäyttöä</span></div>` : ''}
       <div class="rec-explanation">${v.explanation}</div>
+      <a class="rec-detail-link" href="vehicle.html?id=${encodeURIComponent(v.id)}" aria-label="Katso ${v.brand} ${v.model} ajoneuvon tiedot">Katso auton tiedot →</a>
     `;
     container.appendChild(card);
   });

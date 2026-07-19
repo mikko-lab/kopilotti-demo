@@ -958,6 +958,16 @@ body {
   line-height: 1.4;
 }
 
+.rec-detail-link {
+  display: inline-flex;
+  margin-top: 8px;
+  color: var(--primary);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-decoration: none;
+}
+.rec-detail-link:hover { text-decoration: underline; }
+
 /* Van-only (vatDeductible), never rendered for passenger cars — see
    js/app.js's renderRecommendations and the field's own origin comment in
    scripts/generate-inventory.js for why that split is deliberate. The
