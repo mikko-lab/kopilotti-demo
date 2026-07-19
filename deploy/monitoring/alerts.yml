@@ -1,0 +1,31 @@
+groups:
+  - name: kopilotti-cdc
+    rules:
+      - alert: KopilottiTransactionCoreMetricsDown
+        expr: up{job="kopilotti-transaction-core"} == 0
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: Kopilotti Transaction Core metrics endpoint is unavailable
+      - alert: DebeziumMetricsDown
+        expr: up{job="debezium-connect"} == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: Debezium JMX metrics endpoint is unavailable
+      - alert: DebeziumDisconnected
+        expr: debezium_postgresql_connected == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: Debezium PostgreSQL connector is disconnected
+      - alert: DebeziumSourceLagHigh
+        expr: debezium_postgresql_milliseconds_behind_source / 1000 > 30
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: Debezium is more than 30 seconds behind PostgreSQL

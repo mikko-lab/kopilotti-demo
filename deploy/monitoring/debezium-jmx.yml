@@ -1,0 +1,24 @@
+startDelaySeconds: 0
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+rules:
+  - pattern: 'debezium\.postgres(?:ql)?<type=connector-metrics, context=streaming, server=([^,>]+)><>Connected'
+    name: debezium_postgresql_connected
+    labels:
+      server: "$1"
+    type: GAUGE
+  - pattern: 'debezium\.postgres(?:ql)?<type=connector-metrics, context=streaming, server=([^,>]+)><>MilliSecondsBehindSource'
+    name: debezium_postgresql_milliseconds_behind_source
+    labels:
+      server: "$1"
+    type: GAUGE
+  - pattern: 'debezium\.postgres(?:ql)?<type=connector-metrics, context=streaming, server=([^,>]+)><>QueueTotalCapacity'
+    name: debezium_postgresql_queue_total_capacity
+    labels:
+      server: "$1"
+    type: GAUGE
+  - pattern: 'debezium\.postgres(?:ql)?<type=connector-metrics, context=streaming, server=([^,>]+)><>QueueRemainingCapacity'
+    name: debezium_postgresql_queue_remaining_capacity
+    labels:
+      server: "$1"
+    type: GAUGE
