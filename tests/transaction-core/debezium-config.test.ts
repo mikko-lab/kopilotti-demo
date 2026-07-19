@@ -14,7 +14,7 @@ test('Debezium connector uses the purpose-built outbox router and contains no co
   assert.equal(config['transforms.outbox.table.field.event.key'], 'transaction_id');
   assert.equal(config['transforms.outbox.table.field.event.payload'], 'payload');
   assert.equal(config['skipped.operations'], 'u,d,t');
-  assert.match(config['database.password'] ?? '', /^\$\{file:/);
+  assert.equal(config['database.password'], '${env:DEBEZIUM_DATABASE_PASSWORD}');
   assert.match(config['database.hostname'] ?? '', /^\$\{env:/);
   assert.doesNotMatch(JSON.stringify(config), /postgres-service|secret-password|ContentBasedRouter|ExtractNewRecordState|processed_at/);
 });

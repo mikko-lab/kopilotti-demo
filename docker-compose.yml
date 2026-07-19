@@ -1,0 +1,136 @@
+name: kopilotti-cdc
+
+services:
+  postgres-db:
+    image: postgres:15.13-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kopilotti_db}
+      POSTGRES_USER: ${POSTGRES_USER:-kopilotti_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      DEBEZIUM_DATABASE_USER: ${DEBEZIUM_DATABASE_USER:-debezium_user}
+      DEBEZIUM_DATABASE_PASSWORD: ${DEBEZIUM_DATABASE_PASSWORD:?Set DEBEZIUM_DATABASE_PASSWORD in .env}
+    command:
+      - postgres
+      - -c
+      - wal_level=logical
+      - -c
+      - max_replication_slots=4
+      - -c
+      - max_wal_senders=4
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations/001_transaction_core.sql:/docker-entrypoint-initdb.d/001-transaction-core.sql:ro
+      - ./deploy/postgres/002-create-debezium-user.sh:/docker-entrypoint-initdb.d/002-create-debezium-user.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB && test \"$$(psql -U $$POSTGRES_USER -d $$POSTGRES_DB -Atqc 'SHOW wal_level')\" = logical"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  kafka:
+    image: quay.io/debezium/kafka:3.6
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      NODE_ID: 1
+      NODE_ROLE: combined
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:${KAFKA_PORT:-29092}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    ports:
+      - "${KAFKA_PORT:-29092}:29092"
+    volumes:
+      - kafkadata:/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  debezium-connect:
+    image: quay.io/debezium/connect:3.6
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: kopilotti-connect
+      CONFIG_STORAGE_TOPIC: kopilotti_connect_configs
+      OFFSET_STORAGE_TOPIC: kopilotti_connect_offsets
+      STATUS_STORAGE_TOPIC: kopilotti_connect_statuses
+      CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      STATUS_STORAGE_REPLICATION_FACTOR: 1
+      KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONFIG_PROVIDERS: env
+      CONFIG_PROVIDERS_ENV_CLASS: org.apache.kafka.common.config.provider.EnvVarConfigProvider
+      DEBEZIUM_DATABASE_HOST: postgres-db
+      DEBEZIUM_DATABASE_PORT: 5432
+      DEBEZIUM_DATABASE_NAME: ${POSTGRES_DB:-kopilotti_db}
+      DEBEZIUM_DATABASE_USER: ${DEBEZIUM_DATABASE_USER:-debezium_user}
+      DEBEZIUM_DATABASE_PASSWORD: ${DEBEZIUM_DATABASE_PASSWORD:?Set DEBEZIUM_DATABASE_PASSWORD in .env}
+    ports:
+      - "${DEBEZIUM_CONNECT_PORT:-8083}:8083"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8083/connectors >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  connector-init:
+    image: curlimages/curl:8.12.1
+    depends_on:
+      debezium-connect:
+        condition: service_healthy
+    volumes:
+      - ./deploy/debezium/debezium-outbox-connector.json:/config/connector.json:ro
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        status="$$(curl --silent --output /tmp/response --write-out '%{http_code}' \
+          --header 'Content-Type: application/json' \
+          --data-binary @/config/connector.json \
+          http://debezium-connect:8083/connectors)"
+        if [ "$$status" != "201" ] && [ "$$status" != "409" ]; then
+          cat /tmp/response
+          exit 1
+        fi
+        attempts=0
+        while [ "$$attempts" -lt 12 ]; do
+          connector_status="$$(curl --fail --silent http://debezium-connect:8083/connectors/kopilotti-outbox-connector/status)"
+          if printf '%s' "$$connector_status" | grep -q '"tasks":\[{"id":0,"state":"RUNNING"'; then
+            printf '%s\n' "$$connector_status"
+            exit 0
+          fi
+          if printf '%s' "$$connector_status" | grep -q '"state":"FAILED"'; then
+            printf '%s\n' "$$connector_status"
+            exit 1
+          fi
+          attempts=$$((attempts + 1))
+          sleep 5
+        done
+        printf '%s\n' "$$connector_status"
+        exit 1
+    restart: "no"
+
+volumes:
+  pgdata:
+  kafkadata:
