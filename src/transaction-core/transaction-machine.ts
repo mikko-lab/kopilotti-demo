@@ -42,6 +42,9 @@ export class TransactionMachine {
     this.#calendar = dependencies.calendar;
     invariant(this.#paymentProvider.method === 'CASH', 'INVALID_PROVIDER_CONFIGURATION', 'Payment adapter must use CASH method');
     invariant(this.#financingProvider.method === 'FINANCING', 'INVALID_PROVIDER_CONFIGURATION', 'Financing adapter must use FINANCING method');
+    requireIdentifier(this.#paymentProvider.providerId, 'paymentProvider.providerId');
+    requireIdentifier(this.#financingProvider.providerId, 'financingProvider.providerId');
+    invariant(this.#paymentProvider.providerId !== this.#financingProvider.providerId, 'INVALID_PROVIDER_CONFIGURATION', 'Provider identifiers must be unique');
   }
 
   async createNegotiation(input: { readonly dealId: string; readonly tenantId: string; readonly vehicle: LockedVehicle }): Promise<Deal> {
@@ -104,7 +107,7 @@ export class TransactionMachine {
     const timestamp = this.#now();
     return this.#repository.transaction(async (context) => {
       const current = await requireDeal(context, verified.dealId);
-      const processedDealId = await context.getProcessedCallbackDealId(method, verified.idempotencyKey);
+      const processedDealId = await context.getProcessedCallbackDealId(adapter.providerId, verified.idempotencyKey);
       if (processedDealId !== null) {
         invariant(processedDealId === verified.dealId, 'IDEMPOTENCY_KEY_CONFLICT', 'Idempotency key belongs to another deal');
         return current;
@@ -115,10 +118,10 @@ export class TransactionMachine {
       invariant(current.paymentDeadline !== null && !isDeadlineExpired(current.paymentDeadline, new Date(timestamp)), 'PAYMENT_DEADLINE_EXPIRED', 'Payment deadline has expired');
       const source: TransitionSource = verified.simulated ? 'PROVIDER_ADAPTER_SIMULATED' : adapter.sourceName;
       const updated = verified.outcome === 'CONFIRMED' ? evolve(current, timestamp, { state: 'PAID' }) : current;
-      await context.recordProcessedCallback(method, verified.idempotencyKey, current.id);
+      await context.recordProcessedCallback(adapter.providerId, verified.idempotencyKey, current.id);
       if (updated !== current) await context.saveDeal(updated, current.version);
       const audit = this.#event(updated, current, `PROVIDER_${verified.outcome}`, source, timestamp, {
-        idempotencyKey: verified.idempotencyKey, providerReference: verified.providerReference, paymentMethod: method,
+        idempotencyKey: verified.idempotencyKey, providerId: adapter.providerId, providerReference: verified.providerReference, paymentMethod: method,
       });
       await context.appendAudit(audit);
       if (updated !== current) await context.enqueueStatusEvent(statusEvent(updated, audit.id));
@@ -136,6 +139,7 @@ export class TransactionMachine {
       const policy = await this.#policies.getByVersion(current.tenantId, current.handoverPolicyVersion);
       invariant(policy !== null && policy.version === current.handoverPolicyVersion, 'HANDOVER_POLICY_NOT_FOUND', 'Pinned policy version is unavailable');
       assertHandoverReady(policy, current.vehicle, input.facts);
+      await context.lockInventoryForHandover(current.vehicle.vehicleId, current.vehicle.inventoryRevision, current.id);
       const updated = evolve(current, timestamp, { state: 'HANDED_OVER' });
       await persistTransition(context, current, updated, this.#event(updated, current, 'VEHICLE_HANDED_OVER', 'AUTHORIZED_DEALERSHIP_ACTION', timestamp, {
         actorId: actor.actorId, handoverPolicyVersion: policy.version,
@@ -152,18 +156,20 @@ export class TransactionMachine {
 
   async voidExpired(dealId: string): Promise<Deal> {
     const timestamp = this.#now();
-    return this.#repository.transaction(async (context) => {
-      const current = await requireDeal(context, dealId);
-      if (current.state === 'VOIDED') return current;
-      invariant(current.state === 'AWAITING_PAYMENT' && current.paymentDeadline !== null, 'INVALID_TRANSITION', 'Deal is not awaiting payment');
-      invariant(isDeadlineExpired(current.paymentDeadline, new Date(timestamp)), 'PAYMENT_DEADLINE_ACTIVE', 'Payment deadline is still active');
-      const updated = evolve(current, timestamp, { state: 'VOIDED' });
-      await context.releaseInventory(current.vehicle.vehicleId, current.vehicle.inventoryRevision);
-      await persistTransition(context, current, updated, this.#event(updated, current, 'PAYMENT_DEADLINE_EXPIRED', 'SYSTEM_DAEMON', timestamp, {
-        paymentDeadline: current.paymentDeadline, vehicleReleased: true,
-      }));
-      return updated;
-    });
+    return this.#repository.transaction((context) => this.voidExpiredInTransaction(context, dealId, timestamp));
+  }
+
+  async voidExpiredInTransaction(context: TransactionContext, dealId: string, timestamp: string): Promise<Deal> {
+    const current = await requireDeal(context, dealId);
+    if (current.state === 'VOIDED') return current;
+    invariant(current.state === 'AWAITING_PAYMENT' && current.paymentDeadline !== null, 'INVALID_TRANSITION', 'Deal is not awaiting payment');
+    invariant(isDeadlineExpired(current.paymentDeadline, new Date(timestamp)), 'PAYMENT_DEADLINE_ACTIVE', 'Payment deadline is still active');
+    const updated = evolve(current, timestamp, { state: 'VOIDED' });
+    await context.releaseInventory(current.vehicle.vehicleId, current.vehicle.inventoryRevision, current.id);
+    await persistTransition(context, current, updated, this.#event(updated, current, 'PAYMENT_DEADLINE_EXPIRED', 'SYSTEM_DAEMON', timestamp, {
+      paymentDeadline: current.paymentDeadline, vehicleReleased: true,
+    }));
+    return updated;
   }
 
   #now(): string { const value = this.#clock.now(); assertValidDate(value); return value.toISOString(); }
@@ -192,7 +198,7 @@ function evolve<T extends Partial<Deal>>(deal: Deal, timestamp: string, changes:
 }
 function requireIdentifier(value: string, field: string): void { invariant(typeof value === 'string' && /^[A-Za-z0-9_.:-]{1,128}$/.test(value), 'INVALID_INPUT', `${field} is invalid`); }
 function requireMoney(value: number): void { invariant(Number.isSafeInteger(value) && value > 0, 'INVALID_MONEY', 'Price must be positive integer cents'); }
-function validateVehicle(vehicle: LockedVehicle): void { invariant(Boolean(vehicle), 'INVALID_INPUT', 'vehicle is required'); requireIdentifier(vehicle.vehicleId, 'vehicleId'); requireIdentifier(vehicle.registrationIdentifier, 'registrationIdentifier'); invariant(/^[a-fA-F0-9]{64}$/.test(vehicle.inventoryRevision), 'INVALID_INPUT', 'inventoryRevision is invalid'); }
+function validateVehicle(vehicle: LockedVehicle): void { invariant(Boolean(vehicle), 'INVALID_INPUT', 'vehicle is required'); requireIdentifier(vehicle.vehicleId, 'vehicleId'); requireIdentifier(vehicle.registrationIdentifier, 'registrationIdentifier'); invariant((typeof vehicle.inventoryRevision === 'string' && /^[a-fA-F0-9]{64}$/.test(vehicle.inventoryRevision)) || (Number.isSafeInteger(vehicle.inventoryRevision) && Number(vehicle.inventoryRevision) >= 0), 'INVALID_INPUT', 'inventoryRevision is invalid'); }
 function validateVerifiedCallback(value: VerifiedProviderCallback): void { invariant(Boolean(value), 'CALLBACK_NOT_VERIFIED', 'Provider callback was not verified'); requireIdentifier(value.dealId, 'dealId'); requireIdentifier(value.idempotencyKey, 'idempotencyKey'); requireIdentifier(value.providerReference, 'providerReference'); invariant(['PENDING', 'CONFIRMED', 'REJECTED'].includes(value.outcome), 'CALLBACK_NOT_VERIFIED', 'Provider outcome is invalid'); invariant(typeof value.simulated === 'boolean', 'CALLBACK_NOT_VERIFIED', 'Provider simulation marker is required'); }
 function validateStronglyAuthenticatedCustomer(customer: Customer): void {
   invariant(Boolean(customer) && customer.ssnVerified === true, 'CUSTOMER_STRONG_AUTHENTICATION_REQUIRED', 'Strong customer authentication is required');

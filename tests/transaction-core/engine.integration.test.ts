@@ -23,11 +23,13 @@ const policy = createVersionedHandoverPolicy({
 });
 
 class SignedTestProvider implements ProviderAdapter {
+  readonly providerId: string;
   readonly method: PaymentMethod;
   readonly sourceName: 'PAYMENT_PROVIDER_ADAPTER' | 'FINANCING_PROVIDER_ADAPTER';
   readonly #secret: string;
   constructor(method: PaymentMethod, secret: string) {
     this.method = method; this.#secret = secret;
+    this.providerId = method === 'CASH' ? 'test-bank-provider' : 'test-finance-provider';
     this.sourceName = method === 'CASH' ? 'PAYMENT_PROVIDER_ADAPTER' : 'FINANCING_PROVIDER_ADAPTER';
   }
   async verifyCallback(rawBody: Uint8Array, headers: Readonly<Record<string, string | undefined>>): Promise<VerifiedProviderCallback> {

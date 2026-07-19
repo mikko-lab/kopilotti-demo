@@ -25,7 +25,8 @@ class MemoryRepository implements TransactionRepository {
     catch (error) { this.deals = new Map(snapshot.deals); this.audits = snapshot.audits; this.callbacks = new Map(snapshot.callbacks); this.released = snapshot.released; this.locked = new Set(snapshot.locked); this.outbox = snapshot.outbox; throw error; }
   }
   async findExpiredAwaitingPayment(now: string, limit: number): Promise<readonly string[]> { return [...this.deals.values()].filter((deal) => deal.state === 'AWAITING_PAYMENT' && Date.parse(String(deal.paymentDeadline)) <= Date.parse(now)).slice(0, limit).map((deal) => deal.id); }
-  async listPendingStatusEvents(limit: number): Promise<readonly TransactionStatusEvent[]> { return this.outbox.filter((record) => !record.published).slice(0, limit).map((record) => structuredClone(record.event)); }
+  async processExpiredAwaitingPayment(now: string, limit: number, operation: (context: TransactionContext, dealId: string) => Promise<void>): Promise<{ processed: number; skipped: number }> { const ids = await this.findExpiredAwaitingPayment(now, limit); for (const id of ids) await this.transaction((context) => operation(context, id)); return { processed: ids.length, skipped: 0 }; }
+  async claimPendingStatusEvents(limit: number): Promise<readonly TransactionStatusEvent[]> { return this.outbox.filter((record) => !record.published).slice(0, limit).map((record) => structuredClone(record.event)); }
   async markStatusEventPublished(eventId: string): Promise<void> { const record = this.outbox.find((item) => item.event.eventId === eventId); if (record) record.published = true; }
   context(): TransactionContext {
     return {
@@ -36,6 +37,7 @@ class MemoryRepository implements TransactionRepository {
       getProcessedCallbackDealId: async (provider, key) => this.callbacks.get(`${provider}:${key}`) ?? null,
       recordProcessedCallback: async (provider, key, dealId) => { this.callbacks.set(`${provider}:${key}`, dealId); },
       lockInventory: async (vehicleId) => { if (this.locked.has(vehicleId)) throw Object.assign(new Error('locked'), { code: 'VEHICLE_NOT_AVAILABLE' }); this.locked.add(vehicleId); },
+      lockInventoryForHandover: async (vehicleId) => { if (!this.locked.has(vehicleId)) throw Object.assign(new Error('not locked'), { code: 'VEHICLE_LOCK_MISMATCH' }); },
       releaseInventory: async (vehicleId) => { this.locked.delete(vehicleId); this.released.push(vehicleId); },
     };
   }
@@ -47,8 +49,8 @@ function fixture(start = '2026-07-17T12:00:00.000Z') {
   const common = { verifyCallback: async () => { throw new Error('not configured'); } };
   const machine = new TransactionMachine({
     repository, policies: { getCurrent: async () => policy, getByVersion: async (_tenant, version) => version === policy.version ? policy : null },
-    paymentProvider: { ...common, method: 'CASH', sourceName: 'PAYMENT_PROVIDER_ADAPTER', verifyCallback: async () => { if (!paymentCallback) throw new Error('unverified'); return paymentCallback; } },
-    financingProvider: { ...common, method: 'FINANCING', sourceName: 'FINANCING_PROVIDER_ADAPTER', verifyCallback: async () => { if (!financingCallback) throw new Error('unverified'); return financingCallback; } },
+    paymentProvider: { ...common, providerId: 'test-bank-provider', method: 'CASH', sourceName: 'PAYMENT_PROVIDER_ADAPTER', verifyCallback: async () => { if (!paymentCallback) throw new Error('unverified'); return paymentCallback; } },
+    financingProvider: { ...common, providerId: 'test-finance-provider', method: 'FINANCING', sourceName: 'FINANCING_PROVIDER_ADAPTER', verifyCallback: async () => { if (!financingCallback) throw new Error('unverified'); return financingCallback; } },
     authorizer: { requireHandoverPermission: async (credential) => { if (credential !== 'dealer-secret') throw Object.assign(new Error('forbidden'), { code: 'FORBIDDEN' }); return { actorId: 'dealer-user-1' }; } },
     clock: { now: () => new Date(now) }, ids: { next: () => `event-${++id}` }, calendar: { addBusinessDays },
   });

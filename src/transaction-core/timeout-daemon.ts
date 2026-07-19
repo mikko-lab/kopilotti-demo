@@ -14,19 +14,10 @@ export class PaymentTimeoutDaemon {
   }
 
   async runOnce(): Promise<{ scanned: number; voided: number; skipped: number }> {
-    const ids = await this.#repository.findExpiredAwaitingPayment(this.#clock.now().toISOString(), this.#batchSize);
-    let voided = 0; let skipped = 0;
-    for (const id of ids) {
-      try { await this.#machine.voidExpired(id); voided += 1; }
-      catch (error) {
-        if (isConcurrentOrNoLongerEligible(error)) skipped += 1; else throw error;
-      }
-    }
-    return { scanned: ids.length, voided, skipped };
+    const timestamp = this.#clock.now().toISOString();
+    const result = await this.#repository.processExpiredAwaitingPayment(timestamp, this.#batchSize, async (context, dealId) => {
+      await this.#machine.voidExpiredInTransaction(context, dealId, timestamp);
+    });
+    return { scanned: result.processed + result.skipped, voided: result.processed, skipped: result.skipped };
   }
-}
-
-function isConcurrentOrNoLongerEligible(error: unknown): boolean {
-  const code = typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
-  return ['INVALID_TRANSITION', 'PAYMENT_DEADLINE_ACTIVE', 'VERSION_CONFLICT'].includes(code);
 }

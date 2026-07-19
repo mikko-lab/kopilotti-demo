@@ -2,11 +2,11 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { invariant } from './errors.ts';
-import type { AuditEvent, Deal, PaymentMethod } from './model.ts';
+import type { AuditEvent, Deal } from './model.ts';
 import type { TransactionContext, TransactionRepository } from './ports.ts';
 import type { TransactionStatusEvent } from './events.ts';
 
-interface InventoryRecord { readonly revision: string; availability: 'AVAILABLE' | 'LOCKED'; dealId: string | null; }
+interface InventoryRecord { readonly revision: string | number; availability: 'AVAILABLE' | 'LOCKED'; dealId: string | null; }
 interface StoreData {
   schemaVersion: 1;
   deals: Record<string, Deal>;
@@ -18,8 +18,8 @@ interface StoreData {
 
 /**
  * Single-process durable adapter for demos and one-worker deployments.
- * Production clusters should implement TransactionRepository with a database
- * transaction and a unique constraint on (provider, idempotency_key).
+ * Production clusters must use PostgresTransactionRepository (or an equivalent
+ * ACID implementation); this adapter has no cross-process locking.
  */
 export class JsonTransactionRepository implements TransactionRepository {
   readonly #filePath: string;
@@ -45,7 +45,18 @@ export class JsonTransactionRepository implements TransactionRepository {
       .slice(0, limit).map((deal) => deal.id);
   }
 
-  async listPendingStatusEvents(limit: number): Promise<readonly TransactionStatusEvent[]> {
+  async processExpiredAwaitingPayment(now: string, limit: number, operation: (context: TransactionContext, dealId: string) => Promise<void>): Promise<{ processed: number; skipped: number }> {
+    const ids = await this.findExpiredAwaitingPayment(now, limit); let processed = 0; let skipped = 0;
+    for (const id of ids) {
+      try { await this.transaction((context) => operation(context, id)); processed += 1; }
+      catch (error) {
+        if (isNoLongerEligible(error)) skipped += 1; else throw error;
+      }
+    }
+    return { processed, skipped };
+  }
+
+  async claimPendingStatusEvents(limit: number): Promise<readonly TransactionStatusEvent[]> {
     await this.#queue; const data = await this.#read();
     return data.statusOutbox.filter((record) => !record.published).slice(0, limit).map((record) => structuredClone(record.event));
   }
@@ -113,9 +124,13 @@ function contextFor(data: StoreData): TransactionContext {
         record.availability = 'LOCKED'; record.dealId = dealId;
       }
     },
-    async releaseInventory(vehicleId, revision) {
+    async lockInventoryForHandover(vehicleId, revision, dealId) {
       const record = data.inventory[vehicleId];
-      invariant(record?.revision === revision, 'STALE_INVENTORY', 'Inventory revision is stale');
+      invariant(record?.revision === revision && record.availability === 'LOCKED' && record.dealId === dealId, 'VEHICLE_LOCK_MISMATCH', 'Vehicle lock does not belong to deal');
+    },
+    async releaseInventory(vehicleId, revision, dealId) {
+      const record = data.inventory[vehicleId];
+      invariant(record?.revision === revision && record.dealId === dealId, 'STALE_INVENTORY', 'Inventory revision or deal lock is stale');
       record.availability = 'AVAILABLE'; record.dealId = null;
     },
   };
@@ -134,5 +149,6 @@ function validateStore(value: unknown): StoreData {
   candidate.statusOutbox ??= [];
   return candidate as StoreData;
 }
-function callbackKey(provider: PaymentMethod, key: string): string { return `${provider}:${key}`; }
+function callbackKey(provider: string, key: string): string { return `${provider}:${key}`; }
 function isNotFound(error: unknown): boolean { return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT'; }
+function isNoLongerEligible(error: unknown): boolean { const code = typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : ''; return ['INVALID_TRANSITION', 'PAYMENT_DEADLINE_ACTIVE', 'VERSION_CONFLICT'].includes(code); }

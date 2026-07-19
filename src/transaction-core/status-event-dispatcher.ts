@@ -12,7 +12,7 @@ export class StatusEventDispatcher {
   }
 
   async dispatchOnce(): Promise<number> {
-    const pending = await this.#repository.listPendingStatusEvents(this.#batchSize);
+    const pending = await this.#repository.claimPendingStatusEvents(this.#batchSize);
     for (const event of pending) {
       this.#events.emitStatusChange(event);
       await this.#repository.markStatusEventPublished(event.eventId);

@@ -12,7 +12,7 @@ export type TransitionSource =
 export interface LockedVehicle {
   readonly vehicleId: string;
   readonly registrationIdentifier: string;
-  readonly inventoryRevision: string;
+  readonly inventoryRevision: string | number;
 }
 
 export interface Customer {

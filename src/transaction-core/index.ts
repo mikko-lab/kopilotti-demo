@@ -8,6 +8,7 @@ export * from './handover-policy.ts';
 export * from './json-transaction-repository.ts';
 export * from './model.ts';
 export * from './policies.ts';
+export * from './postgres-transaction-repository.ts';
 export * from './ports.ts';
 export * from './timeout-daemon.ts';
 export * from './status-event-dispatcher.ts';
