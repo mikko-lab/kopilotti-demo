@@ -12,8 +12,16 @@ Do not delete outbox rows until the deployment's independently monitored retenti
 
 ## Local CDC stack
 
-Copy `.env.example` to `.env`, replace both password placeholders, and run `docker compose up --wait`. The stack uses single-node Kafka in KRaft combined mode, PostgreSQL with logical WAL, Debezium Connect, and a one-shot connector registrar. It is production-like for integration testing but not a production topology: Kafka and Connect have no replication, transport authentication, or TLS.
+Copy `.env.example` to `.env`, replace both password placeholders, and run `docker compose up --wait`. The stack uses single-node Kafka in KRaft combined mode, PostgreSQL with logical WAL, Debezium Connect, and a one-shot connector reconciler. The connector JSON contains the Kafka Connect config object and is applied idempotently with the REST API's `PUT /connectors/{name}/config` operation. It is production-like for integration testing but not a production topology: Kafka and Connect have no replication, transport authentication, or TLS.
 
 Inspect connector health with `curl --fail http://localhost:8083/connectors/kopilotti-outbox-connector/status`. A healthy Connect REST endpoint does not prove that the connector task is running; tests and monitoring must inspect the connector status response as well.
 
 Debezium does not update the source outbox after Kafka acknowledgement. `kopilotti_kafka_cdc_lag_seconds` reacts only when the application is configured with a `KafkaCdcMetricsProvider` backed by Debezium's connector metrics. Docker Compose alone does not synthesize that metric.
+
+Run the live tool-to-Kafka scenario after the stack is healthy:
+
+```sh
+E2E_DATABASE_URL='postgresql://kopilotti_user:<app-password>@127.0.0.1:5432/kopilotti_db' npm run test:e2e:cdc
+```
+
+The normal test suite reports this scenario as skipped instead of pretending to exercise CDC. The live test fails with connector, replication-slot, and deal-state diagnostics if any stage does not become observable before its deadline.

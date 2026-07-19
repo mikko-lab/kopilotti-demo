@@ -77,8 +77,8 @@ services:
       KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
       VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
-      CONFIG_PROVIDERS: env
-      CONFIG_PROVIDERS_ENV_CLASS: org.apache.kafka.common.config.provider.EnvVarConfigProvider
+      CONNECT_CONFIG_PROVIDERS: env
+      CONNECT_CONFIG_PROVIDERS_ENV_CLASS: org.apache.kafka.common.config.provider.EnvVarConfigProvider
       DEBEZIUM_DATABASE_HOST: postgres-db
       DEBEZIUM_DATABASE_PORT: 5432
       DEBEZIUM_DATABASE_NAME: ${POSTGRES_DB:-kopilotti_db}
@@ -105,17 +105,17 @@ services:
       - /bin/sh
       - -ec
       - |
-        status="$$(curl --silent --output /tmp/response --write-out '%{http_code}' \
+        status="$$(curl --silent --output /tmp/response --write-out '%{http_code}' --request PUT \
           --header 'Content-Type: application/json' \
           --data-binary @/config/connector.json \
-          http://debezium-connect:8083/connectors)"
-        if [ "$$status" != "201" ] && [ "$$status" != "409" ]; then
+          http://debezium-connect:8083/connectors/kopilotti-outbox-connector/config)"
+        if [ "$$status" != "200" ] && [ "$$status" != "201" ]; then
           cat /tmp/response
           exit 1
         fi
         attempts=0
         while [ "$$attempts" -lt 12 ]; do
-          connector_status="$$(curl --fail --silent http://debezium-connect:8083/connectors/kopilotti-outbox-connector/status)"
+          connector_status="$$(curl --silent http://debezium-connect:8083/connectors/kopilotti-outbox-connector/status || true)"
           if printf '%s' "$$connector_status" | grep -q '"tasks":\[{"id":0,"state":"RUNNING"'; then
             printf '%s\n' "$$connector_status"
             exit 0

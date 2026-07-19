@@ -11,7 +11,8 @@
     "dev:static": "npx --yes serve . -l 8090",
     "generate:inventory": "node scripts/generate-inventory.js",
     "typecheck": "tsc --project tsconfig.json",
-    "test": "npm run typecheck && node --test tests/**/*.test.js tests/**/*.test.ts"
+    "test": "npm run typecheck && node --test tests/**/*.test.js tests/**/*.test.ts",
+    "test:e2e:cdc": "RUN_CDC_E2E=1 node --test tests/transaction-core/e2e-cdc-transaction.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.51.0",
