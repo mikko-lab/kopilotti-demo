@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import express from 'express';
 import type { AddressInfo } from 'node:net';
-import { createCorePriceLockRouter, type Customer, type Deal, type LockedVehicle } from '../../src/transaction-core/index.ts';
+import { createCorePriceLockRouter, type Customer, type Deal, type LockedVehicle, type LockFailureType, type PriceLockErrorCode, type PriceLockMetricStatus } from '../../src/transaction-core/index.ts';
 
 const vehicle: LockedVehicle = { vehicleId: 'vehicle-1', registrationIdentifier: 'XYZ-123', inventoryRevision: 7 };
 const buyer: Customer = { id: 'customer-1', ssnVerified: true, fullName: 'Testi Ostaja', email: 'ostaja@example.test', phone: '+358401234567' };
@@ -14,6 +14,8 @@ const deal: Deal = {
 
 function fixture(input: { authenticatedBuyer?: Customer | null; engineFailure?: Error } = {}) {
   const locks: Array<{ agreedPriceCents: number; buyer: Customer }> = [];
+  const metricCalls: Array<readonly [PriceLockMetricStatus, PriceLockErrorCode]> = [];
+  const lockFailureCalls: LockFailureType[] = [];
   const router = createCorePriceLockRouter({
     authorizer: { authorize: async (request) => {
       if (request.header('authorization') !== 'Bearer service-secret') throw new Error('secret auth detail');
@@ -34,8 +36,13 @@ function fixture(input: { authenticatedBuyer?: Customer | null; engineFailure?: 
         return { ...deal, state: 'PRICE_AGREED', version: 3, buyer: command.buyer, agreedPriceCents: command.agreedPriceCents, updatedAt: '2026-07-20T10:01:00.000Z' };
       },
     },
+    metrics: {
+      recordPriceLock: (status, errorCode) => { metricCalls.push([status, errorCode]); },
+      recordLockFailure: (failureType) => { lockFailureCalls.push(failureType); },
+      setCdcLagSeconds: () => {},
+    },
   });
-  return { router, locks };
+  return { router, locks, metricCalls, lockFailureCalls };
 }
 
 async function request(router: ReturnType<typeof fixture>['router'], body: unknown, headers: Record<string, string> = {}) {
@@ -59,6 +66,7 @@ test('service boundary locks only verifier-approved price and returns a minimal 
   assert.equal(result.status, 201);
   assert.deepEqual(result.body, { success: true, transactionId: 'deal-1', status: 'PRICE_AGREED', createdAt: '2026-07-20T10:01:00.000Z' });
   assert.equal(context.locks[0]?.agreedPriceCents, 92_500_00); assert.equal(context.locks[0]?.buyer.id, 'customer-1');
+  assert.deepEqual(context.metricCalls, [['success', 'none']]);
   assert.doesNotMatch(JSON.stringify(result.body), /agreedPrice|inventoryRevision|buyer|decision|policy/i);
 });
 
@@ -82,6 +90,7 @@ test('strong authentication and exact inventory revision fail closed before pric
 test('deterministic verifier rejection does not leak commercial policy details', async () => {
   const context = fixture(); const result = await request(context.router, { ...validBody, agreedPrice: 1 }, validHeaders);
   assert.equal(result.status, 403); assert.deepEqual(result.body, { errorCode: 'PRICE_NOT_AUTHORIZED', message: 'Hinnan lukitusta ei voitu vahvistaa.' });
+  assert.deepEqual(context.metricCalls, [['failed', 'price_not_authorized']]);
   assert.doesNotMatch(JSON.stringify(result.body), /floor|threshold|secret/i); assert.equal(context.locks.length, 0);
 });
 
@@ -89,5 +98,6 @@ test('unexpected repository failure is unavailable, not a misleading transaction
   const context = fixture({ engineFailure: new Error('postgres://secret@internal') });
   const result = await request(context.router, validBody, validHeaders);
   assert.equal(result.status, 503); assert.deepEqual(result.body, { errorCode: 'INTERNAL_ERROR', message: 'Palvelu ei ole käytettävissä.' });
+  assert.deepEqual(context.metricCalls, [['failed', 'core_unavailable']]); assert.deepEqual(context.lockFailureCalls, ['db_timeout']);
   assert.doesNotMatch(JSON.stringify(result.body), /postgres:\/\/|secret@|database host/i);
 });

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { LockPriceRequestSchema, type LockPriceRequest } from './openapi-core-spec.ts';
+import { coreMetrics, type PriceLockErrorCode, type TransactionCoreMetrics } from './metrics.ts';
 
 const LockPriceResponseSchema = z.object({
   success: z.literal(true), transactionId: z.string().min(1).max(128), status: z.literal('PRICE_AGREED'), createdAt: z.string().datetime(),
@@ -27,6 +28,7 @@ export class AgentCoreBridge {
   readonly #maxServiceUnavailableRetries: number;
   readonly #retryDelayMs: number;
   readonly #wait: (milliseconds: number) => Promise<void>;
+  readonly #metrics: TransactionCoreMetrics;
 
   constructor(input: {
     readonly coreServiceUrl: string;
@@ -36,6 +38,7 @@ export class AgentCoreBridge {
     readonly maxServiceUnavailableRetries?: number;
     readonly retryDelayMs?: number;
     readonly wait?: (milliseconds: number) => Promise<void>;
+    readonly metrics?: TransactionCoreMetrics;
   }) {
     const base = new URL(input.coreServiceUrl);
     if (!['http:', 'https:'].includes(base.protocol)) throw new TypeError('Core service URL must use HTTP or HTTPS');
@@ -47,6 +50,7 @@ export class AgentCoreBridge {
     this.#maxServiceUnavailableRetries = input.maxServiceUnavailableRetries ?? 1;
     this.#retryDelayMs = input.retryDelayMs ?? 150;
     this.#wait = input.wait ?? ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+    this.#metrics = input.metrics ?? coreMetrics;
     requireIntegerRange(this.#timeoutMs, 100, 30_000, 'timeoutMs');
     requireIntegerRange(this.#maxServiceUnavailableRetries, 0, 3, 'maxServiceUnavailableRetries');
     requireIntegerRange(this.#retryDelayMs, 0, 5_000, 'retryDelayMs');
@@ -55,8 +59,8 @@ export class AgentCoreBridge {
   async handleAgentLockPrice(context: AgentCoreBridgeContext, agreedPrice: number, currentRevision: number): Promise<AgentCoreBridgeResult> {
     let payload: LockPriceRequest;
     try { payload = LockPriceRequestSchema.parse({ dealId: context.dealId, vehicleId: context.vehicleId, agreedPrice, inventoryRevisionAtLock: currentRevision }); }
-    catch { return rejected(); }
-    if (!context.buyerSessionToken || context.buyerSessionToken.length > 2048) return strongAuthRequired();
+    catch { return this.#failure('invalid_request', rejected()); }
+    if (!context.buyerSessionToken || context.buyerSessionToken.length > 2048) return this.#failure('strong_auth_required', strongAuthRequired());
 
     const requestId = randomUUID();
     for (let attempt = 0; attempt <= this.#maxServiceUnavailableRetries; attempt += 1) {
@@ -69,7 +73,7 @@ export class AgentCoreBridge {
             'x-buyer-session-token': context.buyerSessionToken, 'x-request-id': requestId,
           },
         });
-      } catch { return busy(); }
+      } catch { return this.#failure('core_unavailable', busy(), 'db_timeout'); }
 
       if (response.status === 503 && attempt < this.#maxServiceUnavailableRetries) {
         await this.#wait(this.#retryDelayMs * (attempt + 1)); continue;
@@ -77,22 +81,30 @@ export class AgentCoreBridge {
       if (!response.ok) return await this.#mapError(response);
       try {
         const result = LockPriceResponseSchema.parse(await response.json());
-        return {
+        const resultValue: AgentCoreBridgeResult = {
           success: true, directive: 'NEGOTIATION_CLOSED_SELECT_PAYMENT', transactionId: result.transactionId,
           message: 'Hinta on lukittu. Neuvottelu on päättynyt. Ohjaa asiakas valitsemaan maksutapa.',
         };
-      } catch { return rejected(); }
+        this.#metrics.recordPriceLock('success', 'none');
+        return resultValue;
+      } catch { return this.#failure('invalid_response', rejected()); }
     }
-    return busy();
+    return this.#failure('core_unavailable', busy(), 'db_timeout');
   }
 
   async #mapError(response: Response): Promise<AgentCoreBridgeResult> {
-    if (response.status === 503 || response.status === 429) return busy();
+    if (response.status === 503 || response.status === 429) return this.#failure('core_unavailable', busy(), 'db_timeout');
     try {
       const parsed = ErrorResponseSchema.parse(await response.json());
-      if (parsed.errorCode === 'CUSTOMER_STRONG_AUTHENTICATION_REQUIRED') return strongAuthRequired();
+      if (parsed.errorCode === 'CUSTOMER_STRONG_AUTHENTICATION_REQUIRED') return this.#failure('strong_auth_required', strongAuthRequired());
     } catch { /* Fail closed without forwarding an untrusted response body to the LLM. */ }
-    return rejected();
+    return this.#failure('price_not_authorized', rejected());
+  }
+
+  #failure(errorCode: PriceLockErrorCode, result: AgentCoreBridgeResult, lockFailure?: 'db_timeout'): AgentCoreBridgeResult {
+    this.#metrics.recordPriceLock('failed', errorCode);
+    if (lockFailure) this.#metrics.recordLockFailure(lockFailure);
+    return result;
   }
 }
 

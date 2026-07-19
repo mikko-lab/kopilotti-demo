@@ -3,6 +3,7 @@ import { invariant } from './errors.ts';
 import type { DaemonMonitor, MonitoringMetrics } from './monitoring-types.ts';
 import type { KafkaCdcMetricsProvider, KafkaCdcMetricsSnapshot } from './kafka-cdc-metrics.ts';
 import { validateKafkaCdcMetrics } from './kafka-cdc-metrics.ts';
+import { coreMetrics, type TransactionCoreMetrics } from './metrics.ts';
 
 interface OutboxMetricRow extends QueryResultRow { total_unprocessed: string | number; max_lag_seconds: string | number | null; }
 
@@ -10,12 +11,14 @@ export class PrometheusMetricsCollector implements DaemonMonitor {
   readonly #pool: Pool;
   readonly #clock: () => Date;
   readonly #kafkaCdcMetrics: KafkaCdcMetricsProvider | null;
+  readonly #transactionMetrics: TransactionCoreMetrics;
   #daemonLastHeartbeat: Date | null = null;
   #daemonExecutionCount = 0;
   #daemonErrorCount = 0;
 
-  constructor(input: { pool: Pool; clock?: () => Date; kafkaCdcMetrics?: KafkaCdcMetricsProvider }) {
+  constructor(input: { pool: Pool; clock?: () => Date; kafkaCdcMetrics?: KafkaCdcMetricsProvider; transactionMetrics?: TransactionCoreMetrics }) {
     this.#pool = input.pool; this.#clock = input.clock ?? (() => new Date()); this.#kafkaCdcMetrics = input.kafkaCdcMetrics ?? null;
+    this.#transactionMetrics = input.transactionMetrics ?? coreMetrics;
   }
 
   registerDaemonHeartbeat(occurredAt = this.#clock()): void {
@@ -34,6 +37,7 @@ export class PrometheusMetricsCollector implements DaemonMonitor {
     const row = result.rows[0];
     invariant(Boolean(row), 'METRICS_QUERY_EMPTY', 'Metrics query returned no aggregate row');
     const cdc = await this.#collectKafkaCdcMetrics();
+    if (cdc?.lagSeconds !== null && cdc?.lagSeconds !== undefined) this.#transactionMetrics.setCdcLagSeconds(cdc.lagSeconds);
     return {
       outboxLagSeconds: nonNegativeNumber(row?.max_lag_seconds),
       unprocessedOutboxCount: nonNegativeSafeInteger(row?.total_unprocessed),

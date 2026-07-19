@@ -20,5 +20,7 @@ export * from './timeout-daemon.ts';
 export * from './status-event-dispatcher.ts';
 export * from './sse-router.ts';
 export * from './healthRouter.ts';
+export * from './metrics.ts';
+export * from './metrics-server.ts';
 export * from './transaction-machine.ts';
 export { KopilottiEngine } from './KopilottiEngine.ts';
