@@ -7,6 +7,7 @@ import { createTransactionSseHandler, KopilottiEventEmitter, type Deal } from '.
 const deal: Deal = {
   id: 'deal-1', tenantId: 'dealer-1', state: 'AWAITING_PAYMENT', version: 3,
   vehicle: { vehicleId: 'vehicle-1', registrationIdentifier: 'ABC-123', inventoryRevision: 'a'.repeat(64) },
+  buyer: { id: 'customer-1', ssnVerified: true, fullName: 'Testi Ostaja', email: 'ostaja@example.test', phone: '+358401234567' },
   agreedPriceCents: 3_000_000, currency: 'EUR', paymentMethod: 'CASH',
   paymentDeadline: '2026-07-22T12:00:00.000Z', providerReference: 'payment-1',
   handoverPolicyVersion: 'secret-policy-v1', createdAt: '2026-07-16T12:00:00.000Z', updatedAt: '2026-07-17T12:00:00.000Z',
@@ -37,7 +38,7 @@ test('authorized SSE sends only safe status data and removes listener on close',
   });
   await handler(req, response as unknown as Response);
   assert.equal(authorized, true); assert.equal(response.statusCode, 200); assert.equal(events.listenerCount(), 1);
-  assert.match(response.writes[0] ?? '', /event: statusChange/); assert.doesNotMatch(response.writes[0] ?? '', /agreedPrice|handoverPolicyVersion|providerReference/);
+  assert.match(response.writes[0] ?? '', /event: statusChange/); assert.doesNotMatch(response.writes[0] ?? '', /agreedPrice|handoverPolicyVersion|providerReference|customer-1|ostaja@example/);
   events.emitStatusChange({ eventId: 'event-4', transactionId: 'deal-1', registrationNumber: 'ABC-123', status: 'PAID', paymentDeadline: deal.paymentDeadline, timestamp: '2026-07-18T12:01:00.000Z' });
   assert.match(response.writes.at(-1) ?? '', /"status":"PAID"/);
   (req as unknown as EventEmitter).emit('close');

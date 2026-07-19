@@ -6,6 +6,7 @@ import {
 } from '../../src/transaction-core/index.ts';
 
 const revision = 'a'.repeat(64);
+const buyer = { id: 'customer-1', ssnVerified: true, fullName: 'Testi Ostaja', email: 'ostaja@example.test', phone: '+358401234567' } as const;
 const rules = {
   requireCeramicCoatingCompleted: false, requireHandoverInspectionCompleted: true,
   requireIdentityVerified: false, requireRegistrationCompleted: false,
@@ -56,14 +57,23 @@ function fixture(start = '2026-07-17T12:00:00.000Z') {
 
 async function priceAgreed(context: ReturnType<typeof fixture>) {
   const negotiating = await context.machine.createNegotiation({ dealId: 'deal-1', tenantId: 'dealer-1', vehicle: { vehicleId: 'alfa-qv-1', registrationIdentifier: 'ABC-123', inventoryRevision: revision } });
-  return context.machine.agreePrice({ dealId: negotiating.id, expectedVersion: negotiating.version, agreedPriceCents: 8_990_000, commercialDecisionId: 'decision-1' });
+  return context.machine.agreePrice({ dealId: negotiating.id, expectedVersion: negotiating.version, agreedPriceCents: 8_990_000, commercialDecisionId: 'decision-1', buyer });
 }
 
 test('locks price and vehicle at PRICE_AGREED and rejects later negotiation input', async () => {
   const context = fixture(); const agreed = await priceAgreed(context);
   assert.equal(agreed.state, 'PRICE_AGREED'); assert.equal(agreed.agreedPriceCents, 8_990_000); assert.equal(context.repository.locked.has('alfa-qv-1'), true);
   assert.equal(context.repository.audits.at(-1)?.payload.commercialDecisionId, 'decision-1');
-  await assert.rejects(context.machine.agreePrice({ dealId: agreed.id, expectedVersion: agreed.version, agreedPriceCents: 1, commercialDecisionId: 'decision-2' }), { code: 'NEGOTIATION_LOCKED' });
+  assert.equal(context.repository.audits.at(-1)?.payload.buyerId, 'customer-1');
+  assert.doesNotMatch(JSON.stringify(context.repository.audits.at(-1)), /Testi Ostaja|ostaja@example|358401234567/);
+  await assert.rejects(context.machine.agreePrice({ dealId: agreed.id, expectedVersion: agreed.version, agreedPriceCents: 1, commercialDecisionId: 'decision-2', buyer }), { code: 'NEGOTIATION_LOCKED' });
+});
+
+test('strongly authenticated buyer is required before inventory lock', async () => {
+  const context = fixture();
+  const negotiating = await context.machine.createNegotiation({ dealId: 'deal-unauthenticated', tenantId: 'dealer-1', vehicle: { vehicleId: 'alfa-qv-1', registrationIdentifier: 'ABC-123', inventoryRevision: revision } });
+  await assert.rejects(context.machine.agreePrice({ dealId: negotiating.id, expectedVersion: negotiating.version, agreedPriceCents: 8_990_000, commercialDecisionId: 'decision-unauthenticated', buyer: { ...buyer, ssnVerified: false } }), { code: 'CUSTOMER_STRONG_AUTHENTICATION_REQUIRED' });
+  assert.equal(context.repository.locked.has('alfa-qv-1'), false); assert.equal(context.repository.deals.get(negotiating.id)?.state, 'NEGOTIATING');
 });
 
 test('sets a three-business-day payment deadline in UTC', async () => {

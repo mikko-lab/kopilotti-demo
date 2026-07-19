@@ -15,12 +15,21 @@ export interface LockedVehicle {
   readonly inventoryRevision: string;
 }
 
+export interface Customer {
+  readonly id: string;
+  readonly ssnVerified: boolean;
+  readonly fullName: string;
+  readonly email: string;
+  readonly phone: string;
+}
+
 export interface Deal {
   readonly id: string;
   readonly tenantId: string;
   readonly state: DealState;
   readonly version: number;
   readonly vehicle: LockedVehicle;
+  readonly buyer: Customer | null;
   readonly agreedPriceCents: number | null;
   readonly currency: 'EUR';
   readonly paymentMethod: PaymentMethod | null;

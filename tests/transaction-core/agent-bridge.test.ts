@@ -3,18 +3,19 @@ import assert from 'node:assert/strict';
 import { AgentBridge, AgreePriceToolSchema, agreePriceToolDefinition, type Deal, type LockedVehicle, type PriceLockEngine } from '../../src/transaction-core/index.ts';
 
 const vehicle: LockedVehicle = { vehicleId: 'vehicle-1', registrationIdentifier: 'XYZ-123', inventoryRevision: 'a'.repeat(64) };
+const buyer = { id: 'customer-1', ssnVerified: true, fullName: 'Testi Ostaja', email: 'ostaja@example.test', phone: '+358401234567' } as const;
 
-function fixture() {
+function fixture(authenticatedBuyer: typeof buyer | null = buyer) {
   const deals = new Map<string, Deal>(); const lockedPrices: number[] = []; const decisionIds: string[] = [];
   const engine: PriceLockEngine = {
     async createNegotiation(input) {
-      const deal: Deal = { id: input.dealId, tenantId: input.tenantId, state: 'NEGOTIATING', version: 1, vehicle: input.vehicle, agreedPriceCents: null, currency: 'EUR', paymentMethod: null, paymentDeadline: null, providerReference: null, handoverPolicyVersion: null, createdAt: '2026-07-20T10:00:00.000Z', updatedAt: '2026-07-20T10:00:00.000Z' };
+      const deal: Deal = { id: input.dealId, tenantId: input.tenantId, state: 'NEGOTIATING', version: 1, vehicle: input.vehicle, buyer: null, agreedPriceCents: null, currency: 'EUR', paymentMethod: null, paymentDeadline: null, providerReference: null, handoverPolicyVersion: null, createdAt: '2026-07-20T10:00:00.000Z', updatedAt: '2026-07-20T10:00:00.000Z' };
       deals.set(deal.id, deal); return deal;
     },
     async agreePrice(input) {
       const current = deals.get(input.dealId); if (!current || current.state !== 'NEGOTIATING') throw new Error('SECRET_INTERNAL_POLICY_FAILURE');
       lockedPrices.push(input.agreedPriceCents); decisionIds.push(input.commercialDecisionId);
-      const updated: Deal = { ...current, state: 'PRICE_AGREED', version: current.version + 1, agreedPriceCents: input.agreedPriceCents, handoverPolicyVersion: 'secret-policy' };
+      const updated: Deal = { ...current, state: 'PRICE_AGREED', version: current.version + 1, buyer: input.buyer, agreedPriceCents: input.agreedPriceCents, handoverPolicyVersion: 'secret-policy' };
       deals.set(updated.id, updated); return updated;
     },
   };
@@ -24,7 +25,7 @@ function fixture() {
     verifier: { verify: async (claim) => {
       if (claim.claimedPriceCents !== 90_000_00) throw new Error('SECRET_FLOOR_PRICE');
       return { dealId: claim.transactionId ?? 'server-deal-1', approvedPriceCents: 92_500_00, commercialDecisionId: 'decision-verified-1' };
-    } }, tenantId: 'dealer-1',
+    } }, buyers: { getStronglyAuthenticatedBuyer: async () => authenticatedBuyer }, tenantId: 'dealer-1',
   });
   return { bridge, deals, lockedPrices, decisionIds };
 }
@@ -34,6 +35,8 @@ test('tool schema rejects extra policy fields and ambiguous money', () => {
   assert.throws(() => AgreePriceToolSchema.parse({ transactionId: null, registrationNumber: 'XYZ-123', agreedPrice: 90_000.001 }));
   assert.deepEqual(agreePriceToolDefinition.function.parameters.required, ['transactionId', 'registrationNumber', 'agreedPrice']);
   assert.equal(agreePriceToolDefinition.function.parameters.additionalProperties, false);
+  assert.equal(JSON.stringify(agreePriceToolDefinition).includes('buyer'), false);
+  assert.equal(JSON.stringify(agreePriceToolDefinition).includes('ssn'), false);
 });
 
 test('bridge treats LLM price as a claim and locks only verifier-authorized price', async () => {
@@ -48,6 +51,13 @@ test('bridge rejects unauthorized price without leaking verifier or policy error
   const result = await context.bridge.handleAgentToolCall({ transactionId: null, registrationNumber: 'XYZ-123', agreedPrice: 1 });
   assert.deepEqual(result, { success: false, errorCode: 'PRICE_NOT_AUTHORIZED', message: 'ERROR: PRICE_NOT_AUTHORIZED' });
   assert.equal(JSON.stringify(result).includes('FLOOR_PRICE'), false); assert.equal(context.deals.size, 0);
+});
+
+test('bridge requires protected strong-auth session before creating transaction', async () => {
+  const context = fixture(null);
+  const result = await context.bridge.handleAgentToolCall({ transactionId: null, registrationNumber: 'XYZ-123', agreedPrice: 90_000 });
+  assert.deepEqual(result, { success: false, errorCode: 'CUSTOMER_STRONG_AUTHENTICATION_REQUIRED', message: 'ERROR: CUSTOMER_STRONG_AUTHENTICATION_REQUIRED' });
+  assert.equal(context.deals.size, 0); assert.deepEqual(context.lockedPrices, []);
 });
 
 test('bridge locks negotiation once and rejects subsequent price mutation', async () => {

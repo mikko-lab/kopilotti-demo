@@ -126,6 +126,11 @@ function validateStore(value: unknown): StoreData {
   const candidate = value as Partial<StoreData>;
   invariant(candidate.schemaVersion === 1 && Boolean(candidate.deals) && Array.isArray(candidate.auditEvents)
     && Boolean(candidate.processedCallbacks) && Boolean(candidate.inventory), 'CORRUPT_TRANSACTION_STORE', 'Transaction store schema is invalid');
+  for (const deal of Object.values(candidate.deals ?? {})) {
+    if (deal.state === 'NEGOTIATING' && deal.buyer === undefined) (deal as { buyer: null }).buyer = null;
+    invariant(deal.state === 'NEGOTIATING' ? deal.buyer === null : deal.buyer?.ssnVerified === true,
+      'CORRUPT_TRANSACTION_STORE', 'Strongly authenticated buyer is missing from locked transaction');
+  }
   candidate.statusOutbox ??= [];
   return candidate as StoreData;
 }

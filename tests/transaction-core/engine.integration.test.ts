@@ -11,6 +11,7 @@ import {
 
 const inventoryRevision = 'b'.repeat(64);
 const vehicle = { vehicleId: 'alfa-qf-2026', registrationIdentifier: 'XYZ-123', inventoryRevision } as const;
+const buyer = { id: 'customer-1', ssnVerified: true, fullName: 'Testi Ostaja', email: 'ostaja@example.test', phone: '+358401234567' } as const;
 const defaultRules = {
   requireCeramicCoatingCompleted: false, requireHandoverInspectionCompleted: true,
   requireIdentityVerified: false, requireRegistrationCompleted: false,
@@ -61,7 +62,7 @@ async function integrationFixture(start = '2026-07-16T12:00:00.000Z') {
 
 async function agreePrice(context: Awaited<ReturnType<typeof integrationFixture>>, dealId: string) {
   const negotiating = await context.machine.createNegotiation({ dealId, tenantId: 'dealer-1', vehicle });
-  return context.machine.agreePrice({ dealId, expectedVersion: negotiating.version, agreedPriceCents: 9_250_000, commercialDecisionId: `decision-${dealId}` });
+  return context.machine.agreePrice({ dealId, expectedVersion: negotiating.version, agreedPriceCents: 9_250_000, commercialDecisionId: `decision-${dealId}`, buyer });
 }
 
 function callback(value: VerifiedProviderCallback): Uint8Array { return new TextEncoder().encode(JSON.stringify(value)); }
@@ -72,6 +73,7 @@ describe('Kopilotti Core integration', () => {
     try {
       const agreed = await agreePrice(context, 'deal-cash');
       assert.equal(agreed.state, 'PRICE_AGREED'); assert.equal(agreed.agreedPriceCents, 9_250_000);
+      assert.equal((await context.repository.getDeal(agreed.id))?.buyer?.id, 'customer-1');
       const awaiting = await context.machine.beginPayment({ dealId: agreed.id, expectedVersion: agreed.version, method: 'CASH', providerReference: 'bank-payment-1' });
       assert.equal(awaiting.state, 'AWAITING_PAYMENT'); assert.ok(awaiting.paymentDeadline);
       const paid = await context.machine.handleProviderCallback('CASH', callback({ dealId: agreed.id, idempotencyKey: 'cash-key-123', providerReference: 'bank-payment-1', outcome: 'CONFIRMED', simulated: false }), { 'x-test-signature': 'cash-secret' });
@@ -81,6 +83,7 @@ describe('Kopilotti Core integration', () => {
       assert.equal(handedOver.state, 'HANDED_OVER');
       const handoverAudit = (await context.repository.listAuditEvents(agreed.id)).find((event) => event.toState === 'HANDED_OVER');
       assert.equal(handoverAudit?.source, 'AUTHORIZED_DEALERSHIP_ACTION'); assert.equal(handoverAudit?.payload.handoverPolicyVersion, 'v2.1-high-performance');
+      assert.doesNotMatch(JSON.stringify(await context.repository.listAuditEvents(agreed.id)), /Testi Ostaja|ostaja@example|358401234567/);
       const events = new KopilottiEventEmitter(); const delivered: unknown[] = [];
       events.onStatusChange((event) => delivered.push(event));
       const dispatcher = new StatusEventDispatcher({ repository: context.repository, events });

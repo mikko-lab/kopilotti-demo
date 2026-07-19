@@ -2,7 +2,7 @@ import { assertValidDate, isDeadlineExpired } from './business-days.ts';
 import { invariant } from './errors.ts';
 import { assertHandoverReady } from './handover-policy.ts';
 import type {
-  AuditEvent, Deal, HandoverFacts, LockedVehicle, PaymentMethod, TransitionSource, VerifiedProviderCallback,
+  AuditEvent, Customer, Deal, HandoverFacts, LockedVehicle, PaymentMethod, TransitionSource, VerifiedProviderCallback,
 } from './model.ts';
 import type {
   BusinessCalendarPort, Clock, DealershipAuthorizer, HandoverPolicyRepository, IdGenerator, ProviderAdapter,
@@ -49,7 +49,7 @@ export class TransactionMachine {
     const timestamp = this.#now();
     const deal: Deal = Object.freeze({
       id: input.dealId, tenantId: input.tenantId, state: 'NEGOTIATING', version: 1,
-      vehicle: Object.freeze({ ...input.vehicle }), agreedPriceCents: null, currency: 'EUR', paymentMethod: null,
+      vehicle: Object.freeze({ ...input.vehicle }), buyer: null, agreedPriceCents: null, currency: 'EUR', paymentMethod: null,
       paymentDeadline: null, providerReference: null, handoverPolicyVersion: null,
       createdAt: timestamp, updatedAt: timestamp,
     });
@@ -62,20 +62,21 @@ export class TransactionMachine {
     });
   }
 
-  async agreePrice(input: { readonly dealId: string; readonly expectedVersion: number; readonly agreedPriceCents: number; readonly commercialDecisionId: string }): Promise<Deal> {
-    requireMoney(input.agreedPriceCents); requireIdentifier(input.commercialDecisionId, 'commercialDecisionId'); const timestamp = this.#now();
+  async agreePrice(input: { readonly dealId: string; readonly expectedVersion: number; readonly agreedPriceCents: number; readonly commercialDecisionId: string; readonly buyer: Customer }): Promise<Deal> {
+    requireMoney(input.agreedPriceCents); requireIdentifier(input.commercialDecisionId, 'commercialDecisionId'); validateStronglyAuthenticatedCustomer(input.buyer); const timestamp = this.#now();
     return this.#repository.transaction(async (context) => {
       const current = await requireDeal(context, input.dealId, input.expectedVersion);
       invariant(current.state === 'NEGOTIATING', 'NEGOTIATION_LOCKED', 'Price negotiation is locked');
       const policy = await this.#policies.getCurrent(current.tenantId);
       invariant(policy !== null, 'HANDOVER_POLICY_NOT_FOUND', 'Handover policy is not configured');
       const updated = evolve(current, timestamp, {
-        state: 'PRICE_AGREED', agreedPriceCents: input.agreedPriceCents, handoverPolicyVersion: policy.version,
+        state: 'PRICE_AGREED', buyer: Object.freeze({ ...input.buyer }), agreedPriceCents: input.agreedPriceCents, handoverPolicyVersion: policy.version,
       });
       await context.lockInventory(current.vehicle.vehicleId, current.vehicle.inventoryRevision, current.id);
       await persistTransition(context, current, updated, this.#event(updated, current, 'PRICE_AGREED', 'DETERMINISTIC_NEGOTIATION_ENGINE', timestamp, {
         agreedPriceCents: input.agreedPriceCents, currency: 'EUR', registrationIdentifier: current.vehicle.registrationIdentifier,
         commercialDecisionId: input.commercialDecisionId,
+        buyerId: input.buyer.id, strongAuthenticationVerified: true,
       }));
       return updated;
     });
@@ -193,3 +194,10 @@ function requireIdentifier(value: string, field: string): void { invariant(typeo
 function requireMoney(value: number): void { invariant(Number.isSafeInteger(value) && value > 0, 'INVALID_MONEY', 'Price must be positive integer cents'); }
 function validateVehicle(vehicle: LockedVehicle): void { invariant(Boolean(vehicle), 'INVALID_INPUT', 'vehicle is required'); requireIdentifier(vehicle.vehicleId, 'vehicleId'); requireIdentifier(vehicle.registrationIdentifier, 'registrationIdentifier'); invariant(/^[a-fA-F0-9]{64}$/.test(vehicle.inventoryRevision), 'INVALID_INPUT', 'inventoryRevision is invalid'); }
 function validateVerifiedCallback(value: VerifiedProviderCallback): void { invariant(Boolean(value), 'CALLBACK_NOT_VERIFIED', 'Provider callback was not verified'); requireIdentifier(value.dealId, 'dealId'); requireIdentifier(value.idempotencyKey, 'idempotencyKey'); requireIdentifier(value.providerReference, 'providerReference'); invariant(['PENDING', 'CONFIRMED', 'REJECTED'].includes(value.outcome), 'CALLBACK_NOT_VERIFIED', 'Provider outcome is invalid'); invariant(typeof value.simulated === 'boolean', 'CALLBACK_NOT_VERIFIED', 'Provider simulation marker is required'); }
+function validateStronglyAuthenticatedCustomer(customer: Customer): void {
+  invariant(Boolean(customer) && customer.ssnVerified === true, 'CUSTOMER_STRONG_AUTHENTICATION_REQUIRED', 'Strong customer authentication is required');
+  requireIdentifier(customer.id, 'buyer.id');
+  invariant(typeof customer.fullName === 'string' && customer.fullName.trim().length >= 2 && customer.fullName.length <= 200, 'INVALID_CUSTOMER', 'Customer name is invalid');
+  invariant(typeof customer.email === 'string' && customer.email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email), 'INVALID_CUSTOMER', 'Customer email is invalid');
+  invariant(typeof customer.phone === 'string' && /^\+?[0-9 ()-]{7,30}$/.test(customer.phone), 'INVALID_CUSTOMER', 'Customer phone is invalid');
+}
