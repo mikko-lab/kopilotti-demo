@@ -1,9 +1,11 @@
 import type { AuditEvent, Deal, HandoverPolicy, PaymentMethod, VerifiedProviderCallback } from './model.ts';
+import type { TransactionStatusEvent } from './events.ts';
 
 export interface TransactionContext {
   getDeal(dealId: string): Promise<Deal | null>;
   saveDeal(deal: Deal, expectedVersion: number): Promise<void>;
   appendAudit(event: AuditEvent): Promise<void>;
+  enqueueStatusEvent(event: TransactionStatusEvent): Promise<void>;
   getProcessedCallbackDealId(provider: PaymentMethod, idempotencyKey: string): Promise<string | null>;
   recordProcessedCallback(provider: PaymentMethod, idempotencyKey: string, dealId: string): Promise<void>;
   lockInventory(vehicleId: string, expectedInventoryRevision: string, dealId: string): Promise<void>;
@@ -13,6 +15,8 @@ export interface TransactionContext {
 export interface TransactionRepository {
   transaction<T>(operation: (context: TransactionContext) => Promise<T>): Promise<T>;
   findExpiredAwaitingPayment(now: string, limit: number): Promise<readonly string[]>;
+  listPendingStatusEvents(limit: number): Promise<readonly TransactionStatusEvent[]>;
+  markStatusEventPublished(eventId: string): Promise<void>;
 }
 
 export interface ProviderAdapter {

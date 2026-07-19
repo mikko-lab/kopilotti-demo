@@ -4,7 +4,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import {
-  BusinessCalendar, JsonTransactionRepository, KopilottiEngine, PaymentTimeoutDaemon,
+  BusinessCalendar, JsonTransactionRepository, KopilottiEngine, KopilottiEventEmitter, PaymentTimeoutDaemon, StatusEventDispatcher,
   createVersionedHandoverPolicy, type HandoverFacts, type PaymentMethod,
   type ProviderAdapter, type VerifiedProviderCallback,
 } from '../../src/transaction-core/index.ts';
@@ -81,6 +81,12 @@ describe('Kopilotti Core integration', () => {
       assert.equal(handedOver.state, 'HANDED_OVER');
       const handoverAudit = (await context.repository.listAuditEvents(agreed.id)).find((event) => event.toState === 'HANDED_OVER');
       assert.equal(handoverAudit?.source, 'AUTHORIZED_DEALERSHIP_ACTION'); assert.equal(handoverAudit?.payload.handoverPolicyVersion, 'v2.1-high-performance');
+      const events = new KopilottiEventEmitter(); const delivered: unknown[] = [];
+      events.onStatusChange((event) => delivered.push(event));
+      const dispatcher = new StatusEventDispatcher({ repository: context.repository, events });
+      assert.equal(await dispatcher.dispatchOnce(), 5); assert.equal(await dispatcher.dispatchOnce(), 0);
+      assert.deepEqual(delivered.map((event) => (event as { status: string }).status), ['NEGOTIATING', 'PRICE_AGREED', 'AWAITING_PAYMENT', 'PAID', 'HANDED_OVER']);
+      assert.equal(JSON.stringify(delivered).includes('agreedPrice'), false); assert.equal(JSON.stringify(delivered).includes('handoverPolicy'), false);
     } finally { await context.cleanup(); }
   });
 

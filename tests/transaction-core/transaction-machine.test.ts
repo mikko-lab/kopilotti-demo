@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   addBusinessDays, BusinessCalendar, createVersionedHandoverPolicy, KopilottiEngine, PaymentTimeoutDaemon, TransactionMachine, type AuditEvent, type Deal, type HandoverPolicy,
-  type PaymentMethod, type TransactionContext, type TransactionRepository, type VerifiedProviderCallback,
+  type PaymentMethod, type TransactionContext, type TransactionRepository, type TransactionStatusEvent, type VerifiedProviderCallback,
 } from '../../src/transaction-core/index.ts';
 
 const revision = 'a'.repeat(64);
@@ -17,18 +17,21 @@ const policy: HandoverPolicy = {
 };
 
 class MemoryRepository implements TransactionRepository {
-  deals = new Map<string, Deal>(); audits: AuditEvent[] = []; callbacks = new Map<string, string>(); released: string[] = []; locked = new Set<string>();
+  deals = new Map<string, Deal>(); audits: AuditEvent[] = []; callbacks = new Map<string, string>(); released: string[] = []; locked = new Set<string>(); outbox: Array<{ event: TransactionStatusEvent; published: boolean }> = [];
   async transaction<T>(operation: (context: TransactionContext) => Promise<T>): Promise<T> {
-    const snapshot = structuredClone({ deals: [...this.deals], audits: this.audits, callbacks: [...this.callbacks], released: this.released, locked: [...this.locked] });
+    const snapshot = structuredClone({ deals: [...this.deals], audits: this.audits, callbacks: [...this.callbacks], released: this.released, locked: [...this.locked], outbox: this.outbox });
     try { return await operation(this.context()); }
-    catch (error) { this.deals = new Map(snapshot.deals); this.audits = snapshot.audits; this.callbacks = new Map(snapshot.callbacks); this.released = snapshot.released; this.locked = new Set(snapshot.locked); throw error; }
+    catch (error) { this.deals = new Map(snapshot.deals); this.audits = snapshot.audits; this.callbacks = new Map(snapshot.callbacks); this.released = snapshot.released; this.locked = new Set(snapshot.locked); this.outbox = snapshot.outbox; throw error; }
   }
   async findExpiredAwaitingPayment(now: string, limit: number): Promise<readonly string[]> { return [...this.deals.values()].filter((deal) => deal.state === 'AWAITING_PAYMENT' && Date.parse(String(deal.paymentDeadline)) <= Date.parse(now)).slice(0, limit).map((deal) => deal.id); }
+  async listPendingStatusEvents(limit: number): Promise<readonly TransactionStatusEvent[]> { return this.outbox.filter((record) => !record.published).slice(0, limit).map((record) => structuredClone(record.event)); }
+  async markStatusEventPublished(eventId: string): Promise<void> { const record = this.outbox.find((item) => item.event.eventId === eventId); if (record) record.published = true; }
   context(): TransactionContext {
     return {
       getDeal: async (id) => structuredClone(this.deals.get(id) ?? null),
       saveDeal: async (deal, version) => { const current = this.deals.get(deal.id); if ((version === 0 && current) || (version > 0 && current?.version !== version)) throw Object.assign(new Error('conflict'), { code: 'VERSION_CONFLICT' }); this.deals.set(deal.id, structuredClone(deal)); },
       appendAudit: async (event) => { this.audits.push(structuredClone(event)); },
+      enqueueStatusEvent: async (event) => { this.outbox.push({ event: structuredClone(event), published: false }); },
       getProcessedCallbackDealId: async (provider, key) => this.callbacks.get(`${provider}:${key}`) ?? null,
       recordProcessedCallback: async (provider, key, dealId) => { this.callbacks.set(`${provider}:${key}`, dealId); },
       lockInventory: async (vehicleId) => { if (this.locked.has(vehicleId)) throw Object.assign(new Error('locked'), { code: 'VEHICLE_NOT_AVAILABLE' }); this.locked.add(vehicleId); },

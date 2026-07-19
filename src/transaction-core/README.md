@@ -7,3 +7,5 @@ The application boundary supplies authenticated provider adapters, a dealership 
 `JsonTransactionRepository` gives one-process deployments atomic file replacement and serial transactions. A multi-worker production deployment should implement `TransactionRepository` with a database transaction, optimistic version checks, and a unique constraint on `(provider, idempotency_key)`. Deal update, callback key, audit append, and inventory lock/release belong to that same transaction.
 
 Handover policy and pricing policy remain backend configuration. Public API serializers should expose only customer-safe state labels, never policy versions, missing policy facts, pricing thresholds, raw provider payloads, credentials, or secrets.
+
+Status notifications use a transactional outbox. Run `StatusEventDispatcher.start(...)` in the backend worker and connect its emitter to the authorized SSE handler. Delivery is at-least-once; consumers must treat `eventId` idempotently. In a multi-worker deployment, the database outbox implementation must claim rows safely (for example `FOR UPDATE SKIP LOCKED`) before publishing.

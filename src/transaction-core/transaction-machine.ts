@@ -8,6 +8,7 @@ import type {
   BusinessCalendarPort, Clock, DealershipAuthorizer, HandoverPolicyRepository, IdGenerator, ProviderAdapter,
   TransactionContext, TransactionRepository,
 } from './ports.ts';
+import type { TransactionStatusEvent } from './events.ts';
 
 export interface TransactionMachineDependencies {
   readonly repository: TransactionRepository;
@@ -55,7 +56,8 @@ export class TransactionMachine {
     return this.#repository.transaction(async (context) => {
       invariant(await context.getDeal(deal.id) === null, 'DEAL_ALREADY_EXISTS', 'Deal already exists');
       await context.saveDeal(deal, 0);
-      await context.appendAudit(this.#event(deal, deal, 'NEGOTIATION_STARTED', 'CUSTOMER_INTERFACE_ACTION', timestamp, { vehicleId: deal.vehicle.vehicleId }));
+      const audit = this.#event(deal, deal, 'NEGOTIATION_STARTED', 'CUSTOMER_INTERFACE_ACTION', timestamp, { vehicleId: deal.vehicle.vehicleId });
+      await context.appendAudit(audit); await context.enqueueStatusEvent(statusEvent(deal, audit.id));
       return deal;
     });
   }
@@ -113,9 +115,11 @@ export class TransactionMachine {
       const updated = verified.outcome === 'CONFIRMED' ? evolve(current, timestamp, { state: 'PAID' }) : current;
       await context.recordProcessedCallback(method, verified.idempotencyKey, current.id);
       if (updated !== current) await context.saveDeal(updated, current.version);
-      await context.appendAudit(this.#event(updated, current, `PROVIDER_${verified.outcome}`, source, timestamp, {
+      const audit = this.#event(updated, current, `PROVIDER_${verified.outcome}`, source, timestamp, {
         idempotencyKey: verified.idempotencyKey, providerReference: verified.providerReference, paymentMethod: method,
-      }));
+      });
+      await context.appendAudit(audit);
+      if (updated !== current) await context.enqueueStatusEvent(statusEvent(updated, audit.id));
       return updated;
     });
   }
@@ -174,7 +178,11 @@ async function requireDeal(context: TransactionContext, dealId: string, expected
 }
 
 async function persistTransition(context: TransactionContext, previous: Deal, updated: Deal, event: AuditEvent): Promise<void> {
-  await context.saveDeal(updated, previous.version); await context.appendAudit(event);
+  await context.saveDeal(updated, previous.version); await context.appendAudit(event); await context.enqueueStatusEvent(statusEvent(updated, event.id));
+}
+
+function statusEvent(deal: Deal, eventId: string): TransactionStatusEvent {
+  return Object.freeze({ eventId, transactionId: deal.id, registrationNumber: deal.vehicle.registrationIdentifier, status: deal.state, paymentDeadline: deal.paymentDeadline, timestamp: deal.updatedAt });
 }
 
 function evolve<T extends Partial<Deal>>(deal: Deal, timestamp: string, changes: T): Deal {

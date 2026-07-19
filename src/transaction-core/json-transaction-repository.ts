@@ -4,6 +4,7 @@ import { dirname } from 'node:path';
 import { invariant } from './errors.ts';
 import type { AuditEvent, Deal, PaymentMethod } from './model.ts';
 import type { TransactionContext, TransactionRepository } from './ports.ts';
+import type { TransactionStatusEvent } from './events.ts';
 
 interface InventoryRecord { readonly revision: string; availability: 'AVAILABLE' | 'LOCKED'; dealId: string | null; }
 interface StoreData {
@@ -12,6 +13,7 @@ interface StoreData {
   auditEvents: AuditEvent[];
   processedCallbacks: Record<string, string>;
   inventory: Record<string, InventoryRecord>;
+  statusOutbox: Array<{ event: TransactionStatusEvent; published: boolean }>;
 }
 
 /**
@@ -43,6 +45,20 @@ export class JsonTransactionRepository implements TransactionRepository {
       .slice(0, limit).map((deal) => deal.id);
   }
 
+  async listPendingStatusEvents(limit: number): Promise<readonly TransactionStatusEvent[]> {
+    await this.#queue; const data = await this.#read();
+    return data.statusOutbox.filter((record) => !record.published).slice(0, limit).map((record) => structuredClone(record.event));
+  }
+
+  async markStatusEventPublished(eventId: string): Promise<void> {
+    const run = this.#queue.then(async () => {
+      const data = await this.#read(); const record = data.statusOutbox.find((candidate) => candidate.event.eventId === eventId);
+      invariant(Boolean(record), 'OUTBOX_EVENT_NOT_FOUND', 'Outbox event was not found');
+      if (record && !record.published) { record.published = true; await this.#write(data); }
+    });
+    this.#queue = run.then(() => undefined, () => undefined); await run;
+  }
+
   async getDeal(dealId: string): Promise<Deal | null> {
     await this.#queue; const data = await this.#read();
     return data.deals[dealId] ? structuredClone(data.deals[dealId]) : null;
@@ -56,7 +72,7 @@ export class JsonTransactionRepository implements TransactionRepository {
   async #read(): Promise<StoreData> {
     try { return validateStore(JSON.parse(await readFile(this.#filePath, 'utf8'))); }
     catch (error) {
-      if (isNotFound(error)) return { schemaVersion: 1, deals: {}, auditEvents: [], processedCallbacks: {}, inventory: {} };
+      if (isNotFound(error)) return { schemaVersion: 1, deals: {}, auditEvents: [], processedCallbacks: {}, inventory: {}, statusOutbox: [] };
       throw error;
     }
   }
@@ -78,6 +94,10 @@ function contextFor(data: StoreData): TransactionContext {
       data.deals[deal.id] = structuredClone(deal);
     },
     async appendAudit(event) { data.auditEvents.push(structuredClone(event)); },
+    async enqueueStatusEvent(event) {
+      invariant(!data.statusOutbox.some((record) => record.event.eventId === event.eventId), 'OUTBOX_EVENT_EXISTS', 'Outbox event already exists');
+      data.statusOutbox.push({ event: structuredClone(event), published: false });
+    },
     async getProcessedCallbackDealId(provider, key) { return data.processedCallbacks[callbackKey(provider, key)] ?? null; },
     async recordProcessedCallback(provider, key, dealId) {
       const composite = callbackKey(provider, key);
@@ -106,6 +126,7 @@ function validateStore(value: unknown): StoreData {
   const candidate = value as Partial<StoreData>;
   invariant(candidate.schemaVersion === 1 && Boolean(candidate.deals) && Array.isArray(candidate.auditEvents)
     && Boolean(candidate.processedCallbacks) && Boolean(candidate.inventory), 'CORRUPT_TRANSACTION_STORE', 'Transaction store schema is invalid');
+  candidate.statusOutbox ??= [];
   return candidate as StoreData;
 }
 function callbackKey(provider: PaymentMethod, key: string): string { return `${provider}:${key}`; }
