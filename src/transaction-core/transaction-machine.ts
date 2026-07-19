@@ -62,8 +62,8 @@ export class TransactionMachine {
     });
   }
 
-  async agreePrice(input: { readonly dealId: string; readonly expectedVersion: number; readonly agreedPriceCents: number }): Promise<Deal> {
-    requireMoney(input.agreedPriceCents); const timestamp = this.#now();
+  async agreePrice(input: { readonly dealId: string; readonly expectedVersion: number; readonly agreedPriceCents: number; readonly commercialDecisionId: string }): Promise<Deal> {
+    requireMoney(input.agreedPriceCents); requireIdentifier(input.commercialDecisionId, 'commercialDecisionId'); const timestamp = this.#now();
     return this.#repository.transaction(async (context) => {
       const current = await requireDeal(context, input.dealId, input.expectedVersion);
       invariant(current.state === 'NEGOTIATING', 'NEGOTIATION_LOCKED', 'Price negotiation is locked');
@@ -75,6 +75,7 @@ export class TransactionMachine {
       await context.lockInventory(current.vehicle.vehicleId, current.vehicle.inventoryRevision, current.id);
       await persistTransition(context, current, updated, this.#event(updated, current, 'PRICE_AGREED', 'DETERMINISTIC_NEGOTIATION_ENGINE', timestamp, {
         agreedPriceCents: input.agreedPriceCents, currency: 'EUR', registrationIdentifier: current.vehicle.registrationIdentifier,
+        commercialDecisionId: input.commercialDecisionId,
       }));
       return updated;
     });

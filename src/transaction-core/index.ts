@@ -1,4 +1,6 @@
 export * from './business-days.ts';
+export * from './agentTools.ts';
+export * from './AgentBridge.ts';
 export * from './calendar.ts';
 export * from './errors.ts';
 export * from './events.ts';

@@ -9,3 +9,5 @@ The application boundary supplies authenticated provider adapters, a dealership 
 Handover policy and pricing policy remain backend configuration. Public API serializers should expose only customer-safe state labels, never policy versions, missing policy facts, pricing thresholds, raw provider payloads, credentials, or secrets.
 
 Status notifications use a transactional outbox. Run `StatusEventDispatcher.start(...)` in the backend worker and connect its emitter to the authorized SSE handler. Delivery is at-least-once; consumers must treat `eventId` idempotently. In a multi-worker deployment, the database outbox implementation must claim rows safely (for example `FOR UPDATE SKIP LOCKED`) before publishing.
+
+LLM tool calls enter through `AgentBridge`. The model-provided price is only an untrusted claim: `PriceAgreementVerifier` must validate a server-issued deterministic commercial decision bound to the deal, registration identifier, and exact price. The bridge records the verifier's `commercialDecisionId` in the audit event and never returns verifier exceptions, policy thresholds, or inventory internals to the model.

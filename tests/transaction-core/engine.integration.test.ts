@@ -61,7 +61,7 @@ async function integrationFixture(start = '2026-07-16T12:00:00.000Z') {
 
 async function agreePrice(context: Awaited<ReturnType<typeof integrationFixture>>, dealId: string) {
   const negotiating = await context.machine.createNegotiation({ dealId, tenantId: 'dealer-1', vehicle });
-  return context.machine.agreePrice({ dealId, expectedVersion: negotiating.version, agreedPriceCents: 9_250_000 });
+  return context.machine.agreePrice({ dealId, expectedVersion: negotiating.version, agreedPriceCents: 9_250_000, commercialDecisionId: `decision-${dealId}` });
 }
 
 function callback(value: VerifiedProviderCallback): Uint8Array { return new TextEncoder().encode(JSON.stringify(value)); }
