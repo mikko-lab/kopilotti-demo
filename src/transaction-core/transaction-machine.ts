@@ -5,7 +5,7 @@ import type {
   AuditEvent, Deal, HandoverFacts, LockedVehicle, PaymentMethod, TransitionSource, VerifiedProviderCallback,
 } from './model.ts';
 import type {
-  BusinessCalendar, Clock, DealershipAuthorizer, HandoverPolicyRepository, IdGenerator, ProviderAdapter,
+  BusinessCalendarPort, Clock, DealershipAuthorizer, HandoverPolicyRepository, IdGenerator, ProviderAdapter,
   TransactionContext, TransactionRepository,
 } from './ports.ts';
 
@@ -17,7 +17,7 @@ export interface TransactionMachineDependencies {
   readonly authorizer: DealershipAuthorizer;
   readonly clock: Clock;
   readonly ids: IdGenerator;
-  readonly calendar: BusinessCalendar;
+  readonly calendar: BusinessCalendarPort;
 }
 
 export class TransactionMachine {
@@ -28,7 +28,7 @@ export class TransactionMachine {
   readonly #authorizer: DealershipAuthorizer;
   readonly #clock: Clock;
   readonly #ids: IdGenerator;
-  readonly #calendar: BusinessCalendar;
+  readonly #calendar: BusinessCalendarPort;
 
   constructor(dependencies: TransactionMachineDependencies) {
     this.#repository = dependencies.repository;
@@ -133,6 +133,12 @@ export class TransactionMachine {
       const updated = evolve(current, timestamp, { state: 'HANDED_OVER' });
       await persistTransition(context, current, updated, this.#event(updated, current, 'VEHICLE_HANDED_OVER', 'AUTHORIZED_DEALERSHIP_ACTION', timestamp, {
         actorId: actor.actorId, handoverPolicyVersion: policy.version,
+        ceramicCoatingCompleted: input.facts.ceramicCoatingCompleted,
+        handoverInspectionCompleted: input.facts.handoverInspectionCompleted,
+        identityVerified: input.facts.identityVerified,
+        registrationCompleted: input.facts.registrationCompleted,
+        insuranceInformationReceived: input.facts.insuranceInformationReceived,
+        manualApproval: input.facts.manualApproval,
       }));
       return updated;
     });

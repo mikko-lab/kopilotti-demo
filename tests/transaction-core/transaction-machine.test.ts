@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  addBusinessDays, PaymentTimeoutDaemon, TransactionMachine, type AuditEvent, type Deal, type HandoverPolicy,
+  addBusinessDays, BusinessCalendar, createVersionedHandoverPolicy, KopilottiEngine, PaymentTimeoutDaemon, TransactionMachine, type AuditEvent, type Deal, type HandoverPolicy,
   type PaymentMethod, type TransactionContext, type TransactionRepository, type VerifiedProviderCallback,
 } from '../../src/transaction-core/index.ts';
 
@@ -71,6 +71,15 @@ test('sets a three-business-day payment deadline in UTC', async () => {
 test('business calendar can exclude configured public holidays', () => {
   const holidays = new Set(['2026-12-24', '2026-12-25']);
   assert.equal(addBusinessDays(new Date('2026-12-23T10:00:00.000Z'), 3, holidays).toISOString(), '2026-12-30T10:00:00.000Z');
+  const calendar = new BusinessCalendar([...holidays]);
+  assert.equal(calendar.calculateDeadline('2026-12-23T10:00:00.000Z', 3), '2026-12-30T10:00:00.000Z');
+  assert.equal(calendar.isBusinessDay(new Date('2026-12-25T10:00:00.000Z')), false);
+});
+
+test('named Kopilotti modules retain the hardened engine and immutable policy', () => {
+  assert.equal(KopilottiEngine, TransactionMachine);
+  const created = createVersionedHandoverPolicy(policy);
+  assert.equal(created.version, 'policy-v1'); assert.equal(Object.isFrozen(created.vehicleRules['alfa-qv-1']), true);
 });
 
 test('keeps rejected financing and missing payment in the symmetric awaiting state', async () => {

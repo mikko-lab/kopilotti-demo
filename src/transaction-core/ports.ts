@@ -28,7 +28,7 @@ export interface HandoverPolicyRepository {
 
 export interface Clock { now(): Date; }
 export interface IdGenerator { next(): string; }
-export interface BusinessCalendar { addBusinessDays(input: Date, count: number): Date; }
+export interface BusinessCalendarPort { addBusinessDays(input: Date, count: number): Date; }
 
 export interface DealershipAuthorizer {
   requireHandoverPermission(credential: unknown, tenantId: string): Promise<{ readonly actorId: string }>;
