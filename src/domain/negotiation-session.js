@@ -8,6 +8,7 @@ const SESSION_STATUS = Object.freeze({
   ESCALATED: 'ESCALATED',
   CANCELLED: 'CANCELLED',
   CLOSED: 'CLOSED',
+  PRICE_AGREED: 'PRICE_AGREED',
 });
 
 function createSession({ id, tenantId, vehicleId, policyVersion, inventoryRevision, createdAt }) {
@@ -52,6 +53,17 @@ function transitionSession(session, status, occurredAt) {
   return { ...session, status, version: session.version + 1, updatedAt: occurredAt };
 }
 
+function acceptLatestCounter(session, occurredAt) {
+  assertOpen(session);
+  const latest = session.decisions.at(-1);
+  if (latest?.status !== 'COUNTER' || !Number.isSafeInteger(latest.counterAmount)) {
+    const error = new Error('No counteroffer is available for acceptance');
+    error.code = 'COUNTER_NOT_AVAILABLE';
+    throw error;
+  }
+  return { ...session, status: SESSION_STATUS.PRICE_AGREED, agreedPrice: latest.counterAmount, version: session.version + 1, updatedAt: occurredAt };
+}
+
 function assertOpen(session) {
   if (session.status !== SESSION_STATUS.OPEN) {
     const error = new Error(`Negotiation session is ${session.status}`);
@@ -66,4 +78,4 @@ function statusAfterDecision(status) {
   return SESSION_STATUS.OPEN;
 }
 
-module.exports = { SESSION_STATUS, createSession, recordDecision, transitionSession };
+module.exports = { SESSION_STATUS, acceptLatestCounter, createSession, recordDecision, transitionSession };

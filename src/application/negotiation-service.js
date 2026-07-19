@@ -2,7 +2,7 @@
 
 const crypto = require('node:crypto');
 const { decideNegotiation } = require('../domain/negotiation-engine');
-const { createSession, recordDecision, transitionSession, SESSION_STATUS } = require('../domain/negotiation-session');
+const { acceptLatestCounter, createSession, recordDecision, transitionSession, SESSION_STATUS } = require('../domain/negotiation-session');
 const { ApplicationError } = require('./errors');
 
 class NegotiationService {
@@ -67,6 +67,15 @@ class NegotiationService {
     const updated = transitionSession(session, status, occurredAt);
     await this.negotiations.save(updated, expectedVersion);
     await this.audit(`NEGOTIATION_${status}`, updated, actorId, occurredAt, {});
+    return updated;
+  }
+
+  async agreeLatestCounter({ tenantId, actorId, sessionId }) {
+    const session = await this.requireSession(tenantId, sessionId);
+    const occurredAt = this.clock().toISOString();
+    const updated = acceptLatestCounter(session, occurredAt);
+    await this.negotiations.save(updated, session.version);
+    await this.audit('NEGOTIATION_PRICE_AGREED', updated, actorId, occurredAt, { agreedPrice: updated.agreedPrice });
     return updated;
   }
 

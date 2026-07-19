@@ -4,24 +4,30 @@ const crypto = require('node:crypto');
 const { ApplicationError } = require('./errors');
 const {
   PURCHASE_PATH, PURCHASE_STATUS, createPurchaseSession, recordAcknowledgement,
-  recordHumanReviewRequired, recordProceeding, recordReportDisplayed, recordReportServed,
+  confirmProvider, markHandedOver, markReady, recordHumanReviewRequired, recordPrerequisites,
+  recordReportDisplayed, recordReportServed, selectPaymentMethod, startProviderFlow,
 } = require('../domain/purchase-session');
 const { sameReportIdentity } = require('../domain/condition-report');
+const { readiness } = require('../domain/handover-policy');
 
 class PurchaseFlowService {
-  constructor({ purchases, conditionReports, inventory, negotiations, audits, clock = () => new Date(), idGenerator = () => crypto.randomUUID() }) {
-    Object.assign(this, { purchases, conditionReports, inventory, negotiations, audits, clock, idGenerator });
+  constructor({ purchases, conditionReports, inventory, negotiations, audits, handoverPolicies, paymentProvider, financingProvider, clock = () => new Date(), idGenerator = () => crypto.randomUUID() }) {
+    Object.assign(this, { purchases, conditionReports, inventory, negotiations, audits, handoverPolicies, paymentProvider, financingProvider, clock, idGenerator });
   }
 
   async create({ tenantId, actorId, vehicleId, purchasePath, negotiationSessionId, correlationId }) {
     requireCorrelationId(correlationId);
     const vehicle = await this.inventory.getById(vehicleId);
     if (!vehicle || vehicle.availability !== 'available') throw new ApplicationError('VEHICLE_NOT_AVAILABLE', 'Ajoneuvo ei ole saatavilla', 409);
-    if (purchasePath === PURCHASE_PATH.NEGOTIATED) await this.validateNegotiatedPath(tenantId, vehicleId, negotiationSessionId);
+    const policy = await this.handoverPolicies.getCurrent();
+    if (!policy) throw new ApplicationError('HANDOVER_POLICY_NOT_FOUND', 'Ostopolku vaatii myyjän tarkistuksen', 409);
+    const agreedPrice = purchasePath === PURCHASE_PATH.NEGOTIATED
+      ? await this.validateNegotiatedPath(tenantId, actorId, vehicleId, negotiationSessionId)
+      : vehicle.listPrice;
     const occurredAt = this.now();
-    const session = createPurchaseSession({ id: this.idGenerator(), tenantId, vehicleId, purchasePath, negotiationSessionId, createdAt: occurredAt });
+    const session = createPurchaseSession({ id: this.idGenerator(), tenantId, vehicleId, purchasePath, negotiationSessionId, agreedPrice, handoverPolicyVersion: policy.policyVersion, createdAt: occurredAt });
     await this.purchases.create(session);
-    await this.audit('PURCHASE_FLOW_STARTED', session, actorId, correlationId, occurredAt, { acknowledgement: false });
+    await this.audit('PRICE_AGREED', session, actorId, correlationId, occurredAt, { acknowledgement: false, agreedPrice, handoverPolicyVersion: policy.policyVersion });
     return session;
   }
 
@@ -66,24 +72,14 @@ class PurchaseFlowService {
     return updated;
   }
 
-  async proceed({ tenantId, actorId, sessionId, expectedVersion, reportIdentity, correlationId }) {
-    requireCorrelationId(correlationId);
-    const session = await this.requireVersion(tenantId, sessionId, expectedVersion);
-    const current = await this.requireCurrentReport(session.vehicleId, reportIdentity);
-    const occurredAt = this.now();
-    const updated = recordProceeding(session, current, correlationId, occurredAt);
-    await this.purchases.save(updated, expectedVersion);
-    await this.audit('PURCHASE_PROCEEDED_TO_FINANCE_OR_PAYMENT', updated, actorId, correlationId, occurredAt, reportPayload(current, true));
-    return updated;
-  }
-
-  async validateNegotiatedPath(tenantId, vehicleId, negotiationSessionId) {
+  async validateNegotiatedPath(tenantId, actorId, vehicleId, negotiationSessionId) {
     const negotiation = await this.negotiations.get({ tenantId, sessionId: negotiationSessionId });
     if (negotiation.vehicleId !== vehicleId) throw new ApplicationError('NEGOTIATION_VEHICLE_MISMATCH', 'Neuvottelu ei vastaa ajoneuvoa', 409);
     const latest = negotiation.decisions.at(-1);
-    if (!(negotiation.status === 'ACCEPTED' || latest?.status === 'COUNTER')) {
-      throw new ApplicationError('NEGOTIATED_PRICE_NOT_AVAILABLE', 'Sovittua hintaa ei ole vahvistettu', 409);
-    }
+    if (negotiation.status === 'ACCEPTED' && Number.isSafeInteger(latest?.approvedAmount)) return latest.approvedAmount;
+    if (negotiation.status === 'PRICE_AGREED' && Number.isSafeInteger(negotiation.agreedPrice)) return negotiation.agreedPrice;
+    if (latest?.status === 'COUNTER') return (await this.negotiations.agreeLatestCounter({ tenantId, actorId, sessionId: negotiationSessionId })).agreedPrice;
+    throw new ApplicationError('NEGOTIATED_PRICE_NOT_AVAILABLE', 'Sovittua hintaa ei ole vahvistettu', 409);
   }
 
   async requireCurrentReport(vehicleId, identity) {
