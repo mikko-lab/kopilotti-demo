@@ -9,6 +9,7 @@ export * from './json-transaction-repository.ts';
 export * from './model.ts';
 export * from './monitoring-types.ts';
 export * from './PrometheusMetricsCollector.ts';
+export * from './kafka-cdc-metrics.ts';
 export * from './policies.ts';
 export * from './postgres-transaction-repository.ts';
 export * from './ports.ts';

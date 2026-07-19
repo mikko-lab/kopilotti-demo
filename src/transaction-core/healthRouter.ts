@@ -9,11 +9,14 @@ export interface HealthPolicy {
   readonly maxOutboxLagSeconds: number;
   readonly maxUnprocessedOutboxCount: number;
   readonly databaseTimeoutMs: number;
+  readonly requireKafkaCdc: boolean;
+  readonly maxKafkaCdcLagSeconds: number;
 }
 
 const DEFAULT_POLICY: HealthPolicy = Object.freeze({
   requireDaemonHeartbeat: true, maxHeartbeatAgeMs: 30_000, maxOutboxLagSeconds: 300,
   maxUnprocessedOutboxCount: 100_000, databaseTimeoutMs: 1_000,
+  requireKafkaCdc: false, maxKafkaCdcLagSeconds: 300,
 });
 
 export class HealthRouter {
@@ -63,17 +66,21 @@ export class HealthRouter {
     const daemonHealthy = !this.#policy.requireDaemonHeartbeat || (lastHeartbeatAgeMs !== null && lastHeartbeatAgeMs < this.#policy.maxHeartbeatAgeMs);
     const outboxHealthy = metrics.outboxLagSeconds < this.#policy.maxOutboxLagSeconds
       && metrics.unprocessedOutboxCount < this.#policy.maxUnprocessedOutboxCount;
-    return { isAlive: true, isReady: daemonHealthy && outboxHealthy, lastHeartbeatAgeMs, outboxLagSeconds: metrics.outboxLagSeconds, unprocessedOutboxCount: metrics.unprocessedOutboxCount };
+    const kafkaCdcHealthy = !this.#policy.requireKafkaCdc || (metrics.kafkaCdcConfigured && metrics.kafkaCdcConnected === true
+      && metrics.kafkaCdcLagSeconds !== null && metrics.kafkaCdcLagSeconds < this.#policy.maxKafkaCdcLagSeconds);
+    return { isAlive: true, isReady: daemonHealthy && outboxHealthy && kafkaCdcHealthy, lastHeartbeatAgeMs, outboxLagSeconds: metrics.outboxLagSeconds, unprocessedOutboxCount: metrics.unprocessedOutboxCount, kafkaCdcConfigured: metrics.kafkaCdcConfigured, kafkaCdcConnected: metrics.kafkaCdcConnected, kafkaCdcLagSeconds: metrics.kafkaCdcLagSeconds };
   }
 }
 
 function validatePolicy(policy: HealthPolicy): void {
-  for (const value of [policy.maxHeartbeatAgeMs, policy.maxOutboxLagSeconds, policy.maxUnprocessedOutboxCount, policy.databaseTimeoutMs]) {
+  for (const value of [policy.maxHeartbeatAgeMs, policy.maxOutboxLagSeconds, policy.maxUnprocessedOutboxCount, policy.databaseTimeoutMs, policy.maxKafkaCdcLagSeconds]) {
     if (!Number.isInteger(value) || value < 1) throw new TypeError('Health policy thresholds must be positive integers');
   }
 }
 function readinessReason(status: DaemonHealthStatus, policy: HealthPolicy): string {
   if (policy.requireDaemonHeartbeat && (status.lastHeartbeatAgeMs === null || status.lastHeartbeatAgeMs >= policy.maxHeartbeatAgeMs)) return 'TIMEOUT_DAEMON_STALLED';
   if (status.outboxLagSeconds >= policy.maxOutboxLagSeconds) return 'OUTBOX_LAG_CRITICAL';
+  if (policy.requireKafkaCdc && (!status.kafkaCdcConfigured || status.kafkaCdcConnected !== true || status.kafkaCdcLagSeconds === null)) return 'KAFKA_CDC_UNAVAILABLE';
+  if (policy.requireKafkaCdc && status.kafkaCdcLagSeconds !== null && status.kafkaCdcLagSeconds >= policy.maxKafkaCdcLagSeconds) return 'KAFKA_CDC_LAG_CRITICAL';
   return 'OUTBOX_BACKLOG_CRITICAL';
 }

@@ -4,6 +4,10 @@ export interface MonitoringMetrics {
   readonly daemonLastHeartbeat: string | null;
   readonly daemonExecutionCount: number;
   readonly daemonErrorCount: number;
+  readonly kafkaCdcConfigured: boolean;
+  readonly kafkaCdcConnected: boolean | null;
+  readonly kafkaCdcLagSeconds: number | null;
+  readonly kafkaCdcQueueSize: number | null;
 }
 
 export interface DaemonHealthStatus {
@@ -12,6 +16,9 @@ export interface DaemonHealthStatus {
   readonly lastHeartbeatAgeMs: number | null;
   readonly outboxLagSeconds: number;
   readonly unprocessedOutboxCount: number;
+  readonly kafkaCdcConfigured: boolean;
+  readonly kafkaCdcConnected: boolean | null;
+  readonly kafkaCdcLagSeconds: number | null;
 }
 
 export interface DaemonMonitor {
