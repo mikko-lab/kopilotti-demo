@@ -118,6 +118,8 @@ Ajoneuvon asiakasnäkymä löytyy osoitteesta `vehicle.html?id=veh-0001`. Suora 
 
 Anonyymi asiakasrajapinta on tarkoituksella pois käytöstä oletuksena. Paikallisessa konseptidemossa sen voi ottaa käyttöön asettamalla backendille `ENABLE_CUSTOMER_NEGOTIATION_DEMO=true`. Tuotantoon tarvitaan ensin oikea asiakasistunto, CSRF-suojaus ja nopeusrajoitus. Demo-varaus ei tee sitovaa kauppaa eikä oikeaa ajoneuvovarausta.
 
+Ennen rahoitukseen, maksamiseen tai demo-varaukseen etenemistä asiakas ohjataan pakolliseen saavutettavaan HTML-kuntoraporttiin. Raportti ladataan vain backendistä, sen näytetty versio ja sisältötiiviste sidotaan ostosessioon ja kuittaus auditoidaan palvelimen ajalla. Raporttilähde asetetaan `CONDITION_REPORT_PATH`-ympäristömuuttujalla; raportteja ei säilytetä julkisessa GitHub Pages -juuressa. Jos raporttia ei ole, polku pysähtyy myyjän tarkistukseen eikä puuttuvia kuntotietoja päätellä varastodatasta.
+
 ---
 
 > ⚠️ Rakennettu konseptiksi — fokus idean, käyttötapauksen ja arkkitehtuurin demonstroinnissa, ei tuotantovalmiudessa.

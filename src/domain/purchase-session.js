@@ -80,6 +80,18 @@ function recordProceeding(session, currentReportIdentity, correlationId, occurre
   };
 }
 
+function recordHumanReviewRequired(session, correlationId, occurredAt) {
+  assertNotProceeding(session);
+  return {
+    ...session,
+    status: PURCHASE_STATUS.HUMAN_REVIEW_REQUIRED,
+    version: session.version + 1,
+    report: null,
+    reviewCorrelationId: correlationId,
+    updatedAt: occurredAt,
+  };
+}
+
 function requireServedReport(session, identity) {
   if (!sameReportIdentity(session.report, identity)) {
     const error = new Error('Condition report version does not match the report served to this session');
@@ -106,5 +118,5 @@ function requireString(value, field) {
 
 module.exports = {
   PURCHASE_PATH, PURCHASE_STATUS, createPurchaseSession, recordAcknowledgement,
-  recordProceeding, recordReportDisplayed, recordReportServed,
+  recordHumanReviewRequired, recordProceeding, recordReportDisplayed, recordReportServed,
 };

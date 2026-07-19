@@ -9,6 +9,8 @@ export class CustomerNegotiationApi {
     this.session = null;
   }
 
+  getSessionId() { return this.session?.id || null; }
+
   async ensureSession(vehicleId) {
     if (this.session?.vehicleId === vehicleId && this.session.status === 'OPEN') return this.session;
     this.session = await this.request('/api/digital-salesperson/sessions', {

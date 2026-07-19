@@ -59,6 +59,7 @@ test('missing report requires human review and blocks progression', async () => 
   const session = await context.service.create({ tenantId: 'dealer-1', actorId: 'customer', vehicleId: 'veh-0001', purchasePath: PURCHASE_PATH.DIRECT, correlationId: 'correlation-1' });
   await assert.rejects(context.service.openConditionReport({ tenantId: 'dealer-1', actorId: 'customer', sessionId: session.id, expectedVersion: 1, correlationId: 'correlation-2' }), { code: 'CONDITION_REPORT_REVIEW_REQUIRED' });
   assert.equal(context.events.at(-1).eventType, 'CONDITION_REPORT_REVIEW_REQUIRED');
+  assert.equal(context.sessions.get(session.id).status, 'HUMAN_REVIEW_REQUIRED');
 });
 
 test('changed current report invalidates acknowledgement and progression', async () => {

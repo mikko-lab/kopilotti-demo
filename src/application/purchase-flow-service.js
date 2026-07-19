@@ -4,7 +4,7 @@ const crypto = require('node:crypto');
 const { ApplicationError } = require('./errors');
 const {
   PURCHASE_PATH, PURCHASE_STATUS, createPurchaseSession, recordAcknowledgement,
-  recordProceeding, recordReportDisplayed, recordReportServed,
+  recordHumanReviewRequired, recordProceeding, recordReportDisplayed, recordReportServed,
 } = require('../domain/purchase-session');
 const { sameReportIdentity } = require('../domain/condition-report');
 
@@ -33,7 +33,9 @@ class PurchaseFlowService {
     const report = await this.conditionReports.getCurrentForVehicle(session.vehicleId);
     const occurredAt = this.now();
     if (!report) {
-      await this.audit('CONDITION_REPORT_REVIEW_REQUIRED', session, actorId, correlationId, occurredAt, { acknowledgement: false });
+      const blocked = recordHumanReviewRequired(session, correlationId, occurredAt);
+      await this.purchases.save(blocked, expectedVersion);
+      await this.audit('CONDITION_REPORT_REVIEW_REQUIRED', blocked, actorId, correlationId, occurredAt, { acknowledgement: false });
       throw new ApplicationError('CONDITION_REPORT_REVIEW_REQUIRED', 'Auton kuntotiedot vaativat myyjän tarkistuksen', 409);
     }
     const updated = recordReportServed(session, report, correlationId, occurredAt);

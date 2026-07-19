@@ -1,20 +1,23 @@
 import { CustomerNegotiationApi } from './negotiation-api.js';
+import { PurchaseFlowApi } from './purchase-flow-api.js';
 
 const api = new CustomerNegotiationApi();
-const state = { vehicle: null, persona: 'laura' };
+const purchaseApi = new PurchaseFlowApi();
+const state = { vehicle: null, persona: 'laura', conditionReturnFocus: null };
+const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRICE' };
 
 const PERSONAS = {
   laura: {
     name: 'Laura',
     greeting: (vehicle) => `Hei! Olen Laura. Autan mielelläni ${vehicle.brand} ${vehicle.model} -auton kanssa. Mitä haluaisit tietää?`,
-    condition: (vehicle) => `Tämän ${vehicle.year}-mallisen auton mittarilukema on ${formatNumber(vehicle.mileage)} km. Ajoneuvokohtainen kuntotarkastus kannattaa aina käydä läpi ennen päätöstä.`,
+    condition: (vehicle) => `Tämän ${vehicle.year}-mallisen auton mittarilukema on ${formatNumber(vehicle.mileage)} km. Ennen rahoitusta tai maksamista avaamme aina ajoneuvokohtaisen kuntoraportin tutustuttavaksi.`,
     finance: (vehicle) => `Rahoitus on saatavilla tähän autoon. Suuntaa-antava kuukausierä on ${formatNumber(vehicle.estimatedMonthlyPayment)} €/kk, ja lopullinen rahoitus vahvistetaan erikseen.`,
     priceIntro: 'Totta kai. Voit kertoa hinnan, josta haluaisit keskustella. Välitän sen heti hinnoittelusta vastaavalle järjestelmälle.',
   },
   mika: {
     name: 'Mika',
     greeting: (vehicle) => `Hei, olen Mika. Käydään ${vehicle.brand} ${vehicle.model} ja kaupan eteneminen tehokkaasti läpi. Mistä aloitetaan?`,
-    condition: (vehicle) => `Vuosimalli ${vehicle.year}, ajettu ${formatNumber(vehicle.mileage)} km. Tarkista ajoneuvokohtainen kuntoraportti ennen päätöstä.`,
+    condition: (vehicle) => `Vuosimalli ${vehicle.year}, ajettu ${formatNumber(vehicle.mileage)} km. Ajoneuvokohtainen kuntoraportti avataan pakollisena vaiheena ennen rahoitusta tai maksamista.`,
     finance: (vehicle) => `Rahoitus saatavilla. Arvio ${formatNumber(vehicle.estimatedMonthlyPayment)} €/kk. Lopulliset ehdot vahvistetaan erikseen.`,
     priceIntro: 'Kerro hinta, josta haluat keskustella. Välitän sen heti päätettäväksi.',
   },
@@ -166,10 +169,10 @@ function renderDecisionActions(mode) {
   container.classList.remove('hidden');
   container.replaceChildren();
   if (mode === 'reserve' || mode === 'counter') {
-    container.append(createAction('Hyväksy hinta ja tee demo-varaus', showReservationDemo, true));
+    container.append(createAction('Hyväksy hinta ja jatka', (event) => beginPurchaseFlow(PURCHASE_PATH.NEGOTIATED, event.currentTarget), true));
   }
   if (mode === 'rejected') {
-    container.append(createAction('Jatka listahinnalla', showDirectPurchaseDemo, true));
+    container.append(createAction('Jatka listahinnalla', (event) => beginPurchaseFlow(PURCHASE_PATH.DIRECT, event.currentTarget), true));
   }
   if (mode === 'escalate') {
     const note = document.createElement('p');
@@ -203,31 +206,193 @@ function addMessage(className, text, speaker) {
   return message;
 }
 
-function showDirectPurchaseDemo() {
-  setText('demoDialogTitle', 'Osto / varaus — konseptidemo');
-  setText('demoDialogText', 'Tämä käyttöliittymä ei tee sitovaa kauppaa tai oikeaa ajoneuvovarausta. Tuotannossa tästä jatkettaisiin tunnistautumiseen ja sopimuksen vahvistamiseen.');
+function showReservationDemo() {
+  setText('demoDialogTitle', 'Valitse seuraava vaihe');
+  setText('demoDialogText', 'Kuntoraportin kuittaus on tallennettu palvelimelle. Valitse konseptidemossa, haluatko jatkaa rahoitukseen vai maksamiseen. Kumpikaan valinta ei käynnistä oikeaa hakemusta tai maksua.');
+  const form = document.querySelector('#demoDialog form');
+  form.replaceChildren(
+    createDialogAction('Jatka rahoitukseen', completeReservationDemo),
+    createDialogAction('Jatka maksamiseen', completeReservationDemo),
+  );
   document.getElementById('demoDialog').showModal();
 }
 
-function showReservationDemo() {
+function completeReservationDemo() {
   setText('demoDialogTitle', 'Demo-varaus vahvistettu');
   setText('demoDialogText', 'Ajoneuvo on merkitty varatuksi vain tässä käyttöliittymädemossa. Varaus ei ole sitova kauppa eikä oikea ajoneuvovaraus.');
-  document.getElementById('demoDialog').showModal();
+  const form = document.querySelector('#demoDialog form');
+  const close = document.createElement('button');
+  close.className = 'btn btn-primary';
+  close.type = 'submit';
+  close.value = 'close';
+  close.textContent = 'Ymmärrän';
+  form.replaceChildren(close);
+}
+
+function createDialogAction(label, handler) {
+  const button = document.createElement('button');
+  button.className = 'btn btn-primary';
+  button.type = 'button';
+  button.textContent = label;
+  button.addEventListener('click', handler);
+  return button;
+}
+
+async function beginPurchaseFlow(purchasePath, trigger) {
+  state.conditionReturnFocus = trigger || document.activeElement;
+  const step = document.getElementById('conditionReportStep');
+  resetConditionReportView();
+  step.classList.remove('hidden');
+  step.focus();
+  setConditionStatus('Kuntoraporttia ladataan…');
+  if (purchasePath === PURCHASE_PATH.NEGOTIATED) {
+    addMessage('salesperson', 'Ennen kuin siirrymme rahoitukseen tai maksamiseen, tutustutaan vielä auton kuntoraporttiin.', PERSONAS[state.persona].name);
+  }
+  try {
+    await purchaseApi.start({
+      vehicleId: state.vehicle.id,
+      purchasePath,
+      negotiationSessionId: purchasePath === PURCHASE_PATH.NEGOTIATED ? api.getSessionId() : null,
+    });
+    await loadConditionReport();
+  } catch (error) {
+    showConditionFailure(error);
+  }
+}
+
+async function loadConditionReport() {
+  setConditionStatus('Kuntoraporttia ladataan…');
+  const report = await purchaseApi.openReport();
+  renderConditionReport(report);
+  await afterNextPaint();
+  await purchaseApi.markDisplayed();
+  setConditionStatus(`Kuntoraportti ${report.version} on avattu. Tutustu kaikkiin raportin osioihin ennen kuittausta.`);
+  const form = document.getElementById('conditionAcknowledgementForm');
+  form.classList.remove('hidden');
+  document.getElementById('conditionAcknowledgement').focus();
+}
+
+function renderConditionReport(report) {
+  setText('conditionReportMeta', `Raportti ${report.id} · versio ${report.version} · tarkastettu ${formatDate(report.inspectedAt)}`);
+  const sections = document.getElementById('conditionReportSections');
+  sections.replaceChildren(...report.sections.map((section) => {
+    const wrapper = document.createElement('section');
+    wrapper.className = 'condition-section';
+    const heading = document.createElement('h3');
+    heading.textContent = section.title;
+    const content = document.createElement('p');
+    content.textContent = section.content;
+    wrapper.append(heading, content);
+    return wrapper;
+  }));
+
+  const photographSection = document.getElementById('conditionPhotographs');
+  const grid = document.getElementById('conditionPhotoGrid');
+  grid.replaceChildren(...report.photographs.map((photo) => {
+    const figure = document.createElement('figure');
+    figure.className = 'condition-photo';
+    const image = document.createElement('img');
+    image.src = purchaseApi.assetUrl(photo.url);
+    image.alt = photo.alt;
+    const caption = document.createElement('figcaption');
+    caption.textContent = photo.caption || photo.alt;
+    figure.append(image, caption);
+    return figure;
+  }));
+  photographSection.classList.toggle('hidden', report.photographs.length === 0);
+
+  const source = document.getElementById('conditionReportSource');
+  if (report.sourceDocumentUrl) {
+    source.href = purchaseApi.assetUrl(report.sourceDocumentUrl);
+    source.classList.remove('hidden');
+  } else {
+    source.removeAttribute('href');
+    source.classList.add('hidden');
+  }
+  document.getElementById('conditionReportContent').classList.remove('hidden');
+}
+
+async function submitConditionAcknowledgement(event) {
+  event.preventDefault();
+  const checkbox = document.getElementById('conditionAcknowledgement');
+  const button = document.getElementById('btnProceedAfterCondition');
+  if (!checkbox.checked || button.disabled) return;
+  button.disabled = true;
+  setText('conditionReportError', '');
+  try {
+    await purchaseApi.acknowledge();
+    await purchaseApi.proceed();
+    showReservationDemo();
+  } catch (error) {
+    if (error.code === 'CONDITION_REPORT_CHANGED') {
+      setConditionStatus('Auton kuntoraportti on päivittynyt. Tutustu uuteen versioon ennen kuin jatkat.', 'review');
+      resetAcknowledgement();
+      try { await loadConditionReport(); } catch (loadError) { showConditionFailure(loadError); }
+    } else {
+      setText('conditionReportError', 'Kuittausta ei voitu tallentaa. Emme siirry rahoitukseen tai maksamiseen ennen kuin palvelinyhteys toimii.');
+    }
+  }
+}
+
+function showConditionFailure(error) {
+  document.getElementById('conditionReportContent').classList.add('hidden');
+  document.getElementById('conditionAcknowledgementForm').classList.add('hidden');
+  if (error.code === 'CONDITION_REPORT_REVIEW_REQUIRED') {
+    setConditionStatus('Auton kuntotiedot vaativat myyjän tarkistuksen. Pyyntö on välitetty eteenpäin.', 'review');
+  } else {
+    setConditionStatus('Auton kuntoraporttia ei saatu avattua. Emme siirry rahoitukseen tai maksamiseen ennen kuin raportti on saatavilla.', 'error');
+  }
+}
+
+function resetConditionReportView() {
+  document.getElementById('conditionReportContent').classList.add('hidden');
+  document.getElementById('conditionAcknowledgementForm').classList.add('hidden');
+  document.getElementById('conditionReportSections').replaceChildren();
+  document.getElementById('conditionPhotoGrid').replaceChildren();
+  setText('conditionReportError', '');
+  resetAcknowledgement();
+}
+
+function resetAcknowledgement() {
+  const checkbox = document.getElementById('conditionAcknowledgement');
+  checkbox.checked = false;
+  document.getElementById('btnProceedAfterCondition').disabled = true;
+}
+
+function closeConditionReport() {
+  document.getElementById('conditionReportStep').classList.add('hidden');
+  if (state.conditionReturnFocus?.isConnected) state.conditionReturnFocus.focus();
+}
+
+function setConditionStatus(text, variant = '') {
+  const status = document.getElementById('conditionReportStatus');
+  status.textContent = text;
+  status.className = `condition-status ${variant}`.trim();
+}
+
+function afterNextPaint() {
+  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 }
 
 function parseEuro(value) { return Number(String(value).replace(/[^0-9]/g, '')); }
 function formatEuro(value) { return `${formatNumber(value)} €`; }
 function formatNumber(value) { return Number(value).toLocaleString('fi-FI'); }
+function formatDate(value) { return new Date(value).toLocaleString('fi-FI', { dateStyle: 'medium', timeStyle: 'short' }); }
 function setText(id, value) { document.getElementById(id).textContent = value; }
 function availabilityLabel(value) { return ({ available: 'Heti saatavilla', reserved: 'Varattu', incoming: 'Tulossa' })[value] || 'Saatavuus tarkistettava'; }
 function bodyTypeLabel(value) { return ({ sedan: 'Sedan', suv: 'SUV', van: 'Pakettiauto', hatchback: 'Viistoperä', combi: 'Farmari', mpv: 'Tila-auto' })[value] || value; }
 
 document.getElementById('btnStartDigitalSalesperson').addEventListener('click', openFlow);
 document.getElementById('btnCloseFlow').addEventListener('click', closeFlow);
-document.getElementById('btnDirectPurchase').addEventListener('click', showDirectPurchaseDemo);
+document.getElementById('btnDirectPurchase').addEventListener('click', (event) => beginPurchaseFlow(PURCHASE_PATH.DIRECT, event.currentTarget));
 document.getElementById('personaForm').addEventListener('submit', startConversation);
 document.getElementById('questionActions').addEventListener('click', handleQuestion);
 document.getElementById('priceForm').addEventListener('submit', submitPrice);
+document.getElementById('conditionAcknowledgement').addEventListener('change', (event) => {
+  document.getElementById('btnProceedAfterCondition').disabled = !event.currentTarget.checked;
+});
+document.getElementById('conditionAcknowledgementForm').addEventListener('submit', submitConditionAcknowledgement);
+document.getElementById('btnBackFromCondition').addEventListener('click', closeConditionReport);
 loadVehicle().catch(() => {
   setText('vehicleTitle', 'Ajoneuvotietoja ei voitu ladata');
   setText('vehicleSubtitle', 'Palaa takaisin autoihin ja yritä uudelleen.');

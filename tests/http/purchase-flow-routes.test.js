@@ -68,3 +68,16 @@ test('returns an accessible human-review error contract when report is missing',
     assert.equal((await response.json()).error.code, 'CONDITION_REPORT_REVIEW_REQUIRED');
   });
 });
+
+test('returns a closed backend failure without allowing progression', async () => {
+  const { ApplicationError } = require('../../src/application/errors');
+  const service = { proceed: async () => { throw new ApplicationError('BACKEND_FAILURE', 'Palvelu ei ole käytettävissä', 500); } };
+  await withServer(service, async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/digital-salesperson/purchase-sessions/purchase-1/proceed`, {
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-correlation-id': 'correlation-5' },
+      body: JSON.stringify({ expectedVersion: 4, reportId: 'report-1', reportVersion: 'v1', contentHash: 'a'.repeat(64) }),
+    });
+    assert.equal(response.status, 500);
+    assert.equal((await response.json()).error.code, 'BACKEND_FAILURE');
+  });
+});

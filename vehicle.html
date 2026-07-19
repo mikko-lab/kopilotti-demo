@@ -128,6 +128,47 @@
             <div class="decision-actions hidden" id="decisionActions"></div>
           </section>
         </section>
+
+        <section class="condition-report-step hidden" id="conditionReportStep" aria-labelledby="conditionReportTitle" tabindex="-1">
+          <div class="flow-header">
+            <div>
+              <p class="purchase-eyebrow">Pakollinen vaihe ennen maksamista</p>
+              <h2 id="conditionReportTitle">Auton kuntoraportti</h2>
+            </div>
+          </div>
+          <div class="condition-report-body">
+            <p class="condition-introduction">Tutustu auton kuntoon ja raportissa mainittuihin huomioihin ennen kuin jatkat rahoitukseen tai maksamiseen.</p>
+            <div class="condition-status" id="conditionReportStatus" role="status" aria-live="polite" aria-atomic="true">Kuntoraporttia ladataan…</div>
+
+            <article class="condition-report-content hidden" id="conditionReportContent" aria-labelledby="conditionReportDocumentTitle">
+              <header class="condition-document-header">
+                <div>
+                  <h3 id="conditionReportDocumentTitle">Kuntoraportin yhteenveto</h3>
+                  <p id="conditionReportMeta"></p>
+                </div>
+                <a class="condition-source-link hidden" id="conditionReportSource" href="#" target="_blank" rel="noopener">Avaa alkuperäinen PDF</a>
+              </header>
+              <div class="condition-sections" id="conditionReportSections"></div>
+              <section class="condition-photographs hidden" id="conditionPhotographs" aria-labelledby="conditionPhotographsTitle">
+                <h3 id="conditionPhotographsTitle">Raporttiin liittyvät valokuvat</h3>
+                <div class="condition-photo-grid" id="conditionPhotoGrid"></div>
+              </section>
+            </article>
+
+            <form class="condition-acknowledgement hidden" id="conditionAcknowledgementForm">
+              <label class="condition-checkbox" for="conditionAcknowledgement">
+                <input id="conditionAcknowledgement" name="conditionAcknowledgement" type="checkbox">
+                <span>Olen tutustunut auton kuntoraporttiin ja siinä mainittuihin huomioihin.</span>
+              </label>
+              <p class="condition-rights-note">Kuittaus vahvistaa, että olet tutustunut raporttiin. Se ei rajoita lakisääteisiä oikeuksiasi eikä autoliikkeen vastuuta tietojen oikeellisuudesta.</p>
+              <div class="condition-actions">
+                <button class="btn btn-primary purchase-button" id="btnProceedAfterCondition" type="submit" disabled>Jatka rahoitukseen tai maksamiseen</button>
+                <button class="btn btn-outline purchase-button" id="btnBackFromCondition" type="button">Palaa keskusteluun</button>
+              </div>
+              <p class="form-error" id="conditionReportError" role="alert"></p>
+            </form>
+          </div>
+        </section>
       </aside>
     </div>
   </main>
