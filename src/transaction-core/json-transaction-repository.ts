@@ -43,6 +43,16 @@ export class JsonTransactionRepository implements TransactionRepository {
       .slice(0, limit).map((deal) => deal.id);
   }
 
+  async getDeal(dealId: string): Promise<Deal | null> {
+    await this.#queue; const data = await this.#read();
+    return data.deals[dealId] ? structuredClone(data.deals[dealId]) : null;
+  }
+
+  async listAuditEvents(dealId: string): Promise<readonly AuditEvent[]> {
+    await this.#queue; const data = await this.#read();
+    return data.auditEvents.filter((event) => event.dealId === dealId).map((event) => structuredClone(event));
+  }
+
   async #read(): Promise<StoreData> {
     try { return validateStore(JSON.parse(await readFile(this.#filePath, 'utf8'))); }
     catch (error) {
