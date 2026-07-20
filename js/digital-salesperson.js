@@ -7,6 +7,8 @@ const api = new CustomerNegotiationApi();
 const purchaseApi = new PurchaseFlowApi();
 const state = { vehicle: null, negotiationStarted: false, conditionReturnFocus: null, purchasePath: null, demoRun: 0 };
 const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRICE' };
+const DEMO_STEP_DELAY_MS = 1_500;
+const REDUCED_MOTION_DEMO_STEP_DELAY_MS = 120;
 
 const SALES_EXPERIENCE = {
   name: 'Digitaalinen automyyjä',
@@ -496,7 +498,9 @@ async function runDemo() {
   button.disabled = true;
   timeline.classList.remove('hidden');
   document.querySelectorAll('[data-demo-step]').forEach((item) => item.classList.remove('current', 'complete'));
-  const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 120 : 850;
+  const delay = matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? REDUCED_MOTION_DEMO_STEP_DELAY_MS
+    : DEMO_STEP_DELAY_MS;
   for (let index = 0; index < DEMO_STEPS.length; index += 1) {
     if (run !== state.demoRun) return;
     const [key, message] = DEMO_STEPS[index];

@@ -149,6 +149,12 @@ test('Run Demo remains pinned to its separate 92 500 euro price', () => {
   assert.match(html, /Hinnasta sovittu · 92 500 €/);
 });
 
+test('Run Demo keeps each normal-motion step visible long enough to read', () => {
+  assert.match(uiScript, /const DEMO_STEP_DELAY_MS = 1_500/);
+  assert.match(uiScript, /const REDUCED_MOTION_DEMO_STEP_DELAY_MS = 120/);
+  assert.match(uiScript, /matchMedia\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
+});
+
 test('static demo does not serve backend pricing policy files to the browser', () => {
   assert.match(packageManifest, /"dev:static": "node scripts\/serve-static-demo\.js"/);
   assert.doesNotMatch(staticServer, /express\.static\(projectRoot/);
