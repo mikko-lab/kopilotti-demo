@@ -59,7 +59,15 @@
 
         <section class="vehicle-spec-card" aria-labelledby="specTitle">
           <h2 id="specTitle">Ajoneuvon tiedot</h2>
-          <dl class="vehicle-spec-grid" id="vehicleSpecs"></dl>
+          <dl class="vehicle-spec-grid" id="vehicleSpecs">
+            <div><dt>Merkki ja malli</dt><dd id="specMakeModel">Alfa Romeo Giulia Quadrifoglio</dd></div>
+            <div><dt>Rekisteritunnus</dt><dd id="specRegistration">XYZ-123</dd></div>
+            <div><dt>Listahinta</dt><dd id="specListPrice">95 000 €</dd></div>
+            <div class="condition-report-gate">
+              <dt>Kuntoraportti</dt>
+              <dd><span id="conditionReportAvailability">✓ Saatavilla</span><button class="condition-report-open" id="btnOpenPreNegotiationReport" type="button" aria-haspopup="dialog" aria-controls="preNegotiationConditionReport">Avaa kuntoraportti</button></dd>
+            </div>
+          </dl>
         </section>
 
       </section>
@@ -70,12 +78,11 @@
             <span class="service-mark" aria-hidden="true">✦</span>
             <div><p class="purchase-eyebrow">Digitaalinen automyyjä</p><h2 id="digitalSalespersonTitle">Hintaehdotus</h2></div>
           </div>
-          <p>Olet tutustunut auton tietoihin ja kuntoraporttiin.</p>
+          <p>Tutustu auton tietoihin ja kuntoraporttiin ennen hinnan neuvottelua.</p>
           <div class="purchase-price"><span>Listahinta</span><strong id="offerListPrice">95 000 €</strong></div>
           <p>Millä hinnalla voimme tehdä kaupat?</p>
-          <p class="verified-condition"><span aria-hidden="true">✓</span> Olen tutustunut ajoneuvon tietoihin ja kuntoraporttiin</p>
-          <p class="purchase-fineprint">Hinnan neuvottelu edellyttää, että olet tutustunut ajoneuvon kuntoraporttiin. Tässä käyttöliittymädemossa ehto on valmiiksi vahvistettu.</p>
-          <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-expanded="false">Aloita hinnan neuvottelu</button>
+          <p class="negotiation-gate-status" id="negotiationGateStatus" role="status" aria-live="polite">Avaa kuntoraportti ennen hinnan neuvottelua.</p>
+          <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-describedby="negotiationGateStatus" aria-expanded="false" disabled>Aloita hinnan neuvottelu</button>
         </section>
 
         <section class="salesperson-flow hidden" id="digitalSalespersonFlow" aria-labelledby="flowTitle" tabindex="-1">
@@ -134,6 +141,7 @@
               <span id="journeyDemoVehicle">Alfa Romeo Giulia Quadrifoglio · XYZ-123</span>
             </div>
             <ol aria-label="Demon eteneminen">
+              <li data-demo-step="condition"><span aria-hidden="true">○</span>Kuntoraportti avattu</li>
               <li data-demo-step="offer"><span aria-hidden="true">○</span>Hintaehdotus</li>
               <li data-demo-step="agreement"><span aria-hidden="true">○</span><span id="journeyDemoAgreedPrice">Hinnasta sovittu · 92 500 €</span></li>
               <li data-demo-step="payment"><span aria-hidden="true">○</span>Maksutapa valittu</li>
@@ -221,6 +229,15 @@
       </aside>
     </div>
   </main>
+
+  <dialog class="demo-dialog" id="preNegotiationConditionReport" aria-labelledby="preNegotiationConditionReportTitle">
+    <div>
+      <p class="purchase-eyebrow">Kopilotti Sales -demo</p>
+      <h2 id="preNegotiationConditionReportTitle">Kuntoraportti</h2>
+      <p>Tämä konseptidemo näyttää kuntoraportin avaamisen osana ostopolkua. Varsinaista ajoneuvokohtaista raporttisisältöä ei esitetä.</p>
+      <button class="btn btn-primary" id="btnClosePreNegotiationReport" type="button">Sulje kuntoraportti</button>
+    </div>
+  </dialog>
 
   <script type="module" src="js/digital-salesperson.js"></script>
 </body>

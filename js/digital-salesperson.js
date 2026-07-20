@@ -5,7 +5,7 @@ import { calculateDealSummary, formatSignedEuro, formatSignedPercent } from './d
 
 const api = new CustomerNegotiationApi();
 const purchaseApi = new PurchaseFlowApi();
-const state = { vehicle: null, negotiationStarted: false, conditionReturnFocus: null, purchasePath: null, demoRun: 0 };
+const state = { vehicle: null, negotiationStarted: false, preNegotiationReportOpened: false, conditionReturnFocus: null, purchasePath: null, demoRun: 0 };
 const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRICE' };
 const DEMO_STEP_DELAY_MS = 1_500;
 const REDUCED_MOTION_DEMO_STEP_DELAY_MS = 120;
@@ -33,21 +33,9 @@ function renderVehicle(vehicle) {
   image.src = vehicle.image;
   image.alt = vehicle.imageAlt;
 
-  const specs = [
-    ['Merkki ja malli', vehicle.makeModel],
-    ['Rekisteritunnus', vehicle.registration],
-    ['Listahinta', formatEuro(vehicle.listPrice)],
-  ];
-  const specsElement = document.getElementById('vehicleSpecs');
-  specsElement.replaceChildren(...specs.map(([term, value]) => {
-    const wrapper = document.createElement('div');
-    const dt = document.createElement('dt');
-    const dd = document.createElement('dd');
-    dt.textContent = term;
-    dd.textContent = value;
-    wrapper.append(dt, dd);
-    return wrapper;
-  }));
+  setText('specMakeModel', vehicle.makeModel);
+  setText('specRegistration', vehicle.registration);
+  setText('specListPrice', formatEuro(vehicle.listPrice));
   setText('journeyDemoTitle', vehicle.makeModel);
   setText('journeyDemoRegistration', vehicle.registration);
   setText('journeyDemoListPrice', formatEuro(vehicle.listPrice));
@@ -75,11 +63,41 @@ function showAcceptedDealSummary(approvedAmount) {
 }
 
 function openFlow() {
+  if (!state.preNegotiationReportOpened) {
+    setText('negotiationGateStatus', 'Avaa kuntoraportti ennen hinnan neuvottelua.');
+    document.getElementById('btnOpenPreNegotiationReport').focus();
+    return;
+  }
   const flow = document.getElementById('digitalSalespersonFlow');
   flow.classList.remove('hidden');
   document.getElementById('btnStartDigitalSalesperson').setAttribute('aria-expanded', 'true');
   flow.focus();
   startNegotiation();
+}
+
+function markPreNegotiationReportOpened() {
+  state.preNegotiationReportOpened = true;
+  setText('conditionReportAvailability', '✓ Avattu');
+  setText('negotiationGateStatus', '✓ Kuntoraporttiin tutustuttu');
+  document.getElementById('negotiationGateStatus').classList.add('complete');
+  const startButton = document.getElementById('btnStartDigitalSalesperson');
+  startButton.disabled = false;
+  document.getElementById('btnOpenPreNegotiationReport').textContent = 'Avaa kuntoraportti uudelleen';
+}
+
+function openPreNegotiationConditionReport() {
+  markPreNegotiationReportOpened();
+  const dialog = document.getElementById('preNegotiationConditionReport');
+  dialog.showModal();
+  document.getElementById('btnClosePreNegotiationReport').focus();
+}
+
+function closePreNegotiationConditionReport() {
+  document.getElementById('preNegotiationConditionReport').close();
+}
+
+function restoreFocusAfterPreNegotiationReport() {
+  document.getElementById('btnStartDigitalSalesperson').focus();
 }
 
 function closeFlow() {
@@ -483,6 +501,7 @@ function setText(id, value) { document.getElementById(id).textContent = value; }
 function vehicleIdentity(vehicle) { return `${vehicle.makeModel} · ${vehicle.registration}`; }
 
 const DEMO_STEPS = [
+  ['condition', 'Kuntoraportti avattu'],
   ['offer', 'Hintaehdotus'],
   ['agreement', `Hinnasta sovittu: ${formatEuro(DEMO_VEHICLE.agreedPrice)}`],
   ['payment', 'Maksutavaksi valittu käteinen / tilisiirto'],
@@ -493,6 +512,7 @@ const DEMO_STEPS = [
 
 async function runDemo() {
   const run = ++state.demoRun;
+  markPreNegotiationReportOpened();
   const button = document.getElementById('btnRunDemo');
   const timeline = document.getElementById('journeyDemoTimeline');
   button.disabled = true;
@@ -519,6 +539,9 @@ async function runDemo() {
 }
 
 document.getElementById('btnStartDigitalSalesperson').addEventListener('click', openFlow);
+document.getElementById('btnOpenPreNegotiationReport').addEventListener('click', openPreNegotiationConditionReport);
+document.getElementById('btnClosePreNegotiationReport').addEventListener('click', closePreNegotiationConditionReport);
+document.getElementById('preNegotiationConditionReport').addEventListener('close', restoreFocusAfterPreNegotiationReport);
 document.getElementById('btnCloseFlow').addEventListener('click', closeFlow);
 document.getElementById('btnRunDemo').addEventListener('click', runDemo);
 document.getElementById('btnReviewCondition').addEventListener('click', continueToConditionReport);

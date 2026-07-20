@@ -18,7 +18,7 @@ const dealSummaryModule = import(`data:text/javascript;base64,${Buffer.from(deal
 test('presents one verified price-offer path without direct purchase competition', () => {
   assert.match(html, /<h2 id="digitalSalespersonTitle">Hintaehdotus<\/h2>/);
   assert.match(html, /Aloita hinnan neuvottelu/);
-  assert.match(vehicleStyles, /\.digital-salesperson-card > \.purchase-fineprint \+ \.purchase-button \{ margin-top: var\(--space-3\); \}/);
+  assert.match(vehicleStyles, /\.digital-salesperson-card > \.negotiation-gate-status \+ \.purchase-button \{ margin-top: var\(--space-3\); \}/);
   assert.doesNotMatch(html, /Osta \/ Varaa|Nopea asiointi|Jatka ostoon tai varaukseen/);
   assert.doesNotMatch(html, /id="directPurchaseTitle"|id="btnDirectPurchase"/);
 });
@@ -35,14 +35,27 @@ test('removes person identity and general vehicle question actions', () => {
   assert.match(html, /Tämä demo ei muodosta sitovaa kauppaa, maksua, rahoitussopimusta tai varausta/);
 });
 
-test('shows list price, verified report condition, and an accessible offer form', () => {
+test('requires the inspection report before enabling the accessible negotiation form', () => {
   assert.match(html, /id="offerListPrice">95 000 €/);
-  assert.match(html, /Olen tutustunut ajoneuvon tietoihin ja kuntoraporttiin/);
-  assert.match(html, /Hinnan neuvottelu edellyttää, että olet tutustunut ajoneuvon kuntoraporttiin/);
+  assert.match(html, /id="btnOpenPreNegotiationReport"[^>]+type="button"[^>]*>Avaa kuntoraportti<\/button>/);
+  assert.match(html, /id="btnStartDigitalSalesperson"[^>]+disabled/);
+  assert.match(html, /id="negotiationGateStatus" role="status" aria-live="polite"/);
+  assert.match(html, /Tutustu auton tietoihin ja kuntoraporttiin ennen hinnan neuvottelua/);
+  assert.doesNotMatch(html, /Olen tutustunut ajoneuvon tietoihin ja kuntoraporttiin/);
   assert.match(html, /Millä hinnalla voimme tehdä kaupat\?/);
   assert.match(html, /<label for="priceInput">Ehdottamasi kauppahinta<\/label>/);
   assert.match(html, /id="priceInput"[^>]+aria-describedby="priceHelp priceError"/);
   assert.match(html, /<button class="btn btn-primary" type="submit">Ehdota hintaa<\/button>/);
+});
+
+test('opening the demo report records completion, enables negotiation, and restores focus', () => {
+  assert.match(uiScript, /state\.preNegotiationReportOpened = true/);
+  assert.match(uiScript, /startButton\.disabled = false/);
+  assert.match(uiScript, /✓ Kuntoraporttiin tutustuttu/);
+  assert.match(uiScript, /dialog\.showModal\(\)/);
+  assert.match(uiScript, /preNegotiationConditionReport'\)\.addEventListener\('close', restoreFocusAfterPreNegotiationReport\)/);
+  assert.match(uiScript, /btnStartDigitalSalesperson'\)\.focus\(\)/);
+  assert.match(uiScript, /if \(!state\.preNegotiationReportOpened\)/);
 });
 
 test('keeps persona out of negotiation transport and contains no client pricing thresholds', () => {
@@ -148,6 +161,8 @@ test('uses dealership language while checking, accepting, and escalating a price
 test('Run Demo remains pinned to its separate 92 500 euro price', () => {
   assert.match(demoVehicle, /agreedPrice: 92_500/);
   assert.match(html, /Hinnasta sovittu · 92 500 €/);
+  assert.match(html, /data-demo-step="condition"[^>]*><span[^>]*>○<\/span>Kuntoraportti avattu/);
+  assert.match(uiScript, /async function runDemo\(\) \{[\s\S]*markPreNegotiationReportOpened\(\)/);
 });
 
 test('Run Demo keeps each normal-motion step visible long enough to read', () => {
