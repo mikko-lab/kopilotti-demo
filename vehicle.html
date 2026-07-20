@@ -4,17 +4,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kopilotti Sales – Digital Car Salesperson</title>
-  <meta name="description" content="Kopilotti Sales on asiakkaalle tarkoitettu digitaalinen automyyjä ajoneuvon hinnan keskusteluun ja turvalliseen ostopolkuun.">
-  <meta property="og:title" content="Kopilotti Sales – Digital Car Salesperson">
-  <meta property="og:description" content="Keskustele ajoneuvosta ja hinnasta sekä etene maksutavan valintaan ja auton luovutukseen.">
+  <title>Alfa Romeo Giulia Quadrifoglio · XYZ-123 – Kopilotti Sales</title>
+  <meta name="description" content="Alfa Romeo Giulia Quadrifoglio, XYZ-123. Listahinta 95 000 €. Kopilotti Salesin ei-sitova ostopolkudemo.">
+  <meta property="og:title" content="Alfa Romeo Giulia Quadrifoglio · XYZ-123 – Kopilotti Sales">
+  <meta property="og:description" content="Listahinta 95 000 €. Tutustu Kopilotti Salesin ei-sitovaan ostopolkudemoon.">
   <meta property="og:url" content="https://mikko-lab.github.io/kopilotti-sales/vehicle.html">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="https://mikko-lab.github.io/kopilotti-sales/assets/screenshot.png">
+  <meta property="og:image" content="https://mikko-lab.github.io/kopilotti-sales/assets/cars/demo-vehicle-placeholder.svg">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Kopilotti Sales – Digital Car Salesperson">
-  <meta name="twitter:description" content="Asiakkaalle tarkoitettu digitaalinen automyyjä.">
-  <meta name="twitter:image" content="https://mikko-lab.github.io/kopilotti-sales/assets/screenshot.png">
+  <meta name="twitter:title" content="Alfa Romeo Giulia Quadrifoglio · XYZ-123 – Kopilotti Sales">
+  <meta name="twitter:description" content="Listahinta 95 000 €. Ei-sitova ostopolkudemo.">
+  <meta name="twitter:image" content="https://mikko-lab.github.io/kopilotti-sales/assets/cars/demo-vehicle-placeholder.svg">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="styles/vehicle.css">
 </head>
@@ -43,18 +43,18 @@
       <section class="vehicle-content" aria-labelledby="vehicleTitle">
         <div class="vehicle-heading">
           <div>
-            <span class="vehicle-availability" id="vehicleAvailability">Ladataan saatavuutta…</span>
-            <h1 id="vehicleTitle">Ajoneuvon tiedot</h1>
-            <p id="vehicleSubtitle">Ladataan…</p>
+            <span class="vehicle-availability" id="vehicleAvailability">Demoajoneuvo</span>
+            <h1 id="vehicleTitle">Alfa Romeo Giulia Quadrifoglio</h1>
+            <p id="vehicleSubtitle">XYZ-123</p>
           </div>
           <div class="vehicle-heading-price" aria-label="Ajoneuvon hinta">
-            <strong id="vehiclePrice">—</strong><span id="vehicleMonthly">—</span>
+            <strong id="vehiclePrice">95 000 €</strong><span id="vehicleMonthly"></span>
           </div>
         </div>
 
         <figure class="vehicle-hero">
-          <img id="vehicleImage" alt="" src="assets/cars/audi-a4.jpg">
-          <figcaption>Esimerkkikuva — ei kuva yksittäisestä ajoneuvosta</figcaption>
+          <img id="vehicleImage" alt="Geneerinen demoajoneuvon paikkamerkkikuva" src="assets/cars/demo-vehicle-placeholder.svg">
+          <figcaption>Geneerinen demokuva — ei kuva yksittäisestä ajoneuvosta</figcaption>
         </figure>
 
         <section class="vehicle-spec-card" aria-labelledby="specTitle">
@@ -62,10 +62,6 @@
           <dl class="vehicle-spec-grid" id="vehicleSpecs"></dl>
         </section>
 
-        <section class="vehicle-spec-card" aria-labelledby="equipmentTitle">
-          <h2 id="equipmentTitle">Keskeiset varusteet</h2>
-          <ul class="vehicle-equipment" id="vehicleEquipment"></ul>
-        </section>
       </section>
 
       <aside class="purchase-column" aria-label="Osto- ja varausvaihtoehdot">
@@ -74,7 +70,7 @@
             <p class="purchase-eyebrow">Kopilotti Sales</p>
             <p class="demo-product-subtitle">Digital Car Salesperson</p>
             <h2 id="journeyDemoTitle">Alfa Romeo Giulia Quadrifoglio</h2>
-            <p><strong>XYZ-123</strong><span>95 000 €</span></p>
+            <p><strong id="journeyDemoRegistration">XYZ-123</strong><span id="journeyDemoListPrice">95 000 €</span></p>
           </div>
           <p>Näe, miten keskustelu muuttuu hinnan sopimisen jälkeen turvalliseksi ostoprosessiksi.</p>
           <button class="btn btn-primary purchase-button" id="btnRunDemo" type="button" aria-controls="journeyDemoTimeline">Run Demo</button>
@@ -82,7 +78,7 @@
             <p class="demo-now" id="journeyDemoStatus">Demo käynnistyy…</p>
             <ol aria-label="Demon eteneminen">
               <li data-demo-step="conversation"><span aria-hidden="true">○</span>Keskustelu hinnasta</li>
-              <li data-demo-step="agreement"><span aria-hidden="true">○</span>Hinnasta sovittu · 92 500 €</li>
+              <li data-demo-step="agreement"><span aria-hidden="true">○</span><span id="journeyDemoAgreedPrice">Hinnasta sovittu · 92 500 €</span></li>
               <li data-demo-step="payment"><span aria-hidden="true">○</span>Maksutapa valittu</li>
               <li data-demo-step="waiting"><span aria-hidden="true">○</span>Maksu odottaa vahvistusta</li>
               <li data-demo-step="confirmed"><span aria-hidden="true">○</span>Maksu vahvistettu</li>

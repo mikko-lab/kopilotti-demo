@@ -1,5 +1,6 @@
 import { CustomerNegotiationApi } from './negotiation-api.js';
 import { PurchaseFlowApi } from './purchase-flow-api.js';
+import { DEMO_VEHICLE } from './demo-vehicle.js';
 
 const api = new CustomerNegotiationApi();
 const purchaseApi = new PurchaseFlowApi();
@@ -9,49 +10,42 @@ const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRI
 const PERSONAS = {
   laura: {
     name: 'Laura',
-    greeting: (vehicle) => `Hei! Olen Laura. Autan mielelläni ${vehicle.brand} ${vehicle.model} -auton kanssa. Mitä haluaisit tietää?`,
-    condition: (vehicle) => `Tämän ${vehicle.year}-mallisen auton mittarilukema on ${formatNumber(vehicle.mileage)} km. Ennen rahoitusta tai maksamista avaamme aina ajoneuvokohtaisen kuntoraportin tutustuttavaksi.`,
-    finance: (vehicle) => `Rahoitus on saatavilla tähän autoon. Suuntaa-antava kuukausierä on ${formatNumber(vehicle.estimatedMonthlyPayment)} €/kk, ja lopullinen rahoitus vahvistetaan erikseen.`,
+    greeting: (vehicle) => `Hei! Olen Laura. Autan mielelläni ${vehicle.makeModel} -auton kanssa. Mitä haluaisit tietää?`,
+    condition: (vehicle) => `${vehicle.makeModel} · ${vehicle.registration}. Ennen rahoitusta tai maksamista avaamme aina ajoneuvokohtaisen kuntoraportin tutustuttavaksi.`,
+    finance: () => 'Voit valita maksutavaksi tilisiirron tai rahoituksen. Lopullinen rahoitus vahvistetaan erikseen.',
     priceIntro: 'Totta kai. Voit kertoa hinnan, josta haluaisit keskustella. Välitän sen heti hinnoittelusta vastaavalle järjestelmälle.',
   },
   mika: {
     name: 'Mika',
-    greeting: (vehicle) => `Hei, olen Mika. Käydään ${vehicle.brand} ${vehicle.model} ja kaupan eteneminen tehokkaasti läpi. Mistä aloitetaan?`,
-    condition: (vehicle) => `Vuosimalli ${vehicle.year}, ajettu ${formatNumber(vehicle.mileage)} km. Ajoneuvokohtainen kuntoraportti avataan pakollisena vaiheena ennen rahoitusta tai maksamista.`,
-    finance: (vehicle) => `Rahoitus saatavilla. Arvio ${formatNumber(vehicle.estimatedMonthlyPayment)} €/kk. Lopulliset ehdot vahvistetaan erikseen.`,
+    greeting: (vehicle) => `Hei, olen Mika. Käydään ${vehicle.makeModel} ja kaupan eteneminen tehokkaasti läpi. Mistä aloitetaan?`,
+    condition: (vehicle) => `${vehicle.makeModel} · ${vehicle.registration}. Ajoneuvokohtainen kuntoraportti avataan pakollisena vaiheena ennen rahoitusta tai maksamista.`,
+    finance: () => 'Maksutavat ovat tilisiirto ja rahoitus. Lopulliset rahoitusehdot vahvistetaan erikseen.',
     priceIntro: 'Kerro hinta, josta haluat keskustella. Välitän sen heti päätettäväksi.',
   },
 };
 
 async function loadVehicle() {
-  const requestedId = new URLSearchParams(location.search).get('id') || 'veh-0001';
-  const inventory = await fetch('./inventory.json').then((response) => {
-    if (!response.ok) throw new Error('Ajoneuvotietoja ei voitu ladata');
-    return response.json();
-  });
-  const selected = inventory.find((vehicle) => vehicle.id === requestedId) || inventory[0];
-  state.vehicle = { ...selected, registrationNumber: selected.registrationNumber || demoRegistrationNumber(selected.id) };
+  state.vehicle = DEMO_VEHICLE;
   renderVehicle(state.vehicle);
 }
 
 function renderVehicle(vehicle) {
-  document.title = `${vehicle.brand} ${vehicle.model} ${vehicle.trim} – Kopilotti Sales`;
-  setText('breadcrumbVehicle', `${vehicle.brand} ${vehicle.model}`);
-  setText('vehicleTitle', `${vehicle.brand} ${vehicle.model} ${vehicle.trim}`);
-  setText('vehicleSubtitle', `${vehicle.year} · ${vehicle.fuel} · ${vehicle.transmission}`);
-  setText('vehiclePrice', formatEuro(vehicle.price));
-  setText('directPrice', formatEuro(vehicle.price));
-  setText('vehicleMonthly', `alkaen ${formatNumber(vehicle.estimatedMonthlyPayment)} €/kk`);
-  setText('vehicleAvailability', availabilityLabel(vehicle.available));
+  document.title = `${vehicle.makeModel} · ${vehicle.registration} – Kopilotti Sales`;
+  setText('breadcrumbVehicle', vehicle.makeModel);
+  setText('vehicleTitle', vehicle.makeModel);
+  setText('vehicleSubtitle', vehicle.registration);
+  setText('vehiclePrice', formatEuro(vehicle.listPrice));
+  setText('directPrice', formatEuro(vehicle.listPrice));
+  setText('vehicleMonthly', '');
+  setText('vehicleAvailability', 'Demoajoneuvo');
   const image = document.getElementById('vehicleImage');
   image.src = vehicle.image;
-  image.alt = `${vehicle.brand} ${vehicle.model} -auton esimerkkikuva`;
+  image.alt = vehicle.imageAlt;
 
   const specs = [
-    ['Vuosimalli', vehicle.year], ['Mittarilukema', `${formatNumber(vehicle.mileage)} km`],
-    ['Käyttövoima', vehicle.fuel], ['Vaihteisto', vehicle.transmission],
-    ['Korimalli', bodyTypeLabel(vehicle.bodyType)], ['Väri', vehicle.color],
-    ['Toimipiste', vehicle.dealershipLocation], ['Rekisteritunnus', vehicle.registrationNumber],
+    ['Merkki ja malli', vehicle.makeModel],
+    ['Rekisteritunnus', vehicle.registration],
+    ['Listahinta', formatEuro(vehicle.listPrice)],
   ];
   const specsElement = document.getElementById('vehicleSpecs');
   specsElement.replaceChildren(...specs.map(([term, value]) => {
@@ -63,11 +57,10 @@ function renderVehicle(vehicle) {
     wrapper.append(dt, dd);
     return wrapper;
   }));
-  document.getElementById('vehicleEquipment').replaceChildren(...vehicle.features.slice(0, 10).map((feature) => {
-    const item = document.createElement('li');
-    item.textContent = feature;
-    return item;
-  }));
+  setText('journeyDemoTitle', vehicle.makeModel);
+  setText('journeyDemoRegistration', vehicle.registration);
+  setText('journeyDemoListPrice', formatEuro(vehicle.listPrice));
+  setText('journeyDemoAgreedPrice', `Hinnasta sovittu · ${formatEuro(vehicle.agreedPrice)}`);
 }
 
 function openFlow() {
@@ -497,18 +490,15 @@ function formatEuro(value) { return `${formatNumber(value)} €`; }
 function formatNumber(value) { return Number(value).toLocaleString('fi-FI'); }
 function formatDate(value) { return new Date(value).toLocaleString('fi-FI', { dateStyle: 'medium', timeStyle: 'short' }); }
 function setText(id, value) { document.getElementById(id).textContent = value; }
-function availabilityLabel(value) { return ({ available: 'Heti saatavilla', reserved: 'Varattu', incoming: 'Tulossa' })[value] || 'Saatavuus tarkistettava'; }
-function bodyTypeLabel(value) { return ({ sedan: 'Sedan', suv: 'SUV', van: 'Pakettiauto', hatchback: 'Viistoperä', combi: 'Farmari', mpv: 'Tila-auto' })[value] || value; }
-function demoRegistrationNumber(vehicleId) { return `KPL-${String(vehicleId).replace(/\D/g, '').slice(-3).padStart(3, '0')}`; }
-function vehicleIdentity(vehicle) { return `${vehicle.brand} ${vehicle.model} · ${vehicle.registrationNumber}`; }
+function vehicleIdentity(vehicle) { return `${vehicle.makeModel} · ${vehicle.registration}`; }
 
 const DEMO_STEPS = [
   ['conversation', 'Keskustelu hinnasta'],
-  ['agreement', 'Hinnasta sovittu: 92 500 €'],
+  ['agreement', `Hinnasta sovittu: ${formatEuro(DEMO_VEHICLE.agreedPrice)}`],
   ['payment', 'Maksutavaksi valittu käteinen / tilisiirto'],
   ['waiting', 'Auto on varattu. Maksua odotetaan. Varaus voimassa 22.7.2026 klo 18.00 asti.'],
   ['confirmed', 'Maksu vahvistettu. Auto valmistellaan luovutukseen.'],
-  ['ready', 'Alfa Romeo Giulia Quadrifoglio · XYZ-123 on valmis noudettavaksi.'],
+  ['ready', `${DEMO_VEHICLE.makeModel} · ${DEMO_VEHICLE.registration} on valmis noudettavaksi.`],
 ];
 
 async function runDemo() {

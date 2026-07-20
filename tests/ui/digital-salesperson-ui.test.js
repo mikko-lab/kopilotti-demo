@@ -5,7 +5,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const html = fs.readFileSync('vehicle.html', 'utf8');
+const landing = fs.readFileSync('index.html', 'utf8');
 const uiScript = fs.readFileSync('js/digital-salesperson.js', 'utf8');
+const demoVehicle = fs.readFileSync('js/demo-vehicle.js', 'utf8');
 const apiScript = fs.readFileSync('js/negotiation-api.js', 'utf8');
 
 test('presents the digital salesperson as an additional dealership purchase path', () => {
@@ -56,4 +58,16 @@ test('preserves focus and announces asynchronous purchase state changes', () => 
   assert.match(html, /id="purchaseStatus"[^>]+aria-live="polite"[^>]+tabindex="-1"/);
   assert.match(uiScript, /journey\.focus\(\)/);
   assert.match(uiScript, /panel\.focus\(\)/);
+});
+
+test('uses one Alfa Romeo source throughout the standalone demo without Audi assets', () => {
+  assert.match(demoVehicle, /makeModel: 'Alfa Romeo Giulia Quadrifoglio'/);
+  assert.match(demoVehicle, /registration: 'XYZ-123'/);
+  assert.match(demoVehicle, /listPrice: 95_000/);
+  assert.match(demoVehicle, /agreedPrice: 92_500/);
+  assert.match(uiScript, /import \{ DEMO_VEHICLE \} from '\.\/demo-vehicle\.js'/);
+  assert.match(landing, /src="js\/demo-landing\.js"/);
+  for (const surface of [landing, html, uiScript, demoVehicle]) {
+    assert.doesNotMatch(surface, /audi/i);
+  }
 });

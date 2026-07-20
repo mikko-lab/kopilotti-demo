@@ -10,11 +10,11 @@
   <meta property="og:description" content="Asiakkaalle tarkoitettu digitaalinen automyyjä hinnan keskustelusta maksutavan valintaan ja auton luovutukseen.">
   <meta property="og:url" content="https://mikko-lab.github.io/kopilotti-sales/">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="https://mikko-lab.github.io/kopilotti-sales/assets/screenshot.png">
+  <meta property="og:image" content="https://mikko-lab.github.io/kopilotti-sales/assets/cars/demo-vehicle-placeholder.svg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Kopilotti Sales – Digital Car Salesperson">
   <meta name="twitter:description" content="Asiakkaalle tarkoitettu digitaalinen automyyjä hinnan keskustelusta auton luovutukseen.">
-  <meta name="twitter:image" content="https://mikko-lab.github.io/kopilotti-sales/assets/screenshot.png">
+  <meta name="twitter:image" content="https://mikko-lab.github.io/kopilotti-sales/assets/cars/demo-vehicle-placeholder.svg">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="styles/vehicle.css">
 </head>
@@ -36,8 +36,10 @@
     <h1>Digital Car Salesperson</h1>
     <p>Digitaalinen automyyjä auttaa keskustelemaan ajoneuvosta ja hinnasta sekä etenemään turvallisesti maksutavan valintaan ja auton luovutukseen.</p>
     <blockquote>LLM keskustelee. Backend päättää.</blockquote>
+    <p><strong id="demoVehicleName">Demoajoneuvo</strong><br><span id="demoVehicleRegistration"></span> · <span id="demoVehiclePrice"></span></p>
     <a class="btn btn-primary" href="vehicle.html?id=veh-0001">Avaa ajoneuvo ja Run Demo</a>
     <p class="purchase-fineprint">Run Demo on ei-sitova käyttöliittymäesitys. Se ei sisällä tuotantohinnoittelulogiikkaa, muodosta oikeaa kauppaa tai käsittele oikeaa maksua.</p>
   </main>
+  <script type="module" src="js/demo-landing.js"></script>
 </body>
 </html>

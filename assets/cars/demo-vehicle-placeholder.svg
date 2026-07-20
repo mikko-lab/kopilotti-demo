@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title description">
+  <title id="title">Geneerinen demoajoneuvo</title>
+  <desc id="description">Neutraali ajoneuvon paikkamerkkikuva, joka ei esitä tiettyä automerkkiä tai -mallia.</desc>
+  <rect width="1200" height="675" fill="#eef1f4"/>
+  <path d="M250 420h700l-42-111c-13-35-46-59-83-59H440c-39 0-74 25-86 62l-35 108" fill="none" stroke="#66727d" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M219 420h762c35 0 64 29 64 64v22H155v-22c0-35 29-64 64-64Z" fill="#cfd6dc" stroke="#66727d" stroke-width="18"/>
+  <circle cx="330" cy="510" r="58" fill="#eef1f4" stroke="#66727d" stroke-width="18"/>
+  <circle cx="870" cy="510" r="58" fill="#eef1f4" stroke="#66727d" stroke-width="18"/>
+  <text x="600" y="610" text-anchor="middle" font-family="system-ui, sans-serif" font-size="28" fill="#4b5660">Ajoneuvon demokuva</text>
+</svg>
