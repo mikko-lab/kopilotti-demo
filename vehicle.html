@@ -87,17 +87,35 @@
           <section class="conversation hidden" id="conversation" aria-labelledby="conversationTitle">
             <h3 class="visually-hidden" id="conversationTitle">Hinnan neuvottelu</h3>
             <div class="conversation-status"><span class="status-dot active" aria-hidden="true"></span><span id="personaStatus">Digitaalinen automyyjä</span></div>
-            <div class="message-list" id="messageList" role="log" aria-live="polite" aria-relevant="additions"></div>
-            <form class="price-discussion" id="priceForm">
-              <p class="offer-question">Mikä olisi tarjoushintasi?</p>
-              <label for="priceInput">Tarjoushinta</label>
-              <div class="price-input-row">
-                <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 92 500 €" aria-describedby="priceHelp priceError">
-                <button class="btn btn-primary" type="submit">Lähetä tarjous</button>
+            <div class="negotiation-workspace">
+              <aside class="deal-summary" aria-labelledby="dealSummaryTitle">
+                <p class="purchase-eyebrow">Hinnan tueksi</p>
+                <h3 id="dealSummaryTitle">Tarjousyhteenveto</h3>
+                <div class="deal-summary-vehicle">
+                  <span>Ajoneuvo</span>
+                  <strong id="dealSummaryVehicle">Alfa Romeo Giulia Quadrifoglio</strong>
+                  <span id="dealSummaryRegistration">XYZ-123</span>
+                </div>
+                <dl class="deal-summary-prices">
+                  <div><dt>Listahinta</dt><dd id="dealSummaryListPrice">95 000 €</dd></div>
+                  <div class="deal-summary-offer"><dt>Tarjoushinta</dt><dd id="dealSummaryOffer">—</dd></div>
+                  <div aria-label="Erotus listahintaan"><dt>Erotus</dt><dd id="dealSummaryDifference">—</dd><dd id="dealSummaryPercentage">—</dd></div>
+                </dl>
+              </aside>
+              <div class="negotiation-input">
+                <div class="message-list" id="messageList" role="log" aria-live="polite" aria-relevant="additions"></div>
+                <form class="price-discussion" id="priceForm">
+                  <p class="offer-question">Mikä olisi tarjoushintasi?</p>
+                  <label for="priceInput">Tarjoushinta</label>
+                  <div class="price-input-row">
+                    <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 92 500 €" aria-describedby="priceHelp priceError">
+                    <button class="btn btn-primary" type="submit">Lähetä tarjous</button>
+                  </div>
+                  <p id="priceHelp">Hintaehdotuksesi arvioidaan määriteltyjen sääntöjen mukaisesti. Jos ehdotus hyväksytään, voit siirtyä turvallisesti ostoprosessiin.</p>
+                  <p class="form-error" id="priceError" role="alert"></p>
+                </form>
               </div>
-              <p id="priceHelp">Hintaehdotuksesi arvioidaan määriteltyjen sääntöjen mukaisesti. Jos ehdotus hyväksytään, voit siirtyä turvallisesti ostoprosessiin.</p>
-              <p class="form-error" id="priceError" role="alert"></p>
-            </form>
+            </div>
             <div class="decision-actions hidden" id="decisionActions"></div>
           </section>
         </section>

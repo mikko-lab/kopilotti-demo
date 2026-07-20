@@ -10,6 +10,8 @@ const uiScript = fs.readFileSync('js/digital-salesperson.js', 'utf8');
 const demoVehicle = fs.readFileSync('js/demo-vehicle.js', 'utf8');
 const apiScript = fs.readFileSync('js/negotiation-api.js', 'utf8');
 const vehicleStyles = fs.readFileSync('styles/vehicle.css', 'utf8');
+const dealSummarySource = fs.readFileSync('js/deal-summary.js', 'utf8');
+const dealSummaryModule = import(`data:text/javascript;base64,${Buffer.from(dealSummarySource).toString('base64')}`);
 
 test('presents one verified price-offer path without direct purchase competition', () => {
   assert.match(html, /<h2 id="digitalSalespersonTitle">Hintaehdotus<\/h2>/);
@@ -91,4 +93,34 @@ test('keeps the demo vehicle identity visible after the final status update', ()
 test('turns only the timeline marker into a check without hiding agreement text', () => {
   assert.match(vehicleStyles, /li\.complete > span:first-child/);
   assert.doesNotMatch(vehicleStyles, /journey-demo-timeline li\.complete span \{/);
+});
+
+test('shows a textual deal summary with vehicle, registration, list price, offer and difference', () => {
+  assert.match(html, /id="dealSummaryTitle">Tarjousyhteenveto/);
+  assert.match(html, /id="dealSummaryVehicle">Alfa Romeo Giulia Quadrifoglio/);
+  assert.match(html, /id="dealSummaryRegistration">XYZ-123/);
+  assert.match(html, /id="dealSummaryListPrice">95 000 €/);
+  assert.match(html, /id="dealSummaryOffer">—/);
+  assert.match(html, /aria-label="Erotus listahintaan"/);
+  assert.doesNotMatch(html, /class="deal-summary"[^>]+aria-live/);
+});
+
+test('updates the deal summary on every price input without waiting for submit', () => {
+  assert.match(uiScript, /priceInput'\)\.addEventListener\('input', updateDealSummary\)/);
+  assert.match(uiScript, /calculateDealSummary\(state\.vehicle\.listPrice/);
+});
+
+test('calculates and formats a 92 500 euro offer against 95 000 correctly', async () => {
+  const { calculateDealSummary, formatSignedEuro, formatSignedPercent } = await dealSummaryModule;
+  const summary = calculateDealSummary(95_000, 92_500);
+  assert.deepEqual({ offerPrice: summary.offerPrice, difference: summary.difference }, { offerPrice: 92_500, difference: -2_500 });
+  assert.equal(formatSignedEuro(summary.difference), '−2 500 €');
+  assert.equal(formatSignedPercent(summary.percentageDifference), '−2,6 %');
+});
+
+test('stacks summary before input by default and uses two columns on wide desktop', () => {
+  assert.ok(html.indexOf('class="deal-summary"') < html.indexOf('class="negotiation-input"'));
+  assert.match(vehicleStyles, /@media \(min-width: 1100px\)/);
+  assert.match(vehicleStyles, /grid-template-areas: 'input summary'/);
+  assert.match(vehicleStyles, /\.deal-summary \{ grid-area: summary/);
 });

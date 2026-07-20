@@ -1,6 +1,7 @@
 import { CustomerNegotiationApi } from './negotiation-api.js';
 import { PurchaseFlowApi } from './purchase-flow-api.js';
 import { DEMO_VEHICLE } from './demo-vehicle.js';
+import { calculateDealSummary, formatSignedEuro, formatSignedPercent } from './deal-summary.js';
 
 const api = new CustomerNegotiationApi();
 const purchaseApi = new PurchaseFlowApi();
@@ -50,6 +51,16 @@ function renderVehicle(vehicle) {
   setText('journeyDemoListPrice', formatEuro(vehicle.listPrice));
   setText('journeyDemoAgreedPrice', `Hinnasta sovittu · ${formatEuro(vehicle.agreedPrice)}`);
   setText('journeyDemoVehicle', vehicleIdentity(vehicle));
+  setText('dealSummaryVehicle', vehicle.makeModel);
+  setText('dealSummaryRegistration', vehicle.registration);
+  setText('dealSummaryListPrice', formatEuro(vehicle.listPrice));
+}
+
+function updateDealSummary() {
+  const summary = calculateDealSummary(state.vehicle.listPrice, parseEuro(document.getElementById('priceInput').value));
+  setText('dealSummaryOffer', summary ? formatEuro(summary.offerPrice) : '—');
+  setText('dealSummaryDifference', summary ? formatSignedEuro(summary.difference) : '—');
+  setText('dealSummaryPercentage', summary ? formatSignedPercent(summary.percentageDifference) : '—');
 }
 
 function openFlow() {
@@ -498,6 +509,7 @@ document.getElementById('btnCloseFlow').addEventListener('click', closeFlow);
 document.getElementById('btnRunDemo').addEventListener('click', runDemo);
 document.getElementById('btnReviewCondition').addEventListener('click', continueToConditionReport);
 document.getElementById('priceForm').addEventListener('submit', submitPrice);
+document.getElementById('priceInput').addEventListener('input', updateDealSummary);
 document.getElementById('conditionAcknowledgement').addEventListener('change', (event) => {
   document.getElementById('btnProceedAfterCondition').disabled = !event.currentTarget.checked;
 });
