@@ -23,8 +23,8 @@ test('presents one verified price-offer path without direct purchase competition
 });
 
 test('avoids auction, bidding, discount-promise, and generic chatbot labels', () => {
-  for (const forbidden of ['Tee tarjous', 'Tarjoa hinta', 'Huuda auto', 'AI-chat', 'Chatbot', 'huutokauppa']) {
-    assert.equal(html.includes(forbidden), false, forbidden);
+  for (const forbidden of ['Tee tarjous', 'Tarjoa hinta', 'Huuda auto', 'Lähetä tarjous', 'Tarjousyhteenveto', 'Tarjoushinta', 'AI-chat', 'Chatbot', 'huutokauppa']) {
+    assert.equal(`${html}\n${uiScript}`.includes(forbidden), false, forbidden);
   }
 });
 
@@ -37,10 +37,11 @@ test('removes person identity and general vehicle question actions', () => {
 test('shows list price, verified report condition, and an accessible offer form', () => {
   assert.match(html, /id="offerListPrice">95 000 €/);
   assert.match(html, /Olen tutustunut ajoneuvon tietoihin ja kuntoraporttiin/);
-  assert.match(html, /Tarjouksen tekeminen edellyttää, että olet tutustunut ajoneuvon kuntoraporttiin/);
-  assert.match(html, /<label for="priceInput">Tarjoushinta<\/label>/);
+  assert.match(html, /Hinnan neuvottelu edellyttää, että olet tutustunut ajoneuvon kuntoraporttiin/);
+  assert.match(html, /Millä hinnalla voimme tehdä kaupat\?/);
+  assert.match(html, /<label for="priceInput">Ehdottamasi kauppahinta<\/label>/);
   assert.match(html, /id="priceInput"[^>]+aria-describedby="priceHelp priceError"/);
-  assert.match(html, /<button class="btn btn-primary" type="submit">Lähetä tarjous<\/button>/);
+  assert.match(html, /<button class="btn btn-primary" type="submit">Ehdota hintaa<\/button>/);
 });
 
 test('keeps persona out of negotiation transport and contains no client pricing thresholds', () => {
@@ -56,7 +57,7 @@ test('separates price agreement, provider confirmation, and handover status', ()
   assert.match(html, /aria-label="Ostopolun vaiheet"/);
   assert.match(html, /id="purchaseStatus" role="status" aria-live="polite"/);
   assert.match(html, /Ota yhteys myyjään/);
-  assert.match(uiScript, /Tarjouksesi \$\{formatEuro\(decision\.approvedAmount\)\} hyväksyttiin/);
+  assert.match(uiScript, /Voimme tehdä kaupat hinnalla \$\{formatEuro\(decision\.approvedAmount\)\}\. Jatketaan maksutavan valintaan\./);
   assert.match(uiScript, /Maksu odottaa vahvistusta/);
   assert.match(uiScript, /Rahoitushakemuksesi on käsittelyssä/);
   assert.match(uiScript, /Auton luovutuksen edellytykset ovat kunnossa/);
@@ -98,12 +99,13 @@ test('turns only the timeline marker into a check without hiding agreement text'
 });
 
 test('shows a textual deal summary with vehicle, registration, list price, offer and difference', () => {
-  assert.match(html, /id="dealSummaryTitle">Tarjousyhteenveto/);
+  assert.match(html, /id="dealSummaryTitle">Kaupan yhteenveto/);
+  assert.match(html, /Kaupan kohde/);
   assert.match(html, /id="dealSummaryVehicle">Alfa Romeo Giulia Quadrifoglio/);
   assert.match(html, /id="dealSummaryRegistration">XYZ-123/);
   assert.match(html, /id="dealSummaryListPrice">95 000 €/);
   assert.match(html, /id="dealSummaryOffer">—/);
-  assert.match(html, /aria-label="Erotus listahintaan"/);
+  assert.match(html, /aria-label="Ero listahintaan"/);
   assert.doesNotMatch(html, /class="deal-summary"[^>]+aria-live/);
 });
 
@@ -128,11 +130,18 @@ test('stacks summary before input by default and uses two columns on wide deskto
 });
 
 test('accepted manual offer locks input and changes summary to agreed price', () => {
-  assert.match(html, /id="dealSummaryOfferLabel">Tarjoushinta/);
-  assert.match(uiScript, /setText\('dealSummaryOfferLabel', 'Sovittu hinta'\)/);
+  assert.match(html, /id="dealSummaryOfferLabel">Ehdottamasi hinta/);
+  assert.match(uiScript, /setText\('dealSummaryOfferLabel', 'Sovittu kauppahinta'\)/);
   assert.match(uiScript, /priceInput'\)\.disabled = true/);
-  assert.match(uiScript, /Tarjouksesi \$\{formatEuro\(decision\.approvedAmount\)\} hyväksyttiin/);
+  assert.match(uiScript, /Voimme tehdä kaupat hinnalla \$\{formatEuro\(decision\.approvedAmount\)\}/);
   assert.match(uiScript, /Hinnasta sovittu · \$\{formatEuro\(purchaseApi\.session\.agreedPrice\)\}/);
+});
+
+test('uses dealership language while checking, accepting, and escalating a price', () => {
+  assert.match(uiScript, /Tarkistan, voimmeko tehdä kaupat tällä hinnalla\./);
+  assert.match(uiScript, /En voi vahvistaa kauppaa tällä hinnalla suoraan\. Tarkistutan vielä, voimmeko tulla hinnassa vastaan\./);
+  assert.match(uiScript, /Lähin hinta, jolla voimme tehdä kaupat/);
+  assert.doesNotMatch(`${html}\n${uiScript}`, /Tarjouksesi|hyväksytty tarjous|vastatarjous|bid accepted|offer accepted|auction/i);
 });
 
 test('Run Demo remains pinned to its separate 92 500 euro price', () => {

@@ -10,7 +10,7 @@ const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRI
 
 const SALES_EXPERIENCE = {
   name: 'Digitaalinen automyyjä',
-  greeting: 'Olet tutustunut auton tietoihin ja kuntoraporttiin. Voit nyt tehdä hintaehdotuksen.',
+  greeting: 'Olet tutustunut auton tietoihin ja kuntoraporttiin. Millä hinnalla voimme tehdä kaupat?',
 };
 
 async function loadVehicle() {
@@ -65,7 +65,7 @@ function updateDealSummary() {
 
 function showAcceptedDealSummary(approvedAmount) {
   const summary = calculateDealSummary(state.vehicle.listPrice, approvedAmount);
-  setText('dealSummaryOfferLabel', 'Sovittu hinta');
+  setText('dealSummaryOfferLabel', 'Sovittu kauppahinta');
   setText('dealSummaryOffer', formatEuro(approvedAmount));
   setText('dealSummaryDifference', formatSignedEuro(summary.difference));
   setText('dealSummaryPercentage', formatSignedPercent(summary.percentageDifference));
@@ -102,15 +102,15 @@ async function submitPrice(event) {
   const offerAmount = parseEuro(input.value);
   errorElement.textContent = '';
   if (!Number.isSafeInteger(offerAmount) || offerAmount <= 0) {
-    errorElement.textContent = 'Kirjoita tarjoushinta kokonaisina euroina, esimerkiksi 92 500.';
+    errorElement.textContent = 'Kirjoita ehdottamasi kauppahinta kokonaisina euroina, esimerkiksi 93 900.';
     input.focus();
     return;
   }
 
   const submitButton = event.currentTarget.querySelector('button[type="submit"]');
   submitButton.disabled = true;
-  addMessage('customer', `Tarjoushintani on ${formatEuro(offerAmount)}.`, 'Sinä');
-  const waitingMessage = addMessage('salesperson pending', 'Tarjouksesi on vastaanotettu.', SALES_EXPERIENCE.name);
+  addMessage('customer', formatEuro(offerAmount), 'Sinä');
+  const waitingMessage = addMessage('salesperson pending', 'Tarkistan, voimmeko tehdä kaupat tällä hinnalla.', SALES_EXPERIENCE.name);
   try {
     const decision = await api.discussPrice({
       vehicleId: state.vehicle.id,
@@ -122,7 +122,7 @@ async function submitPrice(event) {
     event.currentTarget.classList.add('hidden');
   } catch (_error) {
     waitingMessage.remove();
-    addMessage('salesperson decision', 'Hinta vaatii automyyjän vahvistuksen. Asia siirtyy tarkistettavaksi, eikä neuvottelua tarvitse aloittaa alusta.', SALES_EXPERIENCE.name);
+    addMessage('salesperson decision', 'En voi vahvistaa kauppaa tällä hinnalla suoraan. Tarkistutan vielä, voimmeko tulla hinnassa vastaan. Neuvottelua ei tarvitse aloittaa alusta.', SALES_EXPERIENCE.name);
     renderDecisionActions('escalate');
   } finally {
     submitButton.disabled = false;
@@ -133,16 +133,16 @@ function renderDecision(decision) {
   const salesperson = SALES_EXPERIENCE.name;
   if (decision.status === 'ACCEPT') {
     showAcceptedDealSummary(decision.approvedAmount);
-    addMessage('salesperson decision', `Tarjouksesi ${formatEuro(decision.approvedAmount)} hyväksyttiin. Voit nyt siirtyä valitsemaan maksutavan. ${vehicleIdentity(state.vehicle)}.`, salesperson);
+    addMessage('salesperson decision', `Voimme tehdä kaupat hinnalla ${formatEuro(decision.approvedAmount)}. Jatketaan maksutavan valintaan. ${vehicleIdentity(state.vehicle)}.`, salesperson);
     renderDecisionActions('reserve');
   } else if (decision.status === 'COUNTER') {
-    addMessage('salesperson decision', `Voimme jatkaa kauppaa hinnalla ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja jatkaa ostoprosessiin?`, salesperson);
+    addMessage('salesperson decision', `Lähin hinta, jolla voimme tehdä kaupat, on ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja jatkaa ostoprosessiin?`, salesperson);
     renderDecisionActions('counter');
   } else if (decision.status === 'REJECT') {
-    addMessage('salesperson decision', 'Emme voi edetä ehdottamallasi hinnalla. Voit tehdä uuden hintaehdotuksen tai ostaa auton listahinnalla.', salesperson);
+    addMessage('salesperson decision', 'Emme voi tehdä kauppoja ehdottamallasi hinnalla. Voit jatkaa neuvottelua tai edetä listahinnalla.', salesperson);
     renderDecisionActions('rejected');
   } else {
-    addMessage('salesperson decision', 'Tarvitsemme automyyjän vahvistuksen. Välitämme asian eteenpäin.', salesperson);
+    addMessage('salesperson decision', 'En voi vahvistaa kauppaa tällä hinnalla suoraan. Tarkistutan vielä, voimmeko tulla hinnassa vastaan. Neuvottelua ei tarvitse aloittaa alusta.', salesperson);
     renderDecisionActions('escalate');
   }
 }

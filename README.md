@@ -10,6 +10,10 @@ Core principle:
 
 > LLM discusses. Backend decides.
 
+Käyttöliittymän sisältöperiaate:
+
+> Kopilotti Sales simuloi ammattimaisen automyyjän kanssa käytävää hinnan neuvottelua – ei huutokauppaa, tarjouskilpailua tai tarjouspyyntöjärjestelmää. Kaiken käyttöliittymäkielen tulee tukea tätä mielikuvaa.
+
 Kopilotti Sales on auton ostajalle tarkoitettu digitaalinen automyyjä. Se keskustelee ajoneuvosta ja hinnasta, siirtää backendin hyväksymän hinnan kauppa-aktiin ja ohjaa asiakkaan maksutavan valinnasta auton luovutukseen. Palvelu automatisoi autokaupassa syntyvän odotuksen, mutta ei korvaa automyyjää tai autoliikkeen vastuuta.
 
 | Product | User | Purpose |
@@ -24,7 +28,7 @@ Kopilotti Sales on auton ostajalle tarkoitettu digitaalinen automyyjä. Se kesku
 ```text
 Ajoneuvo
   → vahvistettu tutustuminen ajoneuvon tietoihin ja kuntoraporttiin
-  → tee hintaehdotus
+  → ehdota kauppahintaa
   → hinnasta sovittu
   → tutustu kuntoraporttiin
   → valitse maksutapa

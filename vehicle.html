@@ -72,9 +72,9 @@
           </div>
           <p>Olet tutustunut auton tietoihin ja kuntoraporttiin.</p>
           <div class="purchase-price"><span>Listahinta</span><strong id="offerListPrice">95 000 €</strong></div>
-          <p>Voit nyt tehdä hintaehdotuksen tästä autosta.</p>
+          <p>Millä hinnalla voimme tehdä kaupat?</p>
           <p class="verified-condition"><span aria-hidden="true">✓</span> Olen tutustunut ajoneuvon tietoihin ja kuntoraporttiin</p>
-          <p class="purchase-fineprint">Tarjouksen tekeminen edellyttää, että olet tutustunut ajoneuvon kuntoraporttiin. Tässä käyttöliittymädemossa ehto on valmiiksi vahvistettu.</p>
+          <p class="purchase-fineprint">Hinnan neuvottelu edellyttää, että olet tutustunut ajoneuvon kuntoraporttiin. Tässä käyttöliittymädemossa ehto on valmiiksi vahvistettu.</p>
           <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-expanded="false">Aloita hinnan neuvottelu</button>
         </section>
 
@@ -90,28 +90,28 @@
             <div class="negotiation-workspace">
               <aside class="deal-summary" aria-labelledby="dealSummaryTitle">
                 <p class="purchase-eyebrow">Hinnan tueksi</p>
-                <h3 id="dealSummaryTitle">Tarjousyhteenveto</h3>
+                <h3 id="dealSummaryTitle">Kaupan yhteenveto</h3>
                 <div class="deal-summary-vehicle">
-                  <span>Ajoneuvo</span>
+                  <span>Kaupan kohde</span>
                   <strong id="dealSummaryVehicle">Alfa Romeo Giulia Quadrifoglio</strong>
                   <span id="dealSummaryRegistration">XYZ-123</span>
                 </div>
                 <dl class="deal-summary-prices">
                   <div><dt>Listahinta</dt><dd id="dealSummaryListPrice">95 000 €</dd></div>
-                  <div class="deal-summary-offer"><dt id="dealSummaryOfferLabel">Tarjoushinta</dt><dd id="dealSummaryOffer">—</dd></div>
-                  <div aria-label="Erotus listahintaan"><dt>Erotus</dt><dd id="dealSummaryDifference">—</dd><dd id="dealSummaryPercentage">—</dd></div>
+                  <div class="deal-summary-offer"><dt id="dealSummaryOfferLabel">Ehdottamasi hinta</dt><dd id="dealSummaryOffer">—</dd></div>
+                  <div aria-label="Ero listahintaan"><dt>Ero listahintaan</dt><dd id="dealSummaryDifference">—</dd><dd id="dealSummaryPercentage">—</dd></div>
                 </dl>
               </aside>
               <div class="negotiation-input">
                 <div class="message-list" id="messageList" role="log" aria-live="polite" aria-relevant="additions"></div>
                 <form class="price-discussion" id="priceForm">
-                  <p class="offer-question">Mikä olisi tarjoushintasi?</p>
-                  <label for="priceInput">Tarjoushinta</label>
+                  <p class="offer-question">Millä hinnalla voimme tehdä kaupat?</p>
+                  <label for="priceInput">Ehdottamasi kauppahinta</label>
                   <div class="price-input-row">
-                    <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 92 500 €" aria-describedby="priceHelp priceError">
-                    <button class="btn btn-primary" type="submit">Lähetä tarjous</button>
+                    <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 93 900 €" aria-describedby="priceHelp priceError">
+                    <button class="btn btn-primary" type="submit">Ehdota hintaa</button>
                   </div>
-                  <p id="priceHelp">Hintaehdotuksesi arvioidaan määriteltyjen sääntöjen mukaisesti. Jos ehdotus hyväksytään, voit siirtyä turvallisesti ostoprosessiin.</p>
+                  <p id="priceHelp">Digitaalinen automyyjä tarkistaa, voidaanko kaupat tehdä ehdottamallasi hinnalla. Kun hinnasta sovitaan, voit siirtyä turvallisesti ostoprosessiin.</p>
                   <p class="form-error" id="priceError" role="alert"></p>
                 </form>
               </div>
