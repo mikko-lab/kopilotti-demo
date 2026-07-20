@@ -107,9 +107,12 @@
 .message.decision { padding: 12px; border: 1px solid rgba(22,163,74,.3); border-radius: var(--radius-sm); background: var(--success-light); color: var(--text); }
 .message.pending { color: var(--text2); }
 .message strong { display: block; margin-bottom: 3px; }
+.message > span { white-space: pre-line; }
 .question-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .question-actions button { border: 1px solid var(--border); background: var(--white); color: var(--primary); padding: 8px 10px; border-radius: 100px; font: inherit; font-size: var(--text-2xs); font-weight: 600; cursor: pointer; }
 .question-actions button:hover { border-color: var(--primary); }
+.question-actions button[data-question="price"] { order: -1; border-color: var(--primary); background: var(--primary); color: var(--white); }
+.question-actions button[data-question="price"]:hover { background: var(--primary-dark); }
 .price-discussion { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border); }
 .price-discussion label { display: block; font-weight: 700; font-size: var(--text-sm); margin-bottom: 8px; }
 .price-input-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 6px; position: relative; }

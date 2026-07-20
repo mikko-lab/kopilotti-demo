@@ -4,24 +4,15 @@ import { DEMO_VEHICLE } from './demo-vehicle.js';
 
 const api = new CustomerNegotiationApi();
 const purchaseApi = new PurchaseFlowApi();
-const state = { vehicle: null, persona: 'laura', conditionReturnFocus: null, purchasePath: null, demoRun: 0 };
+const state = { vehicle: null, negotiationStarted: false, conditionReturnFocus: null, purchasePath: null, demoRun: 0 };
 const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRICE' };
 
-const PERSONAS = {
-  laura: {
-    name: 'Laura',
-    greeting: (vehicle) => `Hei! Olen Laura. Autan mielelläni ${vehicle.makeModel} -auton kanssa. Mitä haluaisit tietää?`,
-    condition: (vehicle) => `${vehicle.makeModel} · ${vehicle.registration}. Ennen rahoitusta tai maksamista avaamme aina ajoneuvokohtaisen kuntoraportin tutustuttavaksi.`,
-    finance: () => 'Voit valita maksutavaksi tilisiirron tai rahoituksen. Lopullinen rahoitus vahvistetaan erikseen.',
-    priceIntro: 'Totta kai. Voit kertoa hinnan, josta haluaisit keskustella. Välitän sen heti hinnoittelusta vastaavalle järjestelmälle.',
-  },
-  mika: {
-    name: 'Mika',
-    greeting: (vehicle) => `Hei, olen Mika. Käydään ${vehicle.makeModel} ja kaupan eteneminen tehokkaasti läpi. Mistä aloitetaan?`,
-    condition: (vehicle) => `${vehicle.makeModel} · ${vehicle.registration}. Ajoneuvokohtainen kuntoraportti avataan pakollisena vaiheena ennen rahoitusta tai maksamista.`,
-    finance: () => 'Maksutavat ovat tilisiirto ja rahoitus. Lopulliset rahoitusehdot vahvistetaan erikseen.',
-    priceIntro: 'Kerro hinta, josta haluat keskustella. Välitän sen heti päätettäväksi.',
-  },
+const SALES_EXPERIENCE = {
+  name: 'Digitaalinen automyyjä',
+  greeting: (vehicle) => `Hei.\n\nAutan sinua ${vehicle.makeModel} -auton ostamisessa.\n\nVoit:\n• kysyä autosta\n• tehdä tarjoushinnan\n• edetä kauppaan`,
+  condition: (vehicle) => `${vehicle.makeModel} · ${vehicle.registration}. Ennen rahoitusta tai maksamista avataan ajoneuvokohtainen kuntoraportti tutustuttavaksi.`,
+  finance: () => 'Maksutavat ovat tilisiirto ja rahoitus. Lopulliset rahoitusehdot vahvistetaan erikseen.',
+  priceIntro: 'Mikä olisi tarjoushintasi?',
 };
 
 async function loadVehicle() {
@@ -69,6 +60,7 @@ function openFlow() {
   flow.classList.remove('hidden');
   document.getElementById('btnStartDigitalSalesperson').setAttribute('aria-expanded', 'true');
   flow.focus();
+  startNegotiation();
 }
 
 function closeFlow() {
@@ -77,31 +69,28 @@ function closeFlow() {
   document.getElementById('btnStartDigitalSalesperson').focus();
 }
 
-function startConversation(event) {
-  event.preventDefault();
-  state.persona = new FormData(event.currentTarget).get('persona');
-  const persona = PERSONAS[state.persona];
-  event.currentTarget.classList.add('hidden');
+function startNegotiation() {
+  if (state.negotiationStarted) return;
+  state.negotiationStarted = true;
   document.getElementById('conversation').classList.remove('hidden');
-  setText('personaStatus', `${persona.name} palvelee nyt`);
-  addMessage('salesperson', persona.greeting(state.vehicle), persona.name);
-  document.querySelector('[data-question="condition"]').focus();
+  setText('personaStatus', SALES_EXPERIENCE.name);
+  addMessage('salesperson', SALES_EXPERIENCE.greeting(state.vehicle), SALES_EXPERIENCE.name);
+  document.querySelector('[data-question="price"]').focus();
 }
 
 function handleQuestion(event) {
   const button = event.target.closest('button[data-question]');
   if (!button) return;
-  const persona = PERSONAS[state.persona];
   const question = button.dataset.question;
   if (question === 'condition') {
     addMessage('customer', 'Millainen auton kunto on?', 'Sinä');
-    addMessage('salesperson', persona.condition(state.vehicle), persona.name);
+    addMessage('salesperson', SALES_EXPERIENCE.condition(state.vehicle), SALES_EXPERIENCE.name);
   } else if (question === 'finance') {
     addMessage('customer', 'Onko tähän saatavilla rahoitus?', 'Sinä');
-    addMessage('salesperson', persona.finance(state.vehicle), persona.name);
+    addMessage('salesperson', SALES_EXPERIENCE.finance(state.vehicle), SALES_EXPERIENCE.name);
   } else if (question === 'price') {
-    addMessage('customer', 'Haluaisin keskustella auton hinnasta.', 'Sinä');
-    addMessage('salesperson', persona.priceIntro, persona.name);
+    addMessage('customer', 'Haluan keskustella hinnasta.', 'Sinä');
+    addMessage('salesperson', SALES_EXPERIENCE.priceIntro, SALES_EXPERIENCE.name);
     document.getElementById('priceForm').classList.remove('hidden');
     document.getElementById('priceInput').focus();
   }
@@ -122,8 +111,8 @@ async function submitPrice(event) {
 
   const submitButton = event.currentTarget.querySelector('button[type="submit"]');
   submitButton.disabled = true;
-  addMessage('customer', `Haluaisin keskustella hinnasta ${formatEuro(offerAmount)}.`, 'Sinä');
-  const waitingMessage = addMessage('salesperson pending', 'Tarkistan asian heti hinnoittelusta vastaavalta järjestelmältä…', PERSONAS[state.persona].name);
+  addMessage('customer', `Tarjoushintani on ${formatEuro(offerAmount)}.`, 'Sinä');
+  const waitingMessage = addMessage('salesperson pending', 'Tarkistan hintaehdotuksen…', SALES_EXPERIENCE.name);
   try {
     const decision = await api.discussPrice({
       vehicleId: state.vehicle.id,
@@ -135,7 +124,7 @@ async function submitPrice(event) {
     event.currentTarget.classList.add('hidden');
   } catch (_error) {
     waitingMessage.remove();
-    addMessage('salesperson decision', 'Tarvitsemme automyyjän vahvistuksen. Välitämme asian eteenpäin, jotta sinun ei tarvitse aloittaa keskustelua alusta.', PERSONAS[state.persona].name);
+    addMessage('salesperson decision', 'Hinta vaatii automyyjän vahvistuksen. Asia siirtyy tarkistettavaksi, eikä neuvottelua tarvitse aloittaa alusta.', SALES_EXPERIENCE.name);
     renderDecisionActions('escalate');
   } finally {
     submitButton.disabled = false;
@@ -143,7 +132,7 @@ async function submitPrice(event) {
 }
 
 function renderDecision(decision) {
-  const salesperson = PERSONAS[state.persona].name;
+  const salesperson = SALES_EXPERIENCE.name;
   if (decision.status === 'ACCEPT') {
     document.getElementById('questionActions').classList.add('hidden');
     addMessage('salesperson decision', `Hinnasta on sovittu. Voin vahvistaa hinnaksi ${formatEuro(decision.approvedAmount)}. ${vehicleIdentity(state.vehicle)}.`, salesperson);
@@ -152,7 +141,7 @@ function renderDecision(decision) {
     addMessage('salesperson decision', `Voimme jatkaa kauppaa hinnalla ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja tutustua seuraavaksi auton kuntoraporttiin?`, salesperson);
     renderDecisionActions('counter');
   } else if (decision.status === 'REJECT') {
-    addMessage('salesperson decision', 'Emme voi edetä ehdottamallasi hinnalla. Voit jatkaa keskustelua tai ostaa auton listahinnalla.', salesperson);
+    addMessage('salesperson decision', 'Emme voi edetä ehdottamallasi hinnalla. Voit tehdä uuden hintaehdotuksen tai ostaa auton listahinnalla.', salesperson);
     renderDecisionActions('rejected');
   } else {
     addMessage('salesperson decision', 'Tarvitsemme automyyjän vahvistuksen. Välitämme asian eteenpäin.', salesperson);
@@ -532,7 +521,6 @@ document.getElementById('btnCloseFlow').addEventListener('click', closeFlow);
 document.getElementById('btnDirectPurchase').addEventListener('click', (event) => beginPurchaseFlow(PURCHASE_PATH.DIRECT, event.currentTarget));
 document.getElementById('btnRunDemo').addEventListener('click', runDemo);
 document.getElementById('btnReviewCondition').addEventListener('click', continueToConditionReport);
-document.getElementById('personaForm').addEventListener('submit', startConversation);
 document.getElementById('questionActions').addEventListener('click', handleQuestion);
 document.getElementById('priceForm').addEventListener('submit', submitPrice);
 document.getElementById('conditionAcknowledgement').addEventListener('change', (event) => {

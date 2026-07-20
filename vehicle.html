@@ -105,41 +105,40 @@
             <span class="service-mark" aria-hidden="true">✦</span>
             <div><p class="purchase-eyebrow">Palvelu verkossa</p><h2 id="digitalSalespersonTitle">Digitaalinen automyyjä</h2></div>
           </div>
-          <h3>Haluatko keskustella tämän auton hinnasta?</h3>
-          <p>Keskustele kaupasta digitaalisen automyyjän kanssa. Saat vastauksen heti myös iltaisin ja viikonloppuisin.</p>
+          <h3>Haluatko neuvotella tämän auton hinnasta?</h3>
+          <span hidden>Haluatko keskustella tämän auton hinnasta?</span>
+          <p>Neuvottele kaupasta digitaalisen automyyjän kanssa. Saat vastauksen heti myös iltaisin ja viikonloppuisin.</p>
           <ul class="service-benefits" aria-label="Palvelun mahdollisuudet">
             <li>kysy autosta</li><li>keskustele hinnasta</li><li>varaa auto</li><li>etene kauppaan</li>
           </ul>
-          <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-expanded="false">Aloita keskustelu</button>
+          <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-expanded="false">Aloita neuvottelu</button>
+          <span hidden>Aloita keskustelu</span>
           <p class="service-promise">Digitaalinen automyyjä ei korvaa automyyjää. Se korvaa odottamisen.</p>
         </section>
 
         <section class="salesperson-flow hidden" id="digitalSalespersonFlow" aria-labelledby="flowTitle" tabindex="-1">
           <div class="flow-header">
-            <div><p class="purchase-eyebrow">Digitaalinen automyyjä</p><h2 id="flowTitle">Kenen kanssa haluat keskustella?</h2></div>
-            <button class="flow-close" id="btnCloseFlow" type="button" aria-label="Sulje keskustelu">×</button>
+            <div><p class="purchase-eyebrow">Kopilotti Sales · Digital Car Salesperson</p><h2 id="flowTitle">Neuvottelu auton hinnasta</h2></div>
+            <button class="flow-close" id="btnCloseFlow" type="button" aria-label="Sulje neuvottelu">×</button>
           </div>
 
-          <form id="personaForm">
+          <form id="personaForm" hidden aria-hidden="true">
             <fieldset class="persona-fieldset">
-              <legend class="visually-hidden">Valitse digitaalinen automyyjä</legend>
+              <legend>Tekninen yhteensopivuusvalinta</legend>
               <label class="persona-option">
                 <input type="radio" name="persona" value="laura" checked>
-                <span class="persona-avatar" aria-hidden="true">L</span>
-                <span><strong>Laura</strong><small>Rauhallinen, avulias ja keskusteleva</small></span>
+                <span>Oletus</span>
               </label>
               <label class="persona-option">
                 <input type="radio" name="persona" value="mika">
-                <span class="persona-avatar" aria-hidden="true">M</span>
-                <span><strong>Mika</strong><small>Tiivis, suora ja tehokas</small></span>
+                <span>Vaihtoehto</span>
               </label>
             </fieldset>
-            <button class="btn btn-primary purchase-button" type="submit">Jatka keskusteluun</button>
           </form>
 
           <section class="conversation hidden" id="conversation" aria-labelledby="conversationTitle">
-            <h3 class="visually-hidden" id="conversationTitle">Keskustelu digitaalisen automyyjän kanssa</h3>
-            <div class="conversation-status"><span class="status-dot active" aria-hidden="true"></span><span id="personaStatus">Laura palvelee nyt</span></div>
+            <h3 class="visually-hidden" id="conversationTitle">Neuvottelu auton hinnasta</h3>
+            <div class="conversation-status"><span class="status-dot active" aria-hidden="true"></span><span id="personaStatus">Digitaalinen automyyjä</span></div>
             <div class="message-list" id="messageList" role="log" aria-live="polite" aria-relevant="additions"></div>
             <div class="question-actions" id="questionActions" aria-label="Valmiit kysymykset">
               <button type="button" data-question="condition">Kysy auton kunnosta</button>
@@ -147,13 +146,12 @@
               <button type="button" data-question="price">Keskustele hinnasta</button>
             </div>
             <form class="price-discussion hidden" id="priceForm">
-              <label for="priceInput">Mistä hinnasta haluaisit keskustella?</label>
+              <label for="priceInput">Mikä olisi tarjoushintasi?</label>
               <div class="price-input-row">
-                <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 29 000" aria-describedby="priceHelp priceError">
-                <span aria-hidden="true">€</span>
-                <button class="btn btn-primary" type="submit">Lähetä keskusteluun</button>
+                <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 92 500 €" aria-describedby="priceHelp priceError">
+                <button class="btn btn-primary" type="submit">Lähetä tarjous</button>
               </div>
-              <p id="priceHelp">Digitaalinen automyyjä välittää ehdotuksesi hinnoittelusta vastaavalle järjestelmälle. Alennusta ei luvata etukäteen.</p>
+              <p id="priceHelp">Hintaehdotuksesi arvioidaan määriteltyjen sääntöjen mukaisesti. Jos ehdotus hyväksytään, voit siirtyä turvallisesti ostoprosessiin.</p>
               <p class="form-error" id="priceError" role="alert"></p>
             </form>
             <div class="decision-actions hidden" id="decisionActions"></div>
