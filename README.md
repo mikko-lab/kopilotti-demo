@@ -21,7 +21,9 @@ Kopilotti Sales on auton ostajalle tarkoitettu digitaalinen automyyjä. Se kesku
 | Kopilotti | Car salesperson | Internal AI sales assistant |
 | Kopilotti Sales | Car buyer | Customer-facing digital car salesperson |
 
-→ [Live demo](https://mikko-lab.github.io/kopilotti-sales/)
+→ [Avaa Kopilotti Sales -demo](https://mikko-lab.github.io/kopilotti-demo/)
+
+Demossa ajoneuvosivu avautuu osoitteessa [Alfa Romeo Giulia Quadrifoglio · XYZ-123](https://mikko-lab.github.io/kopilotti-demo/vehicle.html?id=veh-0001). GitHub Pages julkaisee vain asiakaskäyttöliittymän staattiset tiedostot; backend, policy-konfiguraatiot, audit-data ja testit eivät sisälly julkaisuun.
 
 ## Asiakaspolku
 
@@ -124,8 +126,8 @@ Ajoneuvon asiakasnäkymä: `vehicle.html?id=veh-0001`.
 Vaatimus: Node.js 22.18 tai uudempi.
 
 ```bash
-git clone https://github.com/mikko-lab/kopilotti-sales.git
-cd kopilotti-sales
+git clone https://github.com/mikko-lab/kopilotti-demo.git
+cd kopilotti-demo
 npm install
 npm test
 npm start
