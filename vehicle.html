@@ -60,6 +60,28 @@
       </section>
 
       <aside class="purchase-column" aria-label="Osto- ja varausvaihtoehdot">
+        <section class="purchase-card journey-demo-card" aria-labelledby="journeyDemoTitle">
+          <div class="demo-vehicle-identity">
+            <p class="purchase-eyebrow">Digital Car Salesperson · läpikävely</p>
+            <h2 id="journeyDemoTitle">Alfa Romeo Giulia Quadrifoglio</h2>
+            <p><strong>XYZ-123</strong><span>95 000 €</span></p>
+          </div>
+          <p>Näe, miten keskustelu muuttuu hinnan sopimisen jälkeen turvalliseksi ostoprosessiksi.</p>
+          <button class="btn btn-primary purchase-button" id="btnRunDemo" type="button" aria-controls="journeyDemoTimeline">Run Demo</button>
+          <div class="journey-demo-timeline hidden" id="journeyDemoTimeline" role="status" aria-live="polite" aria-atomic="true">
+            <p class="demo-now" id="journeyDemoStatus">Demo käynnistyy…</p>
+            <ol aria-label="Demon eteneminen">
+              <li data-demo-step="conversation"><span aria-hidden="true">○</span>Keskustelu hinnasta</li>
+              <li data-demo-step="agreement"><span aria-hidden="true">○</span>Hinnasta sovittu · 92 500 €</li>
+              <li data-demo-step="payment"><span aria-hidden="true">○</span>Maksutapa valittu</li>
+              <li data-demo-step="waiting"><span aria-hidden="true">○</span>Maksu odottaa vahvistusta</li>
+              <li data-demo-step="confirmed"><span aria-hidden="true">○</span>Maksu vahvistettu</li>
+              <li data-demo-step="ready"><span aria-hidden="true">○</span>Valmis noudettavaksi</li>
+            </ol>
+            <p class="purchase-fineprint">Automaattinen käyttöliittymädemo. Ei muodosta kauppaa, maksua tai varausta.</p>
+          </div>
+        </section>
+
         <section class="purchase-card direct-purchase" aria-labelledby="directPurchaseTitle">
           <p class="purchase-eyebrow">Nopea asiointi</p>
           <h2 id="directPurchaseTitle">Osta / Varaa</h2>
@@ -163,7 +185,7 @@
               <p class="condition-rights-note">Kuittaus vahvistaa, että olet tutustunut raporttiin. Se ei rajoita lakisääteisiä oikeuksiasi eikä autoliikkeen vastuuta tietojen oikeellisuudesta.</p>
               <div class="condition-actions">
                 <button class="btn btn-primary purchase-button" id="btnProceedAfterCondition" type="submit" disabled>Jatka rahoitukseen tai maksamiseen</button>
-                <button class="btn btn-outline purchase-button" id="btnBackFromCondition" type="button">Palaa keskusteluun</button>
+                <button class="btn btn-outline purchase-button" id="btnBackFromCondition" type="button">Palaa kaupan yhteenvetoon</button>
               </div>
               <p class="form-error" id="conditionReportError" role="alert"></p>
             </form>
@@ -175,6 +197,14 @@
             <div><p class="purchase-eyebrow">Kaupan eteneminen</p><h2 id="purchaseJourneyTitle">Hinnasta sovittu</h2></div>
           </div>
           <div class="purchase-journey-body">
+            <section class="deal-agreement hidden" id="dealAgreement" aria-labelledby="dealAgreementTitle">
+              <span class="agreement-check" aria-hidden="true">✓</span>
+              <p class="purchase-eyebrow">Kauppa-akti</p>
+              <h3 id="dealAgreementTitle">Hinnasta sovittu</h3>
+              <strong class="agreement-price" id="agreementPrice">—</strong>
+              <p class="agreement-vehicle" id="agreementVehicle">—</p>
+              <button class="btn btn-primary purchase-button" id="btnReviewCondition" type="button">Tutustu kuntoraporttiin</button>
+            </section>
             <ol class="purchase-progress" aria-label="Ostopolun vaiheet">
               <li data-progress="price"><span>1</span>Hinta</li>
               <li data-progress="condition"><span>2</span>Kuntoraportti</li>
@@ -183,9 +213,11 @@
             </ol>
             <div class="purchase-status-panel" id="purchaseStatus" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></div>
             <div class="payment-methods" id="paymentMethods">
-              <p>Valitse, haluatko jatkaa maksamiseen vai hakea rahoitusta.</p>
-              <button class="btn btn-primary purchase-button" type="button" data-payment-method="PAYMENT">Jatka maksamiseen</button>
-              <button class="btn btn-outline purchase-button" type="button" data-payment-method="FINANCING">Hae rahoitusta</button>
+              <fieldset>
+                <legend>Valitse maksutapa</legend>
+                <button class="payment-method-option" type="button" data-payment-method="PAYMENT"><span aria-hidden="true">○</span><span><strong>Käteinen / tilisiirto</strong><small>Maksu vahvistetaan maksupalvelun kautta.</small></span></button>
+                <button class="payment-method-option" type="button" data-payment-method="FINANCING"><span aria-hidden="true">○</span><span><strong>Rahoitus</strong><small>Rahoituksen vahvistaa rahoitusyhtiö.</small></span></button>
+              </fieldset>
             </div>
             <div class="demo-confirmation hidden" id="demoConfirmation"></div>
             <button class="seller-contact" id="btnContactSeller" type="button">Ota yhteys myyjään</button>

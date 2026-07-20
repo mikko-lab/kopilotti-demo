@@ -3,7 +3,7 @@ import { PurchaseFlowApi } from './purchase-flow-api.js';
 
 const api = new CustomerNegotiationApi();
 const purchaseApi = new PurchaseFlowApi();
-const state = { vehicle: null, persona: 'laura', conditionReturnFocus: null };
+const state = { vehicle: null, persona: 'laura', conditionReturnFocus: null, purchasePath: null, demoRun: 0 };
 const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRICE' };
 
 const PERSONAS = {
@@ -29,7 +29,8 @@ async function loadVehicle() {
     if (!response.ok) throw new Error('Ajoneuvotietoja ei voitu ladata');
     return response.json();
   });
-  state.vehicle = inventory.find((vehicle) => vehicle.id === requestedId) || inventory[0];
+  const selected = inventory.find((vehicle) => vehicle.id === requestedId) || inventory[0];
+  state.vehicle = { ...selected, registrationNumber: selected.registrationNumber || demoRegistrationNumber(selected.id) };
   renderVehicle(state.vehicle);
 }
 
@@ -50,7 +51,7 @@ function renderVehicle(vehicle) {
     ['Vuosimalli', vehicle.year], ['Mittarilukema', `${formatNumber(vehicle.mileage)} km`],
     ['Käyttövoima', vehicle.fuel], ['Vaihteisto', vehicle.transmission],
     ['Korimalli', bodyTypeLabel(vehicle.bodyType)], ['Väri', vehicle.color],
-    ['Toimipiste', vehicle.dealershipLocation], ['Varastotunnus', vehicle.id],
+    ['Toimipiste', vehicle.dealershipLocation], ['Rekisteritunnus', vehicle.registrationNumber],
   ];
   const specsElement = document.getElementById('vehicleSpecs');
   specsElement.replaceChildren(...specs.map(([term, value]) => {
@@ -151,7 +152,7 @@ function renderDecision(decision) {
   const salesperson = PERSONAS[state.persona].name;
   if (decision.status === 'ACCEPT') {
     document.getElementById('questionActions').classList.add('hidden');
-    addMessage('salesperson decision', `Hinnasta on sovittu. Olemme sopineet auton hinnaksi ${formatEuro(decision.approvedAmount)}. Seuraavaksi tutustut auton kuntoraporttiin ja valitset maksutavan.`, salesperson);
+    addMessage('salesperson decision', `Hinnasta on sovittu. Voin vahvistaa hinnaksi ${formatEuro(decision.approvedAmount)}. ${vehicleIdentity(state.vehicle)}.`, salesperson);
     renderDecisionActions('reserve');
   } else if (decision.status === 'COUNTER') {
     addMessage('salesperson decision', `Voimme jatkaa kauppaa hinnalla ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja tutustua seuraavaksi auton kuntoraporttiin?`, salesperson);
@@ -170,7 +171,7 @@ function renderDecisionActions(mode) {
   container.classList.remove('hidden');
   container.replaceChildren();
   if (mode === 'reserve' || mode === 'counter') {
-    container.append(createAction('Hyväksy hinta ja jatka', (event) => beginPurchaseFlow(PURCHASE_PATH.NEGOTIATED, event.currentTarget), true));
+    container.append(createAction(mode === 'counter' ? 'Hyväksy hinta ja jatka' : 'Jatka ostoprosessiin', (event) => beginPurchaseFlow(PURCHASE_PATH.NEGOTIATED, event.currentTarget), true));
   }
   if (mode === 'rejected') {
     container.append(createAction('Jatka listahinnalla', (event) => beginPurchaseFlow(PURCHASE_PATH.DIRECT, event.currentTarget), true));
@@ -209,29 +210,58 @@ function addMessage(className, text, speaker) {
 
 async function beginPurchaseFlow(purchasePath, trigger) {
   state.conditionReturnFocus = trigger || document.activeElement;
-  const step = document.getElementById('conditionReportStep');
-  resetConditionReportView();
-  step.classList.remove('hidden');
-  step.focus();
-  setConditionStatus('Kuntoraporttia ladataan…');
-  if (purchasePath === PURCHASE_PATH.NEGOTIATED) {
-    document.getElementById('questionActions').classList.add('hidden');
-    addMessage('salesperson', 'Ennen kuin siirrymme rahoitukseen tai maksamiseen, tutustutaan vielä auton kuntoraporttiin.', PERSONAS[state.persona].name);
-  }
+  state.purchasePath = purchasePath;
   try {
     await purchaseApi.start({
       vehicleId: state.vehicle.id,
       purchasePath,
       negotiationSessionId: purchasePath === PURCHASE_PATH.NEGOTIATED ? api.getSessionId() : null,
     });
-    renderPurchaseProgress('condition');
-    if (purchasePath === PURCHASE_PATH.NEGOTIATED) {
-      setPurchaseStatus('Hinnasta sovittu', `Olemme sopineet auton hinnaksi ${formatEuro(purchaseApi.session.agreedPrice)}. Seuraavaksi tutustut auton kuntoraporttiin ja valitset maksutavan.`);
-    }
-    await loadConditionReport();
+    showDealAgreement(purchasePath);
   } catch (error) {
-    showConditionFailure(error);
+    const journey = document.getElementById('purchaseJourney');
+    journey.classList.remove('hidden');
+    setPurchaseStatus('Ostoprosessia ei voitu aloittaa', 'Kaupan tietoja ei muutettu. Yritä uudelleen tai ota yhteys myyjään.');
+    journey.focus();
   }
+}
+
+function showDealAgreement(purchasePath) {
+  document.getElementById('digitalSalespersonFlow').classList.add('hidden');
+  document.querySelectorAll('.purchase-card').forEach((card) => card.classList.add('hidden'));
+  document.getElementById('conditionReportStep').classList.add('hidden');
+  document.getElementById('paymentMethods').classList.add('hidden');
+  document.getElementById('demoConfirmation').classList.add('hidden');
+  const journey = document.getElementById('purchaseJourney');
+  const agreement = document.getElementById('dealAgreement');
+  journey.classList.remove('hidden');
+  agreement.classList.remove('hidden');
+  const negotiated = purchasePath === PURCHASE_PATH.NEGOTIATED;
+  setText('purchaseJourneyTitle', negotiated ? 'Hinnasta sovittu' : 'Ostopolku aloitettu');
+  setText('dealAgreementTitle', negotiated ? 'Hinnasta sovittu' : 'Listahinta valittu');
+  setText('agreementPrice', formatEuro(purchaseApi.session.agreedPrice));
+  setText('agreementVehicle', vehicleIdentity(state.vehicle));
+  setPurchaseStatus(
+    negotiated ? 'Hinnasta sovittu' : 'Suora ostopolku',
+    `${vehicleIdentity(state.vehicle)}. Seuraavaksi tutustut auton kuntoraporttiin.`,
+  );
+  renderPurchaseProgress('price');
+  journey.focus();
+}
+
+async function continueToConditionReport() {
+  const button = document.getElementById('btnReviewCondition');
+  button.disabled = true;
+  document.getElementById('dealAgreement').classList.add('hidden');
+  document.getElementById('purchaseJourney').classList.add('hidden');
+  const step = document.getElementById('conditionReportStep');
+  resetConditionReportView();
+  step.classList.remove('hidden');
+  step.focus();
+  setConditionStatus('Kuntoraporttia ladataan…');
+  try { await loadConditionReport(); }
+  catch (error) { showConditionFailure(error); }
+  finally { button.disabled = false; }
 }
 
 async function loadConditionReport() {
@@ -313,6 +343,7 @@ function showPaymentSelection() {
   journey.classList.remove('hidden');
   document.getElementById('paymentMethods').classList.remove('hidden');
   document.getElementById('demoConfirmation').classList.add('hidden');
+  document.getElementById('dealAgreement').classList.add('hidden');
   setText('purchaseJourneyTitle', 'Hinnasta sovittu');
   setPurchaseStatus('Kuntoraportti kuitattu', 'Valitse, haluatko jatkaa maksamiseen vai hakea rahoitusta.');
   renderPurchaseProgress('provider');
@@ -341,11 +372,11 @@ async function selectPayment(event) {
 
 function renderProviderStatus(session) {
   const payment = session.paymentMethod === 'PAYMENT';
-  setText('purchaseJourneyTitle', payment ? 'Maksu odottaa' : 'Rahoitus käsittelyssä');
+  setText('purchaseJourneyTitle', 'Maksu odottaa vahvistusta');
   setPurchaseStatus(
-    payment ? 'Maksu odottaa vahvistusta' : 'Rahoitus käsittelyssä',
+    'Auto on varattu. Maksua odotetaan.',
     payment
-      ? 'Maksu odottaa vahvistusta. Jatkamme heti, kun maksupalvelu on vahvistanut maksun.'
+      ? 'Jatkamme heti, kun maksupalvelu on vahvistanut maksun.'
       : 'Rahoitushakemuksesi on käsittelyssä. Rahoituksen vahvistaa erillinen rahoitusyhtiö.',
   );
   renderPurchaseProgress('provider');
@@ -380,8 +411,8 @@ async function confirmDemo(method) {
 
 function renderConfirmedStatus(session) {
   if (session.status === 'READY_FOR_HANDOVER') {
-    setText('purchaseJourneyTitle', 'Valmis luovutukseen');
-    setPurchaseStatus('Valmis luovutukseen', 'Auton luovutuksen edellytykset ovat kunnossa. Saat seuraavaksi nouto- tai toimitusohjeet.');
+    setText('purchaseJourneyTitle', 'Valmis noudettavaksi');
+    setPurchaseStatus('Valmis noudettavaksi', `${vehicleIdentity(state.vehicle)}. Auton luovutuksen edellytykset ovat kunnossa. Saat seuraavaksi nouto- tai toimitusohjeet.`);
     renderPurchaseProgress('handover');
     return;
   }
@@ -443,7 +474,12 @@ function resetAcknowledgement() {
 
 function closeConditionReport() {
   document.getElementById('conditionReportStep').classList.add('hidden');
-  if (state.conditionReturnFocus?.isConnected) state.conditionReturnFocus.focus();
+  if (purchaseApi.session) {
+    const journey = document.getElementById('purchaseJourney');
+    document.getElementById('dealAgreement').classList.remove('hidden');
+    journey.classList.remove('hidden');
+    journey.focus();
+  } else if (state.conditionReturnFocus?.isConnected) state.conditionReturnFocus.focus();
 }
 
 function setConditionStatus(text, variant = '') {
@@ -463,10 +499,48 @@ function formatDate(value) { return new Date(value).toLocaleString('fi-FI', { da
 function setText(id, value) { document.getElementById(id).textContent = value; }
 function availabilityLabel(value) { return ({ available: 'Heti saatavilla', reserved: 'Varattu', incoming: 'Tulossa' })[value] || 'Saatavuus tarkistettava'; }
 function bodyTypeLabel(value) { return ({ sedan: 'Sedan', suv: 'SUV', van: 'Pakettiauto', hatchback: 'Viistoperä', combi: 'Farmari', mpv: 'Tila-auto' })[value] || value; }
+function demoRegistrationNumber(vehicleId) { return `KPL-${String(vehicleId).replace(/\D/g, '').slice(-3).padStart(3, '0')}`; }
+function vehicleIdentity(vehicle) { return `${vehicle.brand} ${vehicle.model} · ${vehicle.registrationNumber}`; }
+
+const DEMO_STEPS = [
+  ['conversation', 'Keskustelu hinnasta'],
+  ['agreement', 'Hinnasta sovittu: 92 500 €'],
+  ['payment', 'Maksutavaksi valittu käteinen / tilisiirto'],
+  ['waiting', 'Auto on varattu. Maksua odotetaan. Varaus voimassa 22.7.2026 klo 18.00 asti.'],
+  ['confirmed', 'Maksu vahvistettu. Auto valmistellaan luovutukseen.'],
+  ['ready', 'Alfa Romeo Giulia Quadrifoglio · XYZ-123 on valmis noudettavaksi.'],
+];
+
+async function runDemo() {
+  const run = ++state.demoRun;
+  const button = document.getElementById('btnRunDemo');
+  const timeline = document.getElementById('journeyDemoTimeline');
+  button.disabled = true;
+  timeline.classList.remove('hidden');
+  document.querySelectorAll('[data-demo-step]').forEach((item) => item.classList.remove('current', 'complete'));
+  const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 120 : 850;
+  for (let index = 0; index < DEMO_STEPS.length; index += 1) {
+    if (run !== state.demoRun) return;
+    const [key, message] = DEMO_STEPS[index];
+    document.querySelectorAll('[data-demo-step]').forEach((item, itemIndex) => {
+      item.classList.toggle('complete', itemIndex < index);
+      item.classList.toggle('current', item.dataset.demoStep === key);
+    });
+    setText('journeyDemoStatus', message);
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+  document.querySelectorAll('[data-demo-step]').forEach((item) => { item.classList.remove('current'); item.classList.add('complete'); });
+  setText('journeyDemoStatus', 'Valmis noudettavaksi');
+  button.disabled = false;
+  button.textContent = 'Run Demo uudelleen';
+  button.focus();
+}
 
 document.getElementById('btnStartDigitalSalesperson').addEventListener('click', openFlow);
 document.getElementById('btnCloseFlow').addEventListener('click', closeFlow);
 document.getElementById('btnDirectPurchase').addEventListener('click', (event) => beginPurchaseFlow(PURCHASE_PATH.DIRECT, event.currentTarget));
+document.getElementById('btnRunDemo').addEventListener('click', runDemo);
+document.getElementById('btnReviewCondition').addEventListener('click', continueToConditionReport);
 document.getElementById('personaForm').addEventListener('submit', startConversation);
 document.getElementById('questionActions').addEventListener('click', handleQuestion);
 document.getElementById('priceForm').addEventListener('submit', submitPrice);

@@ -1,8 +1,9 @@
 const TERMINAL_STATES = new Set(['HANDED_OVER', 'VOIDED']);
 const STATUS_TEXT = Object.freeze({
-  NEGOTIATING: 'Neuvottelu käynnissä', PRICE_AGREED: 'Hinnasta sovittu',
-  AWAITING_PAYMENT: 'Maksu tai rahoitus odottaa vahvistusta', PAID: 'Suoritus vahvistettu',
-  HANDED_OVER: 'Ajoneuvo luovutettu', VOIDED: 'Sopimus rauennut',
+  NEGOTIATING: 'Keskustelu hinnasta on käynnissä', PRICE_AGREED: 'Hinnasta sovittu',
+  AWAITING_PAYMENT: 'Auto on varattu ja maksu odottaa vahvistusta', PAID: 'Maksu vahvistettu ja auto valmistellaan luovutukseen',
+  READY_FOR_HANDOVER: 'Auto on valmis noudettavaksi', HANDED_OVER: 'Auto on noudettu',
+  VOIDED: 'Varaus ei ole enää voimassa',
 });
 
 export function initializeTransactionStream(transactionId, options = {}) {
