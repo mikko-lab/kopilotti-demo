@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: Kopilotti
+  - name: Kopilotti Sales
     orgId: 1
-    folder: Kopilotti
+    folder: Kopilotti Sales
     type: file
     disableDeletion: true
     editable: false

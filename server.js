@@ -214,4 +214,4 @@ app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
 app.use(negotiationErrorHandler);
 
-app.listen(port, () => console.log(`Kopilotti backend :${port}`));
+app.listen(port, () => console.log(`Kopilotti Sales backend :${port}`));

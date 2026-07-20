@@ -6,7 +6,7 @@ rule_files:
   - /etc/prometheus/alerts.yml
 
 scrape_configs:
-  - job_name: kopilotti-transaction-core
+  - job_name: kopilotti-sales-transaction-core
     metrics_path: /metrics
     static_configs:
       - targets:

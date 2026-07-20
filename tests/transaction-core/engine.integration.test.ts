@@ -69,7 +69,7 @@ async function agreePrice(context: Awaited<ReturnType<typeof integrationFixture>
 
 function callback(value: VerifiedProviderCallback): Uint8Array { return new TextEncoder().encode(JSON.stringify(value)); }
 
-describe('Kopilotti Core integration', () => {
+describe('Kopilotti Sales Core integration', () => {
   test('successful Alfa Romeo cash flow enforces protected handover policy', async () => {
     const context = await integrationFixture();
     try {

@@ -5,38 +5,38 @@
     {
       "type": "stat",
       "title": "Debezium connected",
-      "datasource": { "type": "prometheus", "uid": "kopilotti-prometheus" },
+      "datasource": { "type": "prometheus", "uid": "kopilotti-sales-prometheus" },
       "targets": [{ "expr": "debezium_postgresql_connected", "refId": "A" }],
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 }
     },
     {
       "type": "timeseries",
       "title": "CDC source lag (seconds)",
-      "datasource": { "type": "prometheus", "uid": "kopilotti-prometheus" },
+      "datasource": { "type": "prometheus", "uid": "kopilotti-sales-prometheus" },
       "targets": [{ "expr": "debezium_postgresql_milliseconds_behind_source / 1000", "legendFormat": "{{server}}", "refId": "A" }],
       "gridPos": { "h": 8, "w": 16, "x": 8, "y": 0 }
     },
     {
       "type": "timeseries",
       "title": "Transaction outbox lag (seconds)",
-      "datasource": { "type": "prometheus", "uid": "kopilotti-prometheus" },
+      "datasource": { "type": "prometheus", "uid": "kopilotti-sales-prometheus" },
       "targets": [{ "expr": "kopilotti_outbox_lag_seconds", "refId": "A" }],
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
     },
     {
       "type": "timeseries",
       "title": "Transaction outbox backlog",
-      "datasource": { "type": "prometheus", "uid": "kopilotti-prometheus" },
+      "datasource": { "type": "prometheus", "uid": "kopilotti-sales-prometheus" },
       "targets": [{ "expr": "kopilotti_outbox_unprocessed_count", "refId": "A" }],
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
     }
   ],
   "schemaVersion": 39,
-  "tags": ["kopilotti", "cdc"],
+  "tags": ["kopilotti-sales", "cdc"],
   "templating": { "list": [] },
   "time": { "from": "now-15m", "to": "now" },
   "timezone": "browser",
-  "title": "Kopilotti CDC",
-  "uid": "kopilotti-cdc",
+  "title": "Kopilotti Sales CDC",
+  "uid": "kopilotti-sales-cdc",
   "version": 1
 }

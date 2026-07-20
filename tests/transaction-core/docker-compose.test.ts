@@ -14,7 +14,7 @@ const datasourcePath = new URL('../../deploy/monitoring/grafana/provisioning/dat
 test('local CDC stack pins official images, enables logical WAL, and requires external passwords', async () => {
   const compose = await readFile(composePath, 'utf8');
   assert.match(compose, /wal_level=logical/); assert.match(compose, /max_replication_slots=4/); assert.match(compose, /max_wal_senders=4/);
-  assert.match(compose, /postgres:15\.13-alpine/); assert.match(compose, /quay\.io\/debezium\/kafka:3\.6/); assert.match(compose, /kopilotti\/debezium-connect-jmx:3\.6-jmx-1\.0\.1/);
+  assert.match(compose, /postgres:15\.13-alpine/); assert.match(compose, /quay\.io\/debezium\/kafka:3\.6/); assert.match(compose, /kopilotti-sales\/debezium-connect-jmx:3\.6-jmx-1\.0\.1/);
   assert.match(compose, /NODE_ROLE: combined/); assert.doesNotMatch(compose, /zookeeper|:latest|local_secure_password|deemate/i);
   assert.match(compose, /POSTGRES_PASSWORD:\s+\$\{POSTGRES_PASSWORD:\?/); assert.match(compose, /DEBEZIUM_DATABASE_PASSWORD:\s+\$\{DEBEZIUM_DATABASE_PASSWORD:\?/);
   assert.match(compose, /condition: service_healthy/); assert.match(compose, /connector-init:/);

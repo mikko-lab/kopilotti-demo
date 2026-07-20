@@ -131,7 +131,7 @@ async function readKafkaRecord(dealId: string, eventId: string): Promise<{ heade
 
 async function kafkaContainerId(): Promise<string> {
   const { stdout } = await execFileAsync('docker', [
-    'ps', '--filter', 'label=com.docker.compose.project=kopilotti-cdc',
+    'ps', '--filter', 'label=com.docker.compose.project=kopilotti-sales-cdc',
     '--filter', 'label=com.docker.compose.service=kafka', '--format', '{{.ID}}',
   ], { timeout: 3_000 });
   const identifier = stdout.trim().split('\n')[0];

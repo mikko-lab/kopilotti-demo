@@ -1,4 +1,4 @@
-name: kopilotti-cdc
+name: kopilotti-sales-cdc
 
 services:
   postgres-db:
@@ -60,7 +60,7 @@ services:
     restart: unless-stopped
 
   debezium-connect:
-    image: kopilotti/debezium-connect-jmx:3.6-jmx-1.0.1
+    image: kopilotti-sales/debezium-connect-jmx:3.6-jmx-1.0.1
     build:
       context: .
       dockerfile: deploy/debezium/Dockerfile

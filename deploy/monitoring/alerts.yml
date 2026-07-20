@@ -1,13 +1,13 @@
 groups:
-  - name: kopilotti-cdc
+  - name: kopilotti-sales-cdc
     rules:
-      - alert: KopilottiTransactionCoreMetricsDown
-        expr: up{job="kopilotti-transaction-core"} == 0
+      - alert: KopilottiSalesTransactionCoreMetricsDown
+        expr: up{job="kopilotti-sales-transaction-core"} == 0
         for: 30s
         labels:
           severity: warning
         annotations:
-          summary: Kopilotti Transaction Core metrics endpoint is unavailable
+          summary: Kopilotti Sales Transaction Core metrics endpoint is unavailable
       - alert: DebeziumMetricsDown
         expr: up{job="debezium-connect"} == 0
         for: 15s

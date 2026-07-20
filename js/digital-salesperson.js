@@ -35,7 +35,7 @@ async function loadVehicle() {
 }
 
 function renderVehicle(vehicle) {
-  document.title = `${vehicle.brand} ${vehicle.model} ${vehicle.trim} — Kopilotti`;
+  document.title = `${vehicle.brand} ${vehicle.model} ${vehicle.trim} – Kopilotti Sales`;
   setText('breadcrumbVehicle', `${vehicle.brand} ${vehicle.model}`);
   setText('vehicleTitle', `${vehicle.brand} ${vehicle.model} ${vehicle.trim}`);
   setText('vehicleSubtitle', `${vehicle.year} · ${vehicle.fuel} · ${vehicle.transmission}`);

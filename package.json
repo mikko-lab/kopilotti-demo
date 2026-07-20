@@ -1,6 +1,7 @@
 {
-  "name": "kopilotti-backend",
+  "name": "kopilotti-sales-backend",
   "version": "1.0.0",
+  "description": "Backend and customer journey for Kopilotti Sales — Digital Car Salesperson.",
   "engines": {
     "node": ">=22.18.0"
   },
