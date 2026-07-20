@@ -18,6 +18,7 @@ test('local CDC stack pins official images, enables logical WAL, and requires ex
   assert.match(compose, /NODE_ROLE: combined/); assert.doesNotMatch(compose, /zookeeper|:latest|local_secure_password|deemate/i);
   assert.match(compose, /POSTGRES_PASSWORD:\s+\$\{POSTGRES_PASSWORD:\?/); assert.match(compose, /DEBEZIUM_DATABASE_PASSWORD:\s+\$\{DEBEZIUM_DATABASE_PASSWORD:\?/);
   assert.match(compose, /condition: service_healthy/); assert.match(compose, /connector-init:/);
+  assert.match(compose, /migrations\/002_processed_events\.sql/);
   assert.match(compose, /--request PUT/); assert.match(compose, /connectors\/kopilotti-outbox-connector\/config/);
   assert.match(compose, /CONNECT_CONFIG_PROVIDERS:\s+env/); assert.match(compose, /CONNECT_CONFIG_PROVIDERS_ENV_CLASS:/);
   assert.match(compose, /"state":"FAILED"/); assert.match(compose, /"state":"RUNNING"/);

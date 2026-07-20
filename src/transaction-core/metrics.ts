@@ -13,11 +13,13 @@ export type PriceLockErrorCode =
   | 'core_unavailable'
   | 'invalid_response';
 export type LockFailureType = 'db_timeout' | 'revision_mismatch' | 'concurrency_conflict';
+export type ConsumerEventType = 'TRANSACTION_STATUS_CHANGED';
 
 export interface TransactionCoreMetrics {
   recordPriceLock(status: PriceLockMetricStatus, errorCode: PriceLockErrorCode): void;
   recordLockFailure(failureType: LockFailureType): void;
   setCdcLagSeconds(seconds: number): void;
+  recordDuplicateEvent(eventType: ConsumerEventType): void;
 }
 
 export interface MetricsBundle extends TransactionCoreMetrics {
@@ -45,6 +47,12 @@ export function createMetricsRegistry(input: { readonly collectDefaults?: boolea
     help: 'Calculated replication lag between PostgreSQL WAL commit and Kafka event processing.',
     registers: [registry],
   });
+  const duplicateEvents = new Counter({
+    name: 'kopilotti_consumer_duplicate_events_total',
+    help: 'Total number of duplicate Kafka events detected and skipped by the idempotent consumer.',
+    labelNames: ['event_type'] as const,
+    registers: [registry],
+  });
 
   return Object.freeze({
     registry,
@@ -56,6 +64,7 @@ export function createMetricsRegistry(input: { readonly collectDefaults?: boolea
       if (!Number.isFinite(seconds) || seconds < 0) throw new TypeError('CDC lag must be a non-negative finite number');
       cdcLagGauge.set(seconds);
     },
+    recordDuplicateEvent: (eventType: ConsumerEventType): void => { duplicateEvents.inc({ event_type: eventType }); },
   });
 }
 

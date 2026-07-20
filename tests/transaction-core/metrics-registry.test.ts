@@ -9,12 +9,14 @@ test('isolated registry records bounded transaction labels and validates CDC lag
   metrics.recordPriceLock('failed', 'price_not_authorized');
   metrics.recordLockFailure('revision_mismatch');
   metrics.setCdcLagSeconds(1.25);
+  metrics.recordDuplicateEvent('TRANSACTION_STATUS_CHANGED');
 
   const exposition = await metrics.registry.metrics();
   assert.match(exposition, /kopilotti_transaction_lock_attempts_total\{status="success",error_code="none"\} 1/);
   assert.match(exposition, /kopilotti_transaction_lock_attempts_total\{status="failed",error_code="price_not_authorized"\} 1/);
   assert.match(exposition, /kopilotti_transaction_lock_failures_total\{failure_type="revision_mismatch"\} 1/);
   assert.match(exposition, /kopilotti_kafka_cdc_lag_seconds 1\.25/);
+  assert.match(exposition, /kopilotti_consumer_duplicate_events_total\{event_type="TRANSACTION_STATUS_CHANGED"\} 1/);
   assert.throws(() => metrics.setCdcLagSeconds(-1), /non-negative/);
 });
 

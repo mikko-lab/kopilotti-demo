@@ -40,6 +40,7 @@ function fixture(input: { authenticatedBuyer?: Customer | null; engineFailure?: 
       recordPriceLock: (status, errorCode) => { metricCalls.push([status, errorCode]); },
       recordLockFailure: (failureType) => { lockFailureCalls.push(failureType); },
       setCdcLagSeconds: () => {},
+      recordDuplicateEvent: () => {},
     },
   });
   return { router, locks, metricCalls, lockFailureCalls };

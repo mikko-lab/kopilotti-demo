@@ -24,4 +24,6 @@ Use `PostgresTransactionRepository` with `migrations/001_transaction_core.sql` f
 
 `metrics.ts` owns the process-wide `prom-client` registry for Node.js defaults, price-lock outcomes, concurrency failures, and CDC lag. Start the standalone management endpoint with `npm run start:metrics`; it listens on `METRICS_PORT` (3001 by default) and exposes only `GET /metrics`. Application tests should inject a registry created with `createMetricsRegistry({ collectDefaults: false })` so counters remain isolated and do not create timer side effects.
 
+Kafka consumers must enter business logic through `IdempotentEventConsumer`. Its `processed_events` insert and the supplied handler share one PostgreSQL transaction: duplicate delivery commits as a successful no-op, while handler failure rolls the marker back so Kafka may retry. The handler receives the transaction's `PoolClient` and must use it for every database side effect; starting a separate transaction would break the atomicity guarantee.
+
 Kafka CDC monitoring must come from Debezium/Kafka Connect through a `KafkaCdcMetricsProvider`; source outbox rows cannot prove Kafka delivery. Enable `requireKafkaCdc` only for a workload whose readiness truly depends on CDC. The default keeps customer-facing HTTP pods available during a connector outage while alerting on connector metrics separately.

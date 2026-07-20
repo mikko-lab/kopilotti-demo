@@ -29,6 +29,12 @@ const paidDeal: Deal = {
   providerReference: 'payment-1', handoverPolicyVersion: 'policy-v1', createdAt: '2026-07-16T12:00:00.000Z', updatedAt: '2026-07-18T12:00:00.000Z',
 };
 const statusEvent: TransactionStatusEvent = { eventId: 'event-1', transactionId: 'deal-1', registrationNumber: 'ABC-123', status: 'PAID', paymentDeadline: paidDeal.paymentDeadline, timestamp: paidDeal.updatedAt };
+
+test('processed event migration uses UUID primary-key deduplication and server timestamp', async () => {
+  const migration = await readFile(new URL('../../migrations/002_processed_events.sql', import.meta.url), 'utf8');
+  assert.match(migration, /event_id uuid PRIMARY KEY/i);
+  assert.match(migration, /processed_at timestamp with time zone NOT NULL DEFAULT now\(\)/i);
+});
 const customers = { getById: async () => buyer };
 
 test('DDL defines inventory, PII reference, callback uniqueness, audit and outbox indexes', async () => {

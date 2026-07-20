@@ -22,6 +22,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./migrations/001_transaction_core.sql:/docker-entrypoint-initdb.d/001-transaction-core.sql:ro
+      - ./migrations/002_processed_events.sql:/docker-entrypoint-initdb.d/003-processed-events.sql:ro
       - ./deploy/postgres/002-create-debezium-user.sh:/docker-entrypoint-initdb.d/002-create-debezium-user.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB && test \"$$(psql -U $$POSTGRES_USER -d $$POSTGRES_DB -Atqc 'SHOW wal_level')\" = logical"]

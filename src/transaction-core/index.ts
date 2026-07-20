@@ -22,5 +22,6 @@ export * from './sse-router.ts';
 export * from './healthRouter.ts';
 export * from './metrics.ts';
 export * from './metrics-server.ts';
+export * from './idempotent-consumer.ts';
 export * from './transaction-machine.ts';
 export { KopilottiEngine } from './KopilottiEngine.ts';
