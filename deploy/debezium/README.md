@@ -1,4 +1,4 @@
-# Kopilotti outbox CDC
+# Kopilotti Sales outbox CDC
 
 The connector publishes immutable outbox inserts to `kopilotti.transactions.events` with the transaction ID as the Kafka key, the outbox event ID in the `id` header, and `event_type` in the `eventType` header. Delivery is at least once: consumers must deduplicate by event ID.
 

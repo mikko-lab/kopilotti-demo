@@ -1,10 +1,23 @@
-# Kopilotti — Digital Car Salesperson
+# Kopilotti Sales
 
-Kopilotti on digitaalinen automyyjä, joka vie asiakkaan ajoneuvon valinnasta hinnan keskusteluun, maksutavan valintaan ja luovutuksen valmisteluun. Palvelu automatisoi autokaupassa syntyvän odotuksen, mutta ei korvaa automyyjää tai autoliikkeen vastuuta.
+**Digital Car Salesperson**
 
-**LLM keskustelee. Backend päättää.**
+Kopilotti Sales is a customer-facing digital car salesperson that guides a buyer from price negotiation to payment and vehicle handover.
 
-→ [Live demo](https://mikko-lab.github.io/kopilotti-demo/)
+It is a separate product from Kopilotti, which is an internal AI sales assistant for human car salespeople.
+
+Core principle:
+
+> LLM discusses. Backend decides.
+
+Kopilotti Sales on auton ostajalle tarkoitettu digitaalinen automyyjä. Se keskustelee ajoneuvosta ja hinnasta, siirtää backendin hyväksymän hinnan kauppa-aktiin ja ohjaa asiakkaan maksutavan valinnasta auton luovutukseen. Palvelu automatisoi autokaupassa syntyvän odotuksen, mutta ei korvaa automyyjää tai autoliikkeen vastuuta.
+
+| Product | User | Purpose |
+|---|---|---|
+| Kopilotti | Car salesperson | Internal AI sales assistant |
+| Kopilotti Sales | Car buyer | Customer-facing digital car salesperson |
+
+→ [Live demo](https://mikko-lab.github.io/kopilotti-sales/)
 
 ## Asiakaspolku
 
@@ -90,7 +103,7 @@ Alfa Romeo Giulia Quadrifoglio · XYZ-123 · 95 000 €
   → valmis noudettavaksi
 ```
 
-Run Demo esittää vain asiakaspolun käyttöliittymässä. Se ei toteuta hinnoittelua selaimessa, kutsu provider-callbackia tai ohita backendin tilakonetta.
+Run Demo on ei-sitova käyttöliittymäesitys. Se ei sisällä tuotantohinnoittelulogiikkaa, toteuta hinnoittelua selaimessa, kutsu provider-callbackia, muodosta oikeaa kauppaa, käsittele oikeaa maksua tai ohita backendin tilakonetta.
 
 Ajoneuvon asiakasnäkymä: `vehicle.html?id=veh-0001`.
 
@@ -99,6 +112,8 @@ Ajoneuvon asiakasnäkymä: `vehicle.html?id=veh-0001`.
 Vaatimus: Node.js 22.18 tai uudempi.
 
 ```bash
+git clone https://github.com/mikko-lab/kopilotti-sales.git
+cd kopilotti-sales
 npm install
 npm test
 npm start
@@ -120,6 +135,10 @@ Palvelut:
 - Debezium JMX metrics: `http://localhost:9404/metrics`
 
 Anonyymi Digital Salesperson -demo-BFF on oletuksena pois käytöstä. Sen paikallinen käyttö vaatii `ENABLE_CUSTOMER_NEGOTIATION_DEMO=true`. Simuloidut maksupalvelut vaativat lisäksi `ENABLE_SIMULATED_PURCHASE_PROVIDERS=true`. Tuotantokäyttö edellyttää oikeaa asiakasistuntoa, CSRF-suojausta, rate limitingiä ja provider-kohtaisia salaisuuksia.
+
+### Vakaat yhteensopivuustunnisteet
+
+Osa ennen tuotenimen täsmennystä julkaistuista koneellisista rajapinnoista säilyttää tarkoituksella `kopilotti`-etuliitteen: Prometheus-metriikat, Kafka-topic `kopilotti.transactions.events`, PostgreSQL:n CDC-publication ja Debezium-connectorin nimi. Niiden nimeäminen rikkoisi nykyiset kuluttajat, dashboardit tai tietokantamigraation. Palvelun, Compose-projektin, Docker-imagen ja monitoroinnin näyttönimet käyttävät nimeä Kopilotti Sales.
 
 ## Testaus
 
