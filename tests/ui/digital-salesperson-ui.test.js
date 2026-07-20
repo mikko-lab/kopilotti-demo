@@ -18,6 +18,7 @@ const dealSummaryModule = import(`data:text/javascript;base64,${Buffer.from(deal
 test('presents one verified price-offer path without direct purchase competition', () => {
   assert.match(html, /<h2 id="digitalSalespersonTitle">Hintaehdotus<\/h2>/);
   assert.match(html, /Aloita hinnan neuvottelu/);
+  assert.match(vehicleStyles, /\.digital-salesperson-card > \.purchase-fineprint \+ \.purchase-button \{ margin-top: var\(--space-3\); \}/);
   assert.doesNotMatch(html, /Osta \/ Varaa|Nopea asiointi|Jatka ostoon tai varaukseen/);
   assert.doesNotMatch(html, /id="directPurchaseTitle"|id="btnDirectPurchase"/);
 });

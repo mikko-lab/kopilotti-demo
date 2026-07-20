@@ -61,6 +61,7 @@
 .purchase-fineprint { color: var(--muted); font-size: var(--text-2xs); line-height: 1.45; margin-top: 8px; }
 
 .digital-salesperson-card { border-color: rgba(31,77,184,.3); background: linear-gradient(145deg, var(--white), var(--primary-light)); }
+.digital-salesperson-card > .purchase-fineprint + .purchase-button { margin-top: var(--space-3); }
 .service-heading { display: flex; gap: 10px; align-items: center; }
 .service-mark { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--primary); color: white; font-size: 20px; }
 .digital-salesperson-card h3 { font-size: var(--text-md); margin-top: var(--space-3); }
