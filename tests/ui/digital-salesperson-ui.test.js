@@ -9,6 +9,7 @@ const landing = fs.readFileSync('index.html', 'utf8');
 const uiScript = fs.readFileSync('js/digital-salesperson.js', 'utf8');
 const demoVehicle = fs.readFileSync('js/demo-vehicle.js', 'utf8');
 const apiScript = fs.readFileSync('js/negotiation-api.js', 'utf8');
+const purchaseApiScript = fs.readFileSync('js/purchase-flow-api.js', 'utf8');
 const vehicleStyles = fs.readFileSync('styles/vehicle.css', 'utf8');
 const dealSummarySource = fs.readFileSync('js/deal-summary.js', 'utf8');
 const staticServer = fs.readFileSync('scripts/serve-static-demo.js', 'utf8');
@@ -17,6 +18,7 @@ const dealSummaryModule = import(`data:text/javascript;base64,${Buffer.from(deal
 const negotiationStart = html.indexOf('<section class="salesperson-flow');
 const negotiationEnd = html.indexOf('<section class="purchase-card journey-demo-card');
 const negotiationMarkup = html.slice(negotiationStart, negotiationEnd);
+const submitPriceSource = uiScript.slice(uiScript.indexOf('async function submitPrice'), uiScript.indexOf('function renderDecision('));
 
 test('presents one verified price-offer path without direct purchase competition', () => {
   assert.match(html, /<h2 id="digitalSalespersonTitle">Hinnan neuvottelu<\/h2>/);
@@ -150,6 +152,13 @@ test('updates the deal summary on every price input without waiting for submit',
   assert.match(uiScript, /`\$\{formatSignedEuro\(summary\.difference\)\} · \$\{formatSignedPercent\(summary\.percentageDifference\)\}`/);
 });
 
+test('parses spaced and compact 94 100 euro input as the same integer amount', async () => {
+  const { parseEuroInput } = await dealSummaryModule;
+  assert.equal(parseEuroInput('94 100'), 94_100);
+  assert.equal(parseEuroInput('94100'), 94_100);
+  assert.equal(parseEuroInput('94 100 €'), 94_100);
+});
+
 test('calculates and formats a 92 500 euro offer against 95 000 correctly', async () => {
   const { calculateDealSummary, formatSignedEuro, formatSignedPercent } = await dealSummaryModule;
   const summary = calculateDealSummary(95_000, 92_500);
@@ -183,8 +192,22 @@ test('accepted manual offer locks input and changes summary to agreed price', ()
   assert.match(html, /id="dealSummaryOfferLabel">Ehdottamasi hinta/);
   assert.match(uiScript, /setText\('dealSummaryOfferLabel', 'Sovittu kauppahinta'\)/);
   assert.match(uiScript, /priceInput'\)\.disabled = true/);
-  assert.match(uiScript, /Voimme tehdä kaupat hinnalla \$\{formatEuro\(decision\.approvedAmount\)\}/);
+  assert.match(submitPriceSource, /const form = event\.currentTarget/);
+  assert.match(submitPriceSource, /form\.classList\.add\('hidden'\)/);
+  assert.doesNotMatch(submitPriceSource, /event\.currentTarget\.classList\.add/);
+  assert.match(uiScript, /Voimme tehdä kaupat hinnalla \$\{formatEuro\(decision\.approvedAmount\)\}\. Jatketaan maksutavan valintaan\./);
   assert.match(uiScript, /Hinnasta sovittu · \$\{formatEuro\(purchaseApi\.session\.agreedPrice\)\}/);
+});
+
+test('does not disguise transport failures as a commercial review decision', () => {
+  assert.match(uiScript, /Hinnan tarkistaminen ei onnistunut juuri nyt\. Kaupan tietoja ei muutettu\./);
+  assert.match(uiScript, /renderDecisionActions\('unavailable'\)/);
+  assert.doesNotMatch(submitPriceSource, /Tarkistutan vielä, voimmeko tulla hinnassa vastaan/);
+});
+
+test('binds native browser fetch before storing it on API client instances', () => {
+  assert.match(apiScript, /fetchImpl = globalThis\.fetch\.bind\(globalThis\)/);
+  assert.match(purchaseApiScript, /fetchImpl = globalThis\.fetch\.bind\(globalThis\)/);
 });
 
 test('uses dealership language while checking, accepting, and escalating a price', () => {

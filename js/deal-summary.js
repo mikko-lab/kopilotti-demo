@@ -4,6 +4,13 @@ export function calculateDealSummary(listPrice, offerPrice) {
   return Object.freeze({ offerPrice, difference, percentageDifference: (difference / listPrice) * 100 });
 }
 
+export function parseEuroInput(value) {
+  const normalized = String(value).trim().replace(/\s/g, '').replace(/€$/, '');
+  if (!/^\d+$/.test(normalized)) return Number.NaN;
+  const amount = Number(normalized);
+  return Number.isSafeInteger(amount) ? amount : Number.NaN;
+}
+
 export function formatSignedEuro(value) {
   return `${signFor(value)}${localizedNumber(Math.abs(value))} €`;
 }

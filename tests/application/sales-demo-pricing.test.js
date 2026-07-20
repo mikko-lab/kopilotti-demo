@@ -17,11 +17,17 @@ async function decide(offerAmount) {
   return decideNegotiation({ vehicle, policy, offerAmount, currency: 'EUR', round: 1 });
 }
 
-test('Sales demo deterministically accepts 93 900 euros at the server-owned threshold', async () => {
-  const decisions = await Promise.all(Array.from({ length: 5 }, () => decide(93_900)));
-  for (const decision of decisions) {
-    assert.equal(decision.status, 'ACCEPT');
-    assert.equal(decision.approvedAmount, 93_900);
+test('Sales demo applies the server-owned acceptance boundary before lower-price branches', async () => {
+  const cases = [
+    [93_899, 'COUNTER'],
+    [93_900, 'ACCEPT'],
+    [94_100, 'ACCEPT'],
+    [95_000, 'ACCEPT'],
+  ];
+  for (const [offerAmount, expectedStatus] of cases) {
+    const decision = await decide(offerAmount);
+    assert.equal(decision.status, expectedStatus, String(offerAmount));
+    if (expectedStatus === 'ACCEPT') assert.equal(decision.approvedAmount, offerAmount);
   }
 });
 

@@ -1,7 +1,7 @@
 import { CustomerNegotiationApi } from './negotiation-api.js';
 import { PurchaseFlowApi } from './purchase-flow-api.js';
 import { DEMO_VEHICLE } from './demo-vehicle.js';
-import { calculateDealSummary, formatSignedEuro, formatSignedPercent } from './deal-summary.js';
+import { calculateDealSummary, formatSignedEuro, formatSignedPercent, parseEuroInput } from './deal-summary.js';
 
 const api = new CustomerNegotiationApi();
 const purchaseApi = new PurchaseFlowApi();
@@ -42,7 +42,7 @@ function renderVehicle(vehicle) {
 }
 
 function updateDealSummary() {
-  const summary = calculateDealSummary(state.vehicle.listPrice, parseEuro(document.getElementById('priceInput').value));
+  const summary = calculateDealSummary(state.vehicle.listPrice, parseEuroInput(document.getElementById('priceInput').value));
   const offer = document.getElementById('dealSummaryOffer');
   offer.textContent = summary ? formatEuro(summary.offerPrice) : 'Ei vielä annettu';
   offer.classList.toggle('has-value', Boolean(summary));
@@ -114,7 +114,7 @@ async function submitPrice(event) {
   event.preventDefault();
   const input = document.getElementById('priceInput');
   const errorElement = document.getElementById('priceError');
-  const offerAmount = parseEuro(input.value);
+  const offerAmount = parseEuroInput(input.value);
   errorElement.textContent = '';
   if (!Number.isSafeInteger(offerAmount) || offerAmount <= 0) {
     errorElement.textContent = 'Kirjoita ehdottamasi kauppahinta kokonaisina euroina, esimerkiksi 93 900.';
@@ -122,7 +122,8 @@ async function submitPrice(event) {
     return;
   }
 
-  const submitButton = event.currentTarget.querySelector('button[type="submit"]');
+  const form = event.currentTarget;
+  const submitButton = form.querySelector('button[type="submit"]');
   submitButton.disabled = true;
   addMessage('customer', formatEuro(offerAmount), 'Sinä');
   const waitingMessage = addMessage('salesperson pending', 'Tarkistan, voimmeko tehdä kaupat tällä hinnalla.');
@@ -134,11 +135,11 @@ async function submitPrice(event) {
     });
     waitingMessage.remove();
     renderDecision(decision);
-    event.currentTarget.classList.add('hidden');
+    form.classList.add('hidden');
   } catch (_error) {
     waitingMessage.remove();
-    addMessage('salesperson decision', 'En voi vahvistaa kauppaa tällä hinnalla suoraan. Tarkistutan vielä, voimmeko tulla hinnassa vastaan. Neuvottelua ei tarvitse aloittaa alusta.');
-    renderDecisionActions('escalate');
+    addMessage('salesperson decision', 'Hinnan tarkistaminen ei onnistunut juuri nyt. Kaupan tietoja ei muutettu. Yritä hetken kuluttua uudelleen.');
+    renderDecisionActions('unavailable');
   } finally {
     submitButton.disabled = false;
   }
@@ -147,7 +148,7 @@ async function submitPrice(event) {
 function renderDecision(decision) {
   if (decision.status === 'ACCEPT') {
     showAcceptedDealSummary(decision.approvedAmount);
-    addMessage('salesperson decision', `Voimme tehdä kaupat hinnalla ${formatEuro(decision.approvedAmount)}. Jatketaan maksutavan valintaan. ${vehicleIdentity(state.vehicle)}.`);
+    addMessage('salesperson decision', `Voimme tehdä kaupat hinnalla ${formatEuro(decision.approvedAmount)}. Jatketaan maksutavan valintaan.`);
     renderDecisionActions('reserve');
   } else if (decision.status === 'COUNTER') {
     addMessage('salesperson decision', `Lähin hinta, jolla voimme tehdä kaupat, on ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja jatkaa ostoprosessiin?`);
@@ -175,6 +176,12 @@ function renderDecisionActions(mode) {
     const note = document.createElement('p');
     note.className = 'purchase-fineprint';
     note.textContent = 'Tämä konseptidemo ei lähetä oikeaa yhteydenottopyyntöä.';
+    container.append(note);
+  }
+  if (mode === 'unavailable') {
+    const note = document.createElement('p');
+    note.className = 'purchase-fineprint';
+    note.textContent = 'Voit lähettää saman hinnan uudelleen, kun palveluyhteys toimii.';
     container.append(note);
   }
   container.append(createAction('Palaa auton tietoihin', closeFlow, false));
@@ -488,7 +495,6 @@ function afterNextPaint() {
   return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 }
 
-function parseEuro(value) { return Number(String(value).replace(/[^0-9]/g, '')); }
 function formatEuro(value) { return `${formatNumber(value)} €`; }
 function formatNumber(value) { return Number(value).toLocaleString('fi-FI'); }
 function formatDate(value) { return new Date(value).toLocaleString('fi-FI', { dateStyle: 'medium', timeStyle: 'short' }); }

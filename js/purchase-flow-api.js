@@ -3,7 +3,7 @@ const DEFAULT_BACKEND_URL = (location.hostname === 'localhost' || location.hostn
   : 'https://kopilotti-demo-production.up.railway.app';
 
 export class PurchaseFlowApi {
-  constructor({ backendUrl = DEFAULT_BACKEND_URL, fetchImpl = fetch } = {}) {
+  constructor({ backendUrl = DEFAULT_BACKEND_URL, fetchImpl = globalThis.fetch.bind(globalThis) } = {}) {
     this.backendUrl = backendUrl;
     this.fetchImpl = fetchImpl;
     this.session = null;

@@ -79,11 +79,11 @@ test('direct and negotiated purchases enter the same downstream state model', as
   assert.equal(negotiated.agreedPrice, 29200);
 });
 
-test('accepted Sales demo price is retained by the negotiated purchase session', async () => {
+test('accepted 94 100 euro Sales demo price is retained through payment start', async () => {
   let providerAmount = null;
   const context = fixture(reportV1, {
     inventory: { getById: async () => ({ id: 'veh-0001', availability: 'available', listPrice: 95_000 }) },
-    negotiations: { get: async () => ({ vehicleId: 'veh-0001', status: 'ACCEPTED', decisions: [{ status: 'ACCEPT', approvedAmount: 93_900 }] }) },
+    negotiations: { get: async () => ({ vehicleId: 'veh-0001', status: 'ACCEPTED', decisions: [{ status: 'ACCEPT', approvedAmount: 94_100 }] }) },
     paymentProvider: {
       startPayment: async ({ sessionId, amount }) => {
         providerAmount = amount;
@@ -94,8 +94,8 @@ test('accepted Sales demo price is retained by the negotiated purchase session',
   });
   const session = await context.service.create({ tenantId: 'dealer-1', actorId: 'customer', vehicleId: 'veh-0001', purchasePath: PURCHASE_PATH.NEGOTIATED, negotiationSessionId: 'sales-negotiation-1', correlationId: 'correlation-sales-1' });
   assert.equal(session.status, 'PRICE_AGREED');
-  assert.equal(session.agreedPrice, 93_900);
-  assert.equal(context.events.at(-1).payload.agreedPrice, 93_900);
+  assert.equal(session.agreedPrice, 94_100);
+  assert.equal(context.events.at(-1).payload.agreedPrice, 94_100);
 
   const opened = await context.service.openConditionReport({ tenantId: 'dealer-1', actorId: 'customer', sessionId: session.id, expectedVersion: 1, correlationId: 'correlation-sales-2' });
   const identity = { id: reportV1.id, version: reportV1.version, contentHash: reportV1.contentHash };
@@ -103,8 +103,8 @@ test('accepted Sales demo price is retained by the negotiated purchase session',
   const acknowledged = await context.service.acknowledge({ tenantId: 'dealer-1', actorId: 'customer', sessionId: displayed.id, expectedVersion: 3, reportIdentity: identity, acknowledged: true, correlationId: 'correlation-sales-4' });
   const selected = await context.service.selectPaymentMethod({ tenantId: 'dealer-1', actorId: 'customer', sessionId: acknowledged.id, expectedVersion: 4, method: 'PAYMENT', correlationId: 'correlation-sales-5' });
   const pending = await context.service.startProvider({ tenantId: 'dealer-1', actorId: 'customer', sessionId: selected.id, expectedVersion: 5, correlationId: 'correlation-sales-6' });
-  assert.equal(pending.agreedPrice, 93_900);
-  assert.equal(providerAmount, 93_900);
+  assert.equal(pending.agreedPrice, 94_100);
+  assert.equal(providerAmount, 94_100);
 });
 
 test('missing report requires human review and blocks progression', async () => {
