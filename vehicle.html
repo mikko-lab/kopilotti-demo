@@ -76,10 +76,9 @@
         <section class="purchase-card digital-salesperson-card" aria-labelledby="digitalSalespersonTitle">
           <div class="service-heading">
             <span class="service-mark" aria-hidden="true">✦</span>
-            <div><p class="purchase-eyebrow">Digitaalinen automyyjä</p><h2 id="digitalSalespersonTitle">Hintaehdotus</h2></div>
+            <div><p class="purchase-eyebrow">Digitaalinen automyyjä</p><h2 id="digitalSalespersonTitle">Hinnan neuvottelu</h2></div>
           </div>
           <p>Tutustu auton tietoihin ja kuntoraporttiin ennen hinnan neuvottelua.</p>
-          <div class="purchase-price"><span>Listahinta</span><strong id="offerListPrice">95 000 €</strong></div>
           <p>Millä hinnalla voimme tehdä kaupat?</p>
           <p class="negotiation-gate-status" id="negotiationGateStatus" role="status" aria-live="polite">Avaa kuntoraportti ennen hinnan neuvottelua.</p>
           <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-describedby="negotiationGateStatus" aria-expanded="false" disabled>Aloita hinnan neuvottelu</button>
@@ -87,39 +86,36 @@
 
         <section class="salesperson-flow hidden" id="digitalSalespersonFlow" aria-labelledby="flowTitle" tabindex="-1">
           <div class="flow-header">
-            <div><p class="purchase-eyebrow">Kopilotti Sales · Digital Car Salesperson</p><h2 id="flowTitle">Neuvottelu auton hinnasta</h2></div>
+            <div><h2 id="flowTitle">Hinnan neuvottelu</h2><p class="flow-vehicle" id="flowVehicle">Alfa Romeo Giulia Quadrifoglio · XYZ-123</p></div>
             <button class="flow-close" id="btnCloseFlow" type="button" aria-label="Sulje neuvottelu">×</button>
           </div>
 
-          <section class="conversation hidden" id="conversation" aria-labelledby="conversationTitle">
-            <h3 class="visually-hidden" id="conversationTitle">Hinnan neuvottelu</h3>
-            <div class="conversation-status"><span class="status-dot active" aria-hidden="true"></span><span id="personaStatus">Digitaalinen automyyjä</span></div>
+          <section class="conversation hidden" id="conversation" aria-labelledby="negotiationAgentTitle">
             <div class="negotiation-workspace">
               <aside class="deal-summary" aria-labelledby="dealSummaryTitle">
-                <p class="purchase-eyebrow">Hinnan tueksi</p>
                 <h3 id="dealSummaryTitle">Kaupan yhteenveto</h3>
-                <img class="deal-summary-image" id="dealSummaryImage" src="assets/cars/demo-vehicle-placeholder.svg" alt="Geneerinen demoajoneuvon paikkamerkkikuva">
+                <img class="deal-summary-image" id="dealSummaryImage" src="assets/cars/demo-vehicle-placeholder.svg" alt="Geneerinen demokuva ajoneuvosta">
                 <div class="deal-summary-vehicle">
-                  <span>Kaupan kohde</span>
                   <strong id="dealSummaryVehicle">Alfa Romeo Giulia Quadrifoglio</strong>
                   <span id="dealSummaryRegistration">XYZ-123</span>
                 </div>
                 <dl class="deal-summary-prices">
                   <div><dt>Listahinta</dt><dd id="dealSummaryListPrice">95 000 €</dd></div>
-                  <div class="deal-summary-offer"><dt id="dealSummaryOfferLabel">Ehdottamasi hinta</dt><dd id="dealSummaryOffer">— €</dd></div>
-                  <div aria-label="Ero listahintaan"><dt>Ero listahintaan</dt><dd id="dealSummaryDifference">— €</dd><dd id="dealSummaryPercentage">—</dd></div>
+                  <div class="deal-summary-offer"><dt id="dealSummaryOfferLabel">Ehdottamasi hinta</dt><dd id="dealSummaryOffer">Ei vielä annettu</dd></div>
+                  <div aria-label="Ero listahintaan"><dt>Ero listahintaan</dt><dd id="dealSummaryDifference">—</dd></div>
                 </dl>
               </aside>
               <div class="negotiation-input">
+                <h3 class="negotiation-agent-title" id="negotiationAgentTitle">Digitaalinen automyyjä</h3>
+                <p class="negotiation-introduction">Olet tutustunut auton tietoihin ja kuntoraporttiin.<br><br>Millä hinnalla voimme tehdä kaupat?</p>
                 <div class="message-list" id="messageList" role="log" aria-live="polite" aria-relevant="additions"></div>
                 <form class="price-discussion" id="priceForm">
-                  <p class="offer-question">Millä hinnalla voimme tehdä kaupat?</p>
                   <label for="priceInput">Ehdottamasi kauppahinta</label>
                   <div class="price-input-row">
                     <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 93 900 €" aria-describedby="priceHelp priceError">
                     <button class="btn btn-primary" type="submit">Ehdota hintaa</button>
                   </div>
-                  <p id="priceHelp">Digitaalinen automyyjä tarkistaa, voidaanko kaupat tehdä ehdottamallasi hinnalla. Kun hinnasta sovitaan, voit siirtyä turvallisesti ostoprosessiin.</p>
+                  <p id="priceHelp">Digitaalinen automyyjä tarkistaa, voidaanko kaupat tehdä ehdottamallasi hinnalla.</p>
                   <p class="form-error" id="priceError" role="alert"></p>
                 </form>
               </div>
@@ -129,13 +125,8 @@
         </section>
 
         <section class="purchase-card journey-demo-card" aria-labelledby="journeyDemoTitle">
-          <div class="demo-vehicle-identity">
-            <p class="purchase-eyebrow">Run Demo</p>
-            <h2 id="journeyDemoTitle">Alfa Romeo Giulia Quadrifoglio</h2>
-            <p><strong id="journeyDemoRegistration">XYZ-123</strong><span id="journeyDemoListPrice">95 000 €</span></p>
-          </div>
-          <p>Katso koko ostopolku hintaehdotuksesta auton luovutukseen.</p>
-          <button class="btn btn-outline purchase-button" id="btnRunDemo" type="button" aria-controls="journeyDemoTimeline">Run Demo</button>
+          <div><p class="purchase-eyebrow">Konseptidemo</p><h2 id="journeyDemoTitle">Koko asiakaspolku</h2></div>
+          <button class="btn btn-outline purchase-button" id="btnRunDemo" type="button" aria-controls="journeyDemoTimeline">Katso koko demopolku</button>
           <div class="journey-demo-timeline hidden" id="journeyDemoTimeline" role="status" aria-live="polite" aria-atomic="true">
             <div class="demo-now">
               <strong id="journeyDemoStatus">Demo käynnistyy…</strong>

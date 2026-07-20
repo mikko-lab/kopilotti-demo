@@ -10,11 +10,6 @@ const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRI
 const DEMO_STEP_DELAY_MS = 1_500;
 const REDUCED_MOTION_DEMO_STEP_DELAY_MS = 120;
 
-const SALES_EXPERIENCE = {
-  name: 'Digitaalinen automyyjä',
-  greeting: 'Olet tutustunut auton tietoihin ja kuntoraporttiin. Millä hinnalla voimme tehdä kaupat?',
-};
-
 async function loadVehicle() {
   state.vehicle = DEMO_VEHICLE;
   renderVehicle(state.vehicle);
@@ -26,7 +21,6 @@ function renderVehicle(vehicle) {
   setText('vehicleTitle', vehicle.makeModel);
   setText('vehicleSubtitle', vehicle.registration);
   setText('vehiclePrice', formatEuro(vehicle.listPrice));
-  setText('offerListPrice', formatEuro(vehicle.listPrice));
   setText('vehicleMonthly', '');
   setText('vehicleAvailability', 'Demoajoneuvo');
   const image = document.getElementById('vehicleImage');
@@ -36,9 +30,7 @@ function renderVehicle(vehicle) {
   setText('specMakeModel', vehicle.makeModel);
   setText('specRegistration', vehicle.registration);
   setText('specListPrice', formatEuro(vehicle.listPrice));
-  setText('journeyDemoTitle', vehicle.makeModel);
-  setText('journeyDemoRegistration', vehicle.registration);
-  setText('journeyDemoListPrice', formatEuro(vehicle.listPrice));
+  setText('flowVehicle', vehicleIdentity(vehicle));
   setText('journeyDemoAgreedPrice', `Hinnasta sovittu · ${formatEuro(vehicle.agreedPrice)}`);
   setText('journeyDemoVehicle', vehicleIdentity(vehicle));
   setText('dealSummaryVehicle', vehicle.makeModel);
@@ -46,22 +38,23 @@ function renderVehicle(vehicle) {
   setText('dealSummaryListPrice', formatEuro(vehicle.listPrice));
   const summaryImage = document.getElementById('dealSummaryImage');
   summaryImage.src = vehicle.image;
-  summaryImage.alt = vehicle.imageAlt;
+  summaryImage.alt = 'Geneerinen demokuva ajoneuvosta';
 }
 
 function updateDealSummary() {
   const summary = calculateDealSummary(state.vehicle.listPrice, parseEuro(document.getElementById('priceInput').value));
-  setText('dealSummaryOffer', summary ? formatEuro(summary.offerPrice) : '— €');
-  setText('dealSummaryDifference', summary ? formatSignedEuro(summary.difference) : '— €');
-  setText('dealSummaryPercentage', summary ? formatSignedPercent(summary.percentageDifference) : '—');
+  const offer = document.getElementById('dealSummaryOffer');
+  offer.textContent = summary ? formatEuro(summary.offerPrice) : 'Ei vielä annettu';
+  offer.classList.toggle('has-value', Boolean(summary));
+  setText('dealSummaryDifference', summary ? `${formatSignedEuro(summary.difference)} · ${formatSignedPercent(summary.percentageDifference)}` : '—');
 }
 
 function showAcceptedDealSummary(approvedAmount) {
   const summary = calculateDealSummary(state.vehicle.listPrice, approvedAmount);
   setText('dealSummaryOfferLabel', 'Sovittu kauppahinta');
   setText('dealSummaryOffer', formatEuro(approvedAmount));
-  setText('dealSummaryDifference', formatSignedEuro(summary.difference));
-  setText('dealSummaryPercentage', formatSignedPercent(summary.percentageDifference));
+  document.getElementById('dealSummaryOffer').classList.add('has-value');
+  setText('dealSummaryDifference', `${formatSignedEuro(summary.difference)} · ${formatSignedPercent(summary.percentageDifference)}`);
   document.getElementById('priceInput').disabled = true;
 }
 
@@ -85,7 +78,9 @@ function markPreNegotiationReportOpened() {
   document.getElementById('negotiationGateStatus').classList.add('complete');
   const startButton = document.getElementById('btnStartDigitalSalesperson');
   startButton.disabled = false;
-  document.getElementById('btnOpenPreNegotiationReport').textContent = 'Avaa kuntoraportti uudelleen';
+  const reportButton = document.getElementById('btnOpenPreNegotiationReport');
+  reportButton.textContent = 'Avaa uudelleen';
+  reportButton.setAttribute('aria-label', 'Avaa kuntoraportti uudelleen');
 }
 
 function openPreNegotiationConditionReport() {
@@ -113,8 +108,6 @@ function startNegotiation() {
   if (state.negotiationStarted) return;
   state.negotiationStarted = true;
   document.getElementById('conversation').classList.remove('hidden');
-  setText('personaStatus', SALES_EXPERIENCE.name);
-  addMessage('salesperson', SALES_EXPERIENCE.greeting, SALES_EXPERIENCE.name);
 }
 
 async function submitPrice(event) {
@@ -132,7 +125,7 @@ async function submitPrice(event) {
   const submitButton = event.currentTarget.querySelector('button[type="submit"]');
   submitButton.disabled = true;
   addMessage('customer', formatEuro(offerAmount), 'Sinä');
-  const waitingMessage = addMessage('salesperson pending', 'Tarkistan, voimmeko tehdä kaupat tällä hinnalla.', SALES_EXPERIENCE.name);
+  const waitingMessage = addMessage('salesperson pending', 'Tarkistan, voimmeko tehdä kaupat tällä hinnalla.');
   try {
     const decision = await api.discussPrice({
       vehicleId: state.vehicle.id,
@@ -144,7 +137,7 @@ async function submitPrice(event) {
     event.currentTarget.classList.add('hidden');
   } catch (_error) {
     waitingMessage.remove();
-    addMessage('salesperson decision', 'En voi vahvistaa kauppaa tällä hinnalla suoraan. Tarkistutan vielä, voimmeko tulla hinnassa vastaan. Neuvottelua ei tarvitse aloittaa alusta.', SALES_EXPERIENCE.name);
+    addMessage('salesperson decision', 'En voi vahvistaa kauppaa tällä hinnalla suoraan. Tarkistutan vielä, voimmeko tulla hinnassa vastaan. Neuvottelua ei tarvitse aloittaa alusta.');
     renderDecisionActions('escalate');
   } finally {
     submitButton.disabled = false;
@@ -152,19 +145,18 @@ async function submitPrice(event) {
 }
 
 function renderDecision(decision) {
-  const salesperson = SALES_EXPERIENCE.name;
   if (decision.status === 'ACCEPT') {
     showAcceptedDealSummary(decision.approvedAmount);
-    addMessage('salesperson decision', `Voimme tehdä kaupat hinnalla ${formatEuro(decision.approvedAmount)}. Jatketaan maksutavan valintaan. ${vehicleIdentity(state.vehicle)}.`, salesperson);
+    addMessage('salesperson decision', `Voimme tehdä kaupat hinnalla ${formatEuro(decision.approvedAmount)}. Jatketaan maksutavan valintaan. ${vehicleIdentity(state.vehicle)}.`);
     renderDecisionActions('reserve');
   } else if (decision.status === 'COUNTER') {
-    addMessage('salesperson decision', `Lähin hinta, jolla voimme tehdä kaupat, on ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja jatkaa ostoprosessiin?`, salesperson);
+    addMessage('salesperson decision', `Lähin hinta, jolla voimme tehdä kaupat, on ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja jatkaa ostoprosessiin?`);
     renderDecisionActions('counter');
   } else if (decision.status === 'REJECT') {
-    addMessage('salesperson decision', 'Emme voi tehdä kauppoja ehdottamallasi hinnalla. Voit jatkaa neuvottelua tai edetä listahinnalla.', salesperson);
+    addMessage('salesperson decision', 'Emme voi tehdä kauppoja ehdottamallasi hinnalla. Voit jatkaa neuvottelua tai edetä listahinnalla.');
     renderDecisionActions('rejected');
   } else {
-    addMessage('salesperson decision', 'En voi vahvistaa kauppaa tällä hinnalla suoraan. Tarkistutan vielä, voimmeko tulla hinnassa vastaan. Neuvottelua ei tarvitse aloittaa alusta.', salesperson);
+    addMessage('salesperson decision', 'En voi vahvistaa kauppaa tällä hinnalla suoraan. Tarkistutan vielä, voimmeko tulla hinnassa vastaan. Neuvottelua ei tarvitse aloittaa alusta.');
     renderDecisionActions('escalate');
   }
 }
@@ -204,7 +196,8 @@ function addMessage(className, text, speaker) {
   name.textContent = speaker;
   const content = document.createElement('span');
   content.textContent = text;
-  message.append(name, content);
+  if (speaker) message.append(name);
+  message.append(content);
   const list = document.getElementById('messageList');
   list.append(message);
   list.scrollTop = list.scrollHeight;
@@ -536,7 +529,7 @@ async function runDemo() {
   document.querySelectorAll('[data-demo-step]').forEach((item) => { item.classList.remove('current'); item.classList.add('complete'); });
   setText('journeyDemoStatus', 'Valmis noudettavaksi');
   button.disabled = false;
-  button.textContent = 'Run Demo uudelleen';
+  button.textContent = 'Katso demopolku uudelleen';
   button.focus();
 }
 

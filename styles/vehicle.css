@@ -76,10 +76,8 @@
 .negotiation-gate-status.complete { background: var(--success-light); color: var(--success-text); }
 
 .journey-demo-card { border-color: var(--border); background: var(--white); }
-.demo-vehicle-identity > p:last-child { display: flex; justify-content: space-between; gap: 12px; margin-top: 5px; color: var(--text); }
-.demo-vehicle-identity > p:last-child span { font-weight: 700; }
 .demo-product-subtitle { margin-top: 2px; color: var(--primary-dark); font-size: var(--text-xs); font-weight: 700; }
-.journey-demo-card > p { color: var(--text2); font-size: var(--text-sm); margin: 12px 0; }
+.journey-demo-card > .purchase-button { margin-top: var(--space-3); }
 .journey-demo-timeline { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid rgba(22,163,74,.25); }
 .journey-demo-timeline .demo-now { min-height: 44px; margin: 0 0 12px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--white); color: var(--text); font-weight: 700; }
 .journey-demo-timeline .demo-now > * { display: block; }
@@ -95,15 +93,14 @@
 .condition-report-step { margin-top: 0; padding: 0; overflow: hidden; }
 .purchase-journey { margin-top: 0; padding: 0; overflow: hidden; }
 .flow-header { padding: var(--space-3); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; gap: var(--space-2); }
+.flow-vehicle { margin-top: 3px; color: var(--text2); font-size: var(--text-xs); font-weight: 600; }
 .flow-close { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--surface2); color: var(--text2); font-size: 24px; cursor: pointer; }
 .conversation { container-type: inline-size; padding: var(--space-3); }
 
-.conversation-status { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--border); font-size: var(--text-xs); font-weight: 600; }
-.conversation-status .status-dot { width: 8px; height: 8px; }
-.negotiation-workspace { display: grid; gap: var(--space-3); margin-top: var(--space-3); }
+.negotiation-workspace { display: grid; gap: var(--space-3); }
 .negotiation-input { min-width: 0; }
 .deal-summary { min-width: 0; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface2); }
-.deal-summary h3 { margin-top: 3px; font-size: var(--text-lg); }
+.deal-summary h3 { font-size: var(--text-lg); }
 .deal-summary-image { display: block; width: 100%; max-height: 150px; margin-top: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); object-fit: cover; aspect-ratio: 16 / 9; }
 .deal-summary-vehicle { display: grid; gap: 2px; margin-top: var(--space-3); }
 .deal-summary-vehicle > span { color: var(--muted); font-size: var(--text-2xs); }
@@ -112,9 +109,11 @@
 .deal-summary-prices > div { padding: 12px 0; border-top: 1px solid var(--border); }
 .deal-summary-prices dt { color: var(--muted); font-size: var(--text-2xs); font-weight: 600; }
 .deal-summary-prices dd { margin-top: 3px; font-size: var(--text-md); font-weight: 700; }
-.deal-summary-prices .deal-summary-offer dd { color: var(--primary-dark); font-size: clamp(26px, 4vw, 34px); letter-spacing: -.025em; }
-#dealSummaryPercentage { color: var(--text2); font-size: var(--text-sm); }
-.message-list { min-height: 120px; max-height: 390px; overflow-y: auto; padding: var(--space-3) 0; display: flex; flex-direction: column; gap: 10px; }
+.deal-summary-prices .deal-summary-offer dd.has-value { color: var(--primary-dark); font-size: clamp(26px, 4vw, 34px); letter-spacing: -.025em; }
+.negotiation-agent-title { font-size: var(--text-md); }
+.negotiation-introduction { margin-top: var(--space-2); color: var(--text2); font-size: var(--text-xs); line-height: 1.55; }
+.message-list { max-height: 390px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.message-list:empty { display: none; }
 .message { width: 100%; max-width: none; padding: 10px 0; border-bottom: 1px solid var(--border); border-radius: 0; font-size: var(--text-xs); line-height: 1.5; }
 .message.salesperson { align-self: stretch; background: transparent; }
 .message.customer { align-self: stretch; background: transparent; color: var(--text2); }
@@ -123,7 +122,6 @@
 .message strong { display: block; margin-bottom: 3px; }
 .message > span { white-space: pre-line; }
 .price-discussion { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border); }
-.offer-question { margin-bottom: var(--space-3); font-size: var(--text-md); font-weight: 700; }
 .price-discussion label { display: block; font-weight: 700; font-size: var(--text-sm); margin-bottom: 8px; }
 .price-input-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 6px; position: relative; }
 .price-input-row input { width: 100%; min-height: 44px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 34px 10px 12px; font: inherit; }
@@ -200,6 +198,7 @@
   .vehicle-heading-price { text-align: left; }
   .vehicle-spec-grid { grid-template-columns: 1fr; }
   .price-input-row { grid-template-columns: 1fr; }
+  .price-input-row .btn { width: 100%; }
   .price-input-row > span { right: 14px; top: 12px; }
 }
 

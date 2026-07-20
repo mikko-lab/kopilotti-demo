@@ -14,9 +14,12 @@ const dealSummarySource = fs.readFileSync('js/deal-summary.js', 'utf8');
 const staticServer = fs.readFileSync('scripts/serve-static-demo.js', 'utf8');
 const packageManifest = fs.readFileSync('package.json', 'utf8');
 const dealSummaryModule = import(`data:text/javascript;base64,${Buffer.from(dealSummarySource).toString('base64')}`);
+const negotiationStart = html.indexOf('<section class="salesperson-flow');
+const negotiationEnd = html.indexOf('<section class="purchase-card journey-demo-card');
+const negotiationMarkup = html.slice(negotiationStart, negotiationEnd);
 
 test('presents one verified price-offer path without direct purchase competition', () => {
-  assert.match(html, /<h2 id="digitalSalespersonTitle">Hintaehdotus<\/h2>/);
+  assert.match(html, /<h2 id="digitalSalespersonTitle">Hinnan neuvottelu<\/h2>/);
   assert.match(html, /Aloita hinnan neuvottelu/);
   assert.match(vehicleStyles, /\.digital-salesperson-card > \.negotiation-gate-status \+ \.purchase-button \{ margin-top: var\(--space-3\); \}/);
   assert.doesNotMatch(html, /Osta \/ Varaa|Nopea asiointi|Jatka ostoon tai varaukseen/);
@@ -36,7 +39,8 @@ test('removes person identity and general vehicle question actions', () => {
 });
 
 test('requires the inspection report before enabling the accessible negotiation form', () => {
-  assert.match(html, /id="offerListPrice">95 000 €/);
+  assert.doesNotMatch(html, /id="offerListPrice"/);
+  assert.match(html, /id="specListPrice">95 000 €/);
   assert.match(html, /id="btnOpenPreNegotiationReport"[^>]+type="button"[^>]*>Avaa kuntoraportti<\/button>/);
   assert.match(html, /id="btnStartDigitalSalesperson"[^>]+disabled/);
   assert.match(html, /id="negotiationGateStatus" role="status" aria-live="polite"/);
@@ -52,6 +56,8 @@ test('opening the demo report records completion, enables negotiation, and resto
   assert.match(uiScript, /state\.preNegotiationReportOpened = true/);
   assert.match(uiScript, /startButton\.disabled = false/);
   assert.match(uiScript, /✓ Kuntoraporttiin tutustuttu/);
+  assert.match(uiScript, /reportButton\.textContent = 'Avaa uudelleen'/);
+  assert.match(uiScript, /reportButton\.setAttribute\('aria-label', 'Avaa kuntoraportti uudelleen'\)/);
   assert.match(uiScript, /dialog\.showModal\(\)/);
   assert.match(uiScript, /preNegotiationConditionReport'\)\.addEventListener\('close', restoreFocusAfterPreNegotiationReport\)/);
   assert.match(uiScript, /btnStartDigitalSalesperson'\)\.focus\(\)/);
@@ -114,22 +120,34 @@ test('turns only the timeline marker into a check without hiding agreement text'
 
 test('shows a textual deal summary with vehicle, registration, list price, offer and difference', () => {
   assert.match(html, /id="dealSummaryTitle">Kaupan yhteenveto/);
-  assert.match(html, /Kaupan kohde/);
-  assert.match(html, /id="dealSummaryImage"[^>]+src="assets\/cars\/demo-vehicle-placeholder\.svg"[^>]+alt="Geneerinen demoajoneuvon paikkamerkkikuva"/);
+  assert.doesNotMatch(negotiationMarkup, /Hinnan tueksi|Kaupan kohde/);
+  assert.match(html, /id="dealSummaryImage"[^>]+src="assets\/cars\/demo-vehicle-placeholder\.svg"[^>]+alt="Geneerinen demokuva ajoneuvosta"/);
   assert.match(uiScript, /summaryImage\.src = vehicle\.image/);
-  assert.match(uiScript, /summaryImage\.alt = vehicle\.imageAlt/);
+  assert.match(uiScript, /summaryImage\.alt = 'Geneerinen demokuva ajoneuvosta'/);
   assert.match(html, /id="dealSummaryVehicle">Alfa Romeo Giulia Quadrifoglio/);
   assert.match(html, /id="dealSummaryRegistration">XYZ-123/);
   assert.match(html, /id="dealSummaryListPrice">95 000 €/);
-  assert.match(html, /id="dealSummaryOffer">— €/);
+  assert.match(html, /id="dealSummaryOffer">Ei vielä annettu/);
+  assert.match(html, /id="dealSummaryDifference">—<\/dd>/);
+  assert.doesNotMatch(html, /id="dealSummaryPercentage"|— €/);
   assert.match(html, /aria-label="Ero listahintaan"/);
   assert.doesNotMatch(html, /class="deal-summary"[^>]+aria-live/);
+  assert.doesNotMatch(negotiationMarkup, /<figcaption|>Geneerinen demokuva ajoneuvosta</);
   assert.doesNotMatch(vehicleStyles, /\.deal-summary\s*\{[^}]*display:\s*none/);
+});
+
+test('uses one clear negotiation heading and asks the main question only once in the flow', () => {
+  assert.equal((negotiationMarkup.match(/Millä hinnalla voimme tehdä kaupat\?/g) || []).length, 1);
+  assert.equal((negotiationMarkup.match(/id="flowTitle">Hinnan neuvottelu</g) || []).length, 1);
+  assert.match(negotiationMarkup, /id="flowVehicle">Alfa Romeo Giulia Quadrifoglio · XYZ-123/);
+  assert.match(negotiationMarkup, /id="negotiationAgentTitle">Digitaalinen automyyjä/);
+  assert.doesNotMatch(negotiationMarkup, /Neuvottelu auton hinnasta|Hinnan tueksi|Kaupan kohde/);
 });
 
 test('updates the deal summary on every price input without waiting for submit', () => {
   assert.match(uiScript, /priceInput'\)\.addEventListener\('input', updateDealSummary\)/);
   assert.match(uiScript, /calculateDealSummary\(state\.vehicle\.listPrice/);
+  assert.match(uiScript, /`\$\{formatSignedEuro\(summary\.difference\)\} · \$\{formatSignedPercent\(summary\.percentageDifference\)\}`/);
 });
 
 test('calculates and formats a 92 500 euro offer against 95 000 correctly', async () => {
@@ -150,6 +168,7 @@ test('calculates and formats a 93 900 euro offer against 95 000 correctly', asyn
 
 test('stacks summary before input by default and uses two columns when the negotiation panel has desktop width', () => {
   assert.ok(html.indexOf('class="deal-summary"') < html.indexOf('class="negotiation-input"'));
+  assert.ok(html.indexOf('id="negotiationAgentTitle"') < html.indexOf('for="priceInput"'));
   assert.doesNotMatch(uiScript, /function startNegotiation\(\) \{[\s\S]*?priceInput'\)\.focus\(\)[\s\S]*?\n\}/);
   assert.match(vehicleStyles, /\.conversation \{ container-type: inline-size/);
   assert.match(vehicleStyles, /@container \(min-width: 560px\)/);
@@ -157,6 +176,7 @@ test('stacks summary before input by default and uses two columns when the negot
   assert.match(vehicleStyles, /grid-template-areas: 'input summary'/);
   assert.match(vehicleStyles, /\.deal-summary \{ grid-area: summary/);
   assert.match(vehicleStyles, /\.deal-summary-image \{ display: block; width: 100%; max-height: 150px/);
+  assert.match(vehicleStyles, /@media \(max-width: 639px\)[\s\S]*?\.price-input-row \.btn \{ width: 100%; \}/);
 });
 
 test('accepted manual offer locks input and changes summary to agreed price', () => {
@@ -179,6 +199,10 @@ test('Run Demo remains pinned to its separate 92 500 euro price', () => {
   assert.match(html, /Hinnasta sovittu · 92 500 €/);
   assert.match(html, /data-demo-step="condition"[^>]*><span[^>]*>○<\/span>Kuntoraportti avattu/);
   assert.match(uiScript, /async function runDemo\(\) \{[\s\S]*markPreNegotiationReportOpened\(\)/);
+  assert.match(html, /id="journeyDemoTitle">Koko asiakaspolku/);
+  assert.match(html, /id="btnRunDemo"[^>]*>Katso koko demopolku<\/button>/);
+  assert.doesNotMatch(negotiationMarkup, /Run Demo|Katso koko demopolku|journeyDemoTimeline/);
+  assert.doesNotMatch(html, /id="journeyDemoRegistration"|id="journeyDemoListPrice"/);
 });
 
 test('Run Demo keeps each normal-motion step visible long enough to read', () => {
