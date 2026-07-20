@@ -44,12 +44,15 @@ function renderVehicle(vehicle) {
   setText('dealSummaryVehicle', vehicle.makeModel);
   setText('dealSummaryRegistration', vehicle.registration);
   setText('dealSummaryListPrice', formatEuro(vehicle.listPrice));
+  const summaryImage = document.getElementById('dealSummaryImage');
+  summaryImage.src = vehicle.image;
+  summaryImage.alt = vehicle.imageAlt;
 }
 
 function updateDealSummary() {
   const summary = calculateDealSummary(state.vehicle.listPrice, parseEuro(document.getElementById('priceInput').value));
-  setText('dealSummaryOffer', summary ? formatEuro(summary.offerPrice) : '—');
-  setText('dealSummaryDifference', summary ? formatSignedEuro(summary.difference) : '—');
+  setText('dealSummaryOffer', summary ? formatEuro(summary.offerPrice) : '— €');
+  setText('dealSummaryDifference', summary ? formatSignedEuro(summary.difference) : '— €');
   setText('dealSummaryPercentage', summary ? formatSignedPercent(summary.percentageDifference) : '—');
 }
 
@@ -112,7 +115,6 @@ function startNegotiation() {
   document.getElementById('conversation').classList.remove('hidden');
   setText('personaStatus', SALES_EXPERIENCE.name);
   addMessage('salesperson', SALES_EXPERIENCE.greeting, SALES_EXPERIENCE.name);
-  document.getElementById('priceInput').focus();
 }
 
 async function submitPrice(event) {

@@ -115,12 +115,16 @@ test('turns only the timeline marker into a check without hiding agreement text'
 test('shows a textual deal summary with vehicle, registration, list price, offer and difference', () => {
   assert.match(html, /id="dealSummaryTitle">Kaupan yhteenveto/);
   assert.match(html, /Kaupan kohde/);
+  assert.match(html, /id="dealSummaryImage"[^>]+src="assets\/cars\/demo-vehicle-placeholder\.svg"[^>]+alt="Geneerinen demoajoneuvon paikkamerkkikuva"/);
+  assert.match(uiScript, /summaryImage\.src = vehicle\.image/);
+  assert.match(uiScript, /summaryImage\.alt = vehicle\.imageAlt/);
   assert.match(html, /id="dealSummaryVehicle">Alfa Romeo Giulia Quadrifoglio/);
   assert.match(html, /id="dealSummaryRegistration">XYZ-123/);
   assert.match(html, /id="dealSummaryListPrice">95 000 €/);
-  assert.match(html, /id="dealSummaryOffer">—/);
+  assert.match(html, /id="dealSummaryOffer">— €/);
   assert.match(html, /aria-label="Ero listahintaan"/);
   assert.doesNotMatch(html, /class="deal-summary"[^>]+aria-live/);
+  assert.doesNotMatch(vehicleStyles, /\.deal-summary\s*\{[^}]*display:\s*none/);
 });
 
 test('updates the deal summary on every price input without waiting for submit', () => {
@@ -136,11 +140,23 @@ test('calculates and formats a 92 500 euro offer against 95 000 correctly', asyn
   assert.equal(formatSignedPercent(summary.percentageDifference), '−2,6 %');
 });
 
-test('stacks summary before input by default and uses two columns on wide desktop', () => {
+test('calculates and formats a 93 900 euro offer against 95 000 correctly', async () => {
+  const { calculateDealSummary, formatSignedEuro, formatSignedPercent } = await dealSummaryModule;
+  const summary = calculateDealSummary(95_000, 93_900);
+  assert.deepEqual({ offerPrice: summary.offerPrice, difference: summary.difference }, { offerPrice: 93_900, difference: -1_100 });
+  assert.equal(formatSignedEuro(summary.difference), '−1 100 €');
+  assert.equal(formatSignedPercent(summary.percentageDifference), '−1,2 %');
+});
+
+test('stacks summary before input by default and uses two columns when the negotiation panel has desktop width', () => {
   assert.ok(html.indexOf('class="deal-summary"') < html.indexOf('class="negotiation-input"'));
-  assert.match(vehicleStyles, /@media \(min-width: 1100px\)/);
+  assert.doesNotMatch(uiScript, /function startNegotiation\(\) \{[\s\S]*?priceInput'\)\.focus\(\)[\s\S]*?\n\}/);
+  assert.match(vehicleStyles, /\.conversation \{ container-type: inline-size/);
+  assert.match(vehicleStyles, /@container \(min-width: 560px\)/);
+  assert.match(vehicleStyles, /grid-template-columns: minmax\(320px, 1\.6fr\) minmax\(220px, 1fr\)/);
   assert.match(vehicleStyles, /grid-template-areas: 'input summary'/);
   assert.match(vehicleStyles, /\.deal-summary \{ grid-area: summary/);
+  assert.match(vehicleStyles, /\.deal-summary-image \{ display: block; width: 100%; max-height: 150px/);
 });
 
 test('accepted manual offer locks input and changes summary to agreed price', () => {
