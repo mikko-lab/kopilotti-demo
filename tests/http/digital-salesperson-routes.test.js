@@ -37,12 +37,15 @@ test('customer BFF injects server-owned demo identity and returns no decision re
     get: async () => submitted ? { ...session, version: 2 } : session,
     submitOffer: async (command) => {
       submitted = command;
-      return { status: 'COUNTER', reasonCode: 'COUNTER_WITHIN_POLICY', counterAmount: 29400, policyVersion: 'internal-v1' };
+      return { status: 'COUNTER', reasonCode: 'COUNTER_WITHIN_POLICY', offerAmount: 28900, counterAmount: 29400, round: 1, mayContinue: true, messageCode: 'COUNTER_ROUND_1', policyVersion: 'internal-v1' };
     },
   };
   await withServer(service, async (baseUrl) => {
     const created = await fetch(`${baseUrl}/api/digital-salesperson/sessions`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ vehicleId: 'veh-0001', tenantId: 'attacker' }) });
     assert.equal(created.status, 201);
+    const restored = await fetch(`${baseUrl}/api/digital-salesperson/sessions/session-1`);
+    assert.equal(restored.status, 200);
+    assert.deepEqual(await restored.json(), { id: 'session-1', vehicleId: 'veh-0001', status: 'OPEN', version: 1, negotiationRound: 0, customerOffers: [], counterOffers: [], latestDecision: null, createdAt: 'now', updatedAt: 'now' });
 
     const response = await fetch(`${baseUrl}/api/digital-salesperson/sessions/session-1/offers`, {
       method: 'POST', headers: { 'content-type': 'application/json' },
@@ -50,7 +53,7 @@ test('customer BFF injects server-owned demo identity and returns no decision re
     });
     assert.equal(response.status, 200);
     const body = await response.json();
-    assert.deepEqual(body, { status: 'COUNTER', counterAmount: 29400, sessionVersion: 2, sessionStatus: 'OPEN' });
+    assert.deepEqual(body, { status: 'COUNTER', customerOffer: 28900, counterOffer: 29400, negotiationRound: 1, canSubmitNewOffer: true, canAcceptCounterOffer: true, messageCode: 'COUNTER_ROUND_1', sessionVersion: 2, sessionStatus: 'OPEN' });
     assert.equal(submitted.offer.persona, undefined);
     assert.equal(submitted.offer.targetPrice, undefined);
   });
@@ -88,7 +91,7 @@ test('manual 94 100 euro request reaches the deterministic engine and returns AC
       body: JSON.stringify({ offerAmount: 94_100, currency: 'EUR', evidence: 'Asiakkaan hintaehdotus on 94100 EUR.', expectedVersion: 1, commandId: 'regression-94100' }),
     });
     assert.equal(offerResponse.status, 200);
-    assert.deepEqual(await offerResponse.json(), { status: 'ACCEPT', approvedAmount: 94_100, sessionVersion: 2, sessionStatus: 'ACCEPTED' });
+    assert.deepEqual(await offerResponse.json(), { status: 'ACCEPT', customerOffer: 94_100, negotiationRound: 1, canSubmitNewOffer: false, canAcceptCounterOffer: false, messageCode: 'OFFER_ACCEPTED', approvedAmount: 94_100, sessionVersion: 2, sessionStatus: 'ACCEPTED' });
 
     const persisted = await service.get({ tenantId: 'demo-dealership', sessionId: session.id });
     assert.equal(persisted.decisions.at(-1).status, 'ACCEPT');

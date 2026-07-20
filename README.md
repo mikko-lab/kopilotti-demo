@@ -41,6 +41,10 @@ Asiakkaalle näytetään autokaupan käsitteitä, ei teknisiä tilakoneen nimiä
 
 Sales-demon ainoa ensisijainen toimintopolku on **Hintaehdotus**. Käyttöliittymä näyttää listahinnan ja valmiiksi vahvistetun demotilan ajoneuvon tietoihin sekä kuntoraporttiin tutustumisesta ennen hinnan neuvottelua. **Run Demo** säilyy erillisenä, visuaalisesti toissijaisena läpikävelynä.
 
+Neuvottelu etenee versioidun, autoliike- ja ajoneuvokohtaisen backend-policyn mukaan. Policy määrittelee sisäisesti `acceptanceFloor`-rajan, `minimumOfferForAutomation`-alueen, `maxAutomatedRounds`-määrän, kierroskohtaisen `counterSteps`-strategian ja eskalointisäännöt. Dealer-kohtainen policy voidaan yliajaa ajoneuvo- tai inventaariokohtaisella versiolla. Jokaisen päätöksen yhteyteen tallennetaan policy-versio ja audit trail.
+
+`acceptanceFloor` ei koskaan siirry selaimelle tai LLM-kontekstiin. Selain säilyttää vain läpinäkymättömän istuntotunnisteen; tarjoukset, vastatarjoukset ja kierrokset ovat backendin pysyvää istuntotilaa. LLM ei määritä vastatarjouksen euromäärää, eikä käyttöliittymä sisällä hintarajoja tai porrastussääntöjä.
+
 ## Arkkitehtuuri
 
 ```text
@@ -100,8 +104,11 @@ Ajoneuvosivulla on automaattinen **Run Demo** -läpikävely:
 
 ```text
 Alfa Romeo Giulia Quadrifoglio · XYZ-123 · 95 000 €
-  → hintaehdotus
-  → hinnasta sovittu 92 500 €
+  → asiakas ehdottaa 92 500 €
+  → hintatarkistus 94 700 €
+  → asiakas ehdottaa 93 500 €
+  → hintatarkistus 94 300 €
+  → hinnasta sovittu 94 300 €
   → maksutapa valittu
   → maksu odottaa vahvistusta
   → maksu vahvistettu

@@ -21,11 +21,12 @@ class PurchaseFlowService {
     if (!vehicle || vehicle.availability !== 'available') throw new ApplicationError('VEHICLE_NOT_AVAILABLE', 'Ajoneuvo ei ole saatavilla', 409);
     const policy = await this.handoverPolicies.getCurrent();
     if (!policy) throw new ApplicationError('HANDOVER_POLICY_NOT_FOUND', 'Ostopolku vaatii myyjän tarkistuksen', 409);
-    const agreedPrice = purchasePath === PURCHASE_PATH.NEGOTIATED
+    const negotiated = purchasePath === PURCHASE_PATH.NEGOTIATED
       ? await this.validateNegotiatedPath(tenantId, actorId, vehicleId, negotiationSessionId)
-      : vehicle.listPrice;
+      : null;
+    const agreedPrice = negotiated?.agreedPrice ?? vehicle.listPrice;
     const occurredAt = this.now();
-    const session = createPurchaseSession({ id: this.idGenerator(), tenantId, vehicleId, purchasePath, negotiationSessionId, agreedPrice, handoverPolicyVersion: policy.policyVersion, createdAt: occurredAt });
+    const session = createPurchaseSession({ id: this.idGenerator(), tenantId, vehicleId, purchasePath, negotiationSessionId, negotiationHistory: negotiated?.history ?? null, agreedPrice, handoverPolicyVersion: policy.policyVersion, createdAt: occurredAt });
     await this.purchases.create(session);
     await this.audit('PRICE_AGREED', session, actorId, correlationId, occurredAt, { acknowledgement: false, agreedPrice, handoverPolicyVersion: policy.policyVersion });
     return session;
@@ -106,9 +107,16 @@ class PurchaseFlowService {
     const negotiation = await this.negotiations.get({ tenantId, sessionId: negotiationSessionId });
     if (negotiation.vehicleId !== vehicleId) throw new ApplicationError('NEGOTIATION_VEHICLE_MISMATCH', 'Neuvottelu ei vastaa ajoneuvoa', 409);
     const latest = negotiation.decisions.at(-1);
-    if (negotiation.status === 'ACCEPTED' && Number.isSafeInteger(latest?.approvedAmount)) return latest.approvedAmount;
-    if (negotiation.status === 'PRICE_AGREED' && Number.isSafeInteger(negotiation.agreedPrice)) return negotiation.agreedPrice;
-    if (latest?.status === 'COUNTER') return (await this.negotiations.agreeLatestCounter({ tenantId, actorId, sessionId: negotiationSessionId })).agreedPrice;
+    if (negotiation.status === 'ACCEPTED' && Number.isSafeInteger(latest?.approvedAmount)) {
+      return { agreedPrice: latest.approvedAmount, history: negotiationHistory(negotiation, latest.approvedAmount) };
+    }
+    if (negotiation.status === 'PRICE_AGREED' && Number.isSafeInteger(negotiation.agreedPrice)) {
+      return { agreedPrice: negotiation.agreedPrice, history: negotiationHistory(negotiation, negotiation.agreedPrice) };
+    }
+    if (latest?.status === 'COUNTER') {
+      const agreed = await this.negotiations.agreeLatestCounter({ tenantId, actorId, sessionId: negotiationSessionId });
+      return { agreedPrice: agreed.agreedPrice, history: negotiationHistory(agreed, agreed.agreedPrice, 'ACCEPTED_COUNTER') };
+    }
     throw new ApplicationError('NEGOTIATED_PRICE_NOT_AVAILABLE', 'Sovittua hintaa ei ole vahvistettu', 409);
   }
 
@@ -139,6 +147,17 @@ class PurchaseFlowService {
       payload: { vehicleId: session.vehicleId, purchasePath: session.purchasePath, correlationId, ...payload },
     });
   }
+}
+
+function negotiationHistory(session, agreedPrice, latestDecision = session.decisions.at(-1)?.status ?? null) {
+  return {
+    negotiationRound: session.decisions.length,
+    customerOffers: session.decisions.map((entry) => entry.offerAmount),
+    counterOffers: session.decisions.filter((entry) => Number.isSafeInteger(entry.counterAmount)).map((entry) => entry.counterAmount),
+    latestDecision,
+    agreedPrice,
+    updatedAt: session.updatedAt,
+  };
 }
 
 function reportPayload(report, acknowledgement) {

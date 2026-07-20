@@ -17,6 +17,8 @@ function decideNegotiation(input) {
   const offerAmount = requireEuroAmount(input.offerAmount, 'offerAmount');
   requireCurrency(input.currency);
   const round = requireRound(input.round);
+  const previousCustomerOffers = requireAmountHistory(input.previousCustomerOffers, 'previousCustomerOffers');
+  const previousCounterOffers = requireAmountHistory(input.previousCounterOffers, 'previousCounterOffers');
 
   if (input.vehicle?.id !== policy.vehicleId) {
     return decision(DECISION_STATUS.ESCALATE, 'VEHICLE_POLICY_MISMATCH', round, policy);
@@ -27,31 +29,45 @@ function decideNegotiation(input) {
   if (input.vehicle.availability !== 'available') {
     return decision(DECISION_STATUS.ESCALATE, 'VEHICLE_NOT_AVAILABLE', round, policy);
   }
-  if (round > policy.maxRounds) {
-    return decision(DECISION_STATUS.REJECT, 'MAX_ROUNDS_REACHED', round, policy, { mayContinue: false });
+  if (round > policy.maxAutomatedRounds) {
+    return decision(policy.escalationRules.roundsExhausted, 'MAX_ROUNDS_REACHED', round, policy, { mayContinue: false });
   }
 
-  const acceptanceThreshold = Math.max(policy.targetPrice, policy.minimumNegotiableOffer);
-  if (offerAmount >= acceptanceThreshold) {
+  if (offerAmount >= policy.acceptanceFloor) {
     return decision(DECISION_STATUS.ACCEPT, 'OFFER_ACCEPTED', round, policy, {
       approvedAmount: offerAmount,
       reservationEligible: policy.reservationEligible,
       mayContinue: false,
     });
   }
-  if (offerAmount < policy.floorPrice) {
+  if (offerAmount < policy.minimumOfferForAutomation) {
     return decision(DECISION_STATUS.REJECT, 'OFFER_BELOW_POLICY', round, policy, {
-      mayContinue: round < policy.maxRounds,
+      mayContinue: policy.counterSteps ? false : round < policy.maxAutomatedRounds,
     });
   }
 
-  const counterAmount = Math.min(
+  const previousOffer = previousCustomerOffers.at(-1);
+  if (previousOffer !== undefined && offerAmount <= previousOffer) {
+    return decision(policy.escalationRules.repeatedOrLowerOffer, 'OFFER_DID_NOT_IMPROVE', round, policy, { mayContinue: false });
+  }
+
+  const configuredStep = policy.counterSteps?.find((step) => step.round === round);
+  if (policy.counterSteps && !configuredStep) {
+    return decision(policy.escalationRules.roundsExhausted, 'MAX_ROUNDS_REACHED', round, policy, { mayContinue: false });
+  }
+  const calculatedCounter = configuredStep?.counterPrice ?? Math.min(
     policy.listPrice,
     Math.max(policy.targetPrice, offerAmount + policy.counterStep)
   );
+  const previousCounter = previousCounterOffers.at(-1);
+  const counterAmount = Math.max(policy.acceptanceFloor, calculatedCounter, offerAmount);
+  if (counterAmount > policy.listPrice || (previousCounter !== undefined && counterAmount > previousCounter)) {
+    return decision(DECISION_STATUS.ESCALATE, 'COUNTER_POLICY_CONFLICT', round, policy, { mayContinue: false });
+  }
   return decision(DECISION_STATUS.COUNTER, 'COUNTER_WITHIN_POLICY', round, policy, {
     counterAmount,
-    mayContinue: round < policy.maxRounds,
+    mayContinue: round < policy.maxAutomatedRounds,
+    messageCode: `COUNTER_ROUND_${round}`,
   });
 }
 
@@ -70,6 +86,12 @@ function requireRound(value) {
     throw new DomainValidationError('round must be a positive integer', 'round');
   }
   return value;
+}
+
+function requireAmountHistory(value, field) {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new DomainValidationError(`${field} must be an array`, field);
+  return value.map((amount) => requireEuroAmount(amount, field));
 }
 
 module.exports = { DECISION_STATUS, decideNegotiation };

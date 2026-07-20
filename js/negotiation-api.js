@@ -3,9 +3,10 @@ const DEFAULT_BACKEND_URL = (location.hostname === 'localhost' || location.hostn
   : 'https://kopilotti-demo-production.up.railway.app';
 
 export class CustomerNegotiationApi {
-  constructor({ backendUrl = DEFAULT_BACKEND_URL, fetchImpl = globalThis.fetch.bind(globalThis) } = {}) {
+  constructor({ backendUrl = DEFAULT_BACKEND_URL, fetchImpl = globalThis.fetch.bind(globalThis), storage = globalThis.sessionStorage ?? null } = {}) {
     this.backendUrl = backendUrl;
     this.fetchImpl = fetchImpl;
+    this.storage = storage;
     this.session = null;
   }
 
@@ -13,10 +14,23 @@ export class CustomerNegotiationApi {
 
   async ensureSession(vehicleId) {
     if (this.session?.vehicleId === vehicleId && this.session.status === 'OPEN') return this.session;
+    const storedSessionId = this.storage?.getItem(this.storageKey(vehicleId));
+    if (storedSessionId) {
+      try {
+        const restored = await this.request(`/api/digital-salesperson/sessions/${encodeURIComponent(storedSessionId)}`, { method: 'GET' });
+        if (restored.vehicleId === vehicleId && restored.status === 'OPEN') {
+          this.session = restored;
+          return restored;
+        }
+      } catch (_error) {
+        this.storage?.removeItem(this.storageKey(vehicleId));
+      }
+    }
     this.session = await this.request('/api/digital-salesperson/sessions', {
       method: 'POST',
       body: JSON.stringify({ vehicleId }),
     });
+    this.storage?.setItem(this.storageKey(vehicleId), this.session.id);
     return this.session;
   }
 
@@ -35,6 +49,8 @@ export class CustomerNegotiationApi {
     this.session = { ...session, version: decision.sessionVersion, status: decision.sessionStatus };
     return decision;
   }
+
+  storageKey(vehicleId) { return `kopilotti.negotiation.${vehicleId}`; }
 
   async request(path, options) {
     const response = await this.fetchImpl(`${this.backendUrl}${path}`, {

@@ -38,8 +38,10 @@ function createBackendServices({ projectRoot = path.join(__dirname, '..'), dataD
     policies: new FilePolicyRepository(policyPath),
     inventory,
   });
-  const conditionReportPath = process.env.CONDITION_REPORT_PATH || path.join(projectRoot, 'config', 'condition-reports.json');
-  const handoverPolicyPath = process.env.HANDOVER_POLICY_PATH || path.join(projectRoot, 'config', 'handover-policy.json');
+  const conditionReportFile = customerDemoEnabled ? 'sales-demo-condition-reports.json' : 'condition-reports.json';
+  const handoverPolicyFile = customerDemoEnabled ? 'sales-demo-handover-policy.json' : 'handover-policy.json';
+  const conditionReportPath = process.env.CONDITION_REPORT_PATH || path.join(projectRoot, 'config', conditionReportFile);
+  const handoverPolicyPath = process.env.HANDOVER_POLICY_PATH || path.join(projectRoot, 'config', handoverPolicyFile);
   const simulatedProviders = process.env.ENABLE_SIMULATED_PURCHASE_PROVIDERS === 'true';
   const purchaseFlowService = new PurchaseFlowService({
     purchases: new FilePurchaseRepository(path.join(durableDirectory, 'purchase-sessions.json')),

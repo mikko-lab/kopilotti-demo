@@ -31,10 +31,30 @@ test('Sales demo applies the server-owned acceptance boundary before lower-price
   }
 });
 
-test('Sales demo does not accidentally accept 92 700 euros', async () => {
-  const decision = await decide(92_700);
+test('Sales demo first low offer receives the first policy step without exposing the boundary', async () => {
+  const decision = await decide(92_500);
   assert.equal(decision.status, 'COUNTER');
-  assert.equal(decision.counterAmount, 93_900);
+  assert.equal(decision.counterAmount, 94_700);
+  assert.equal(decision.messageCode, 'COUNTER_ROUND_1');
+  assert.equal(decision.acceptanceFloor, undefined);
+});
+
+test('Sales demo steps down only when the customer improves the offer', async () => {
+  const [vehicle, policy] = await Promise.all([inventory.getById('veh-0001'), policies.getForVehicle('veh-0001')]);
+  const second = decideNegotiation({ vehicle, policy, offerAmount: 93_300, currency: 'EUR', round: 2, previousCustomerOffers: [92_500], previousCounterOffers: [94_700] });
+  assert.equal(second.status, 'COUNTER');
+  assert.equal(second.counterAmount, 94_300);
+  const third = decideNegotiation({ vehicle, policy, offerAmount: 93_500, currency: 'EUR', round: 3, previousCustomerOffers: [92_500, 93_300], previousCounterOffers: [94_700, 94_300] });
+  assert.equal(third.status, 'COUNTER');
+  assert.equal(third.counterAmount, 93_900);
+});
+
+test('Sales demo escalates a repeated or lower offer and rounds beyond the automated limit', async () => {
+  const [vehicle, policy] = await Promise.all([inventory.getById('veh-0001'), policies.getForVehicle('veh-0001')]);
+  const repeated = decideNegotiation({ vehicle, policy, offerAmount: 92_500, currency: 'EUR', round: 2, previousCustomerOffers: [92_500], previousCounterOffers: [94_700] });
+  assert.equal(repeated.status, 'ESCALATE');
+  const exhausted = decideNegotiation({ vehicle, policy, offerAmount: 93_800, currency: 'EUR', round: 4, previousCustomerOffers: [92_500, 93_300, 93_500], previousCounterOffers: [94_700, 94_300, 93_900] });
+  assert.equal(exhausted.status, 'ESCALATE');
 });
 
 test('Sales demo inventory projection leaves the public inventory file unchanged', async () => {

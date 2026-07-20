@@ -15,14 +15,16 @@ const PURCHASE_STATUS = Object.freeze({
   HUMAN_REVIEW_REQUIRED: 'HUMAN_REVIEW_REQUIRED',
 });
 
-function createPurchaseSession({ id, tenantId, vehicleId, purchasePath, negotiationSessionId = null, agreedPrice, handoverPolicyVersion, createdAt }) {
+function createPurchaseSession({ id, tenantId, vehicleId, purchasePath, negotiationSessionId = null, negotiationHistory = null, agreedPrice, handoverPolicyVersion, createdAt }) {
   for (const [field, value] of Object.entries({ id, tenantId, vehicleId, createdAt })) requireString(value, field);
   if (!Object.values(PURCHASE_PATH).includes(purchasePath)) throw new DomainValidationError('Unsupported purchase path', 'purchasePath');
   if (purchasePath === PURCHASE_PATH.NEGOTIATED) requireString(negotiationSessionId, 'negotiationSessionId');
+  if (purchasePath === PURCHASE_PATH.NEGOTIATED && !negotiationHistory) throw new DomainValidationError('negotiationHistory is required', 'negotiationHistory');
   if (!Number.isSafeInteger(agreedPrice) || agreedPrice <= 0) throw new DomainValidationError('agreedPrice is required', 'agreedPrice');
   requireString(handoverPolicyVersion, 'handoverPolicyVersion');
   return {
     id, tenantId, vehicleId, purchasePath, negotiationSessionId,
+    negotiationHistory: negotiationHistory ? structuredClone(negotiationHistory) : null,
     agreedPrice, handoverPolicyVersion, status: PURCHASE_STATUS.PRICE_AGREED,
     version: 1,
     report: null,

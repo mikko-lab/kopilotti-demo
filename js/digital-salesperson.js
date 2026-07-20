@@ -5,7 +5,7 @@ import { calculateDealSummary, formatSignedEuro, formatSignedPercent, parseEuroI
 
 const api = new CustomerNegotiationApi();
 const purchaseApi = new PurchaseFlowApi();
-const state = { vehicle: null, negotiationStarted: false, preNegotiationReportOpened: false, conditionReturnFocus: null, purchasePath: null, demoRun: 0 };
+const state = { vehicle: null, negotiationStarted: false, preNegotiationReportOpened: false, conditionReturnFocus: null, purchasePath: null, latestCounterOffer: null, demoRun: 0 };
 const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRICE' };
 const DEMO_STEP_DELAY_MS = 1_500;
 const REDUCED_MOTION_DEMO_STEP_DELAY_MS = 120;
@@ -147,12 +147,14 @@ async function submitPrice(event) {
 
 function renderDecision(decision) {
   if (decision.status === 'ACCEPT') {
+    state.latestCounterOffer = null;
     showAcceptedDealSummary(decision.approvedAmount);
     addMessage('salesperson decision', `Voimme tehdä kaupat hinnalla ${formatEuro(decision.approvedAmount)}. Jatketaan maksutavan valintaan.`);
     renderDecisionActions('reserve');
   } else if (decision.status === 'COUNTER') {
-    addMessage('salesperson decision', `Lähin hinta, jolla voimme tehdä kaupat, on ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja jatkaa ostoprosessiin?`);
-    renderDecisionActions('counter');
+    state.latestCounterOffer = decision.counterOffer;
+    addMessage('salesperson decision', counterMessage(decision));
+    renderDecisionActions('counter', decision);
   } else if (decision.status === 'REJECT') {
     addMessage('salesperson decision', 'Emme voi tehdä kauppoja ehdottamallasi hinnalla. Voit jatkaa neuvottelua tai edetä listahinnalla.');
     renderDecisionActions('rejected');
@@ -162,12 +164,27 @@ function renderDecision(decision) {
   }
 }
 
-function renderDecisionActions(mode) {
+function counterMessage(decision) {
+  const price = formatEuro(decision.counterOffer);
+  if (decision.messageCode === 'COUNTER_ROUND_1') {
+    return `Kiitos ehdotuksestasi. Tällä hinnalla emme vielä voi tehdä kauppaa. Voimme tulla vastaan hintaan ${price}. Haluatko hyväksyä hinnan vai tehdä uuden ehdotuksen?`;
+  }
+  if (decision.messageCode === 'COUNTER_ROUND_2') {
+    return `Olemme jo lähempänä. Voimme tarkistaa hinnan ${price.replace(' €', ' euroon')}. Haluatko hyväksyä hinnan vai jatkaa neuvottelua?`;
+  }
+  return `Voimme tehdä vielä viimeisen tarkistuksen hintaan ${price}. Jos hyväksyt tämän hinnan, voimme jatkaa ostoprosessiin.`;
+}
+
+function renderDecisionActions(mode, decision = null) {
   const container = document.getElementById('decisionActions');
   container.classList.remove('hidden');
   container.replaceChildren();
-  if (mode === 'reserve' || mode === 'counter') {
-    container.append(createAction(mode === 'counter' ? 'Hyväksy hinta ja jatka' : 'Jatka ostoprosessiin', (event) => beginPurchaseFlow(PURCHASE_PATH.NEGOTIATED, event.currentTarget), true));
+  if (mode === 'reserve') {
+    container.append(createAction('Jatka ostoprosessiin', (event) => beginPurchaseFlow(PURCHASE_PATH.NEGOTIATED, event.currentTarget), true));
+  }
+  if (mode === 'counter') {
+    container.append(createAction(`Hyväksy ${formatEuro(decision.counterOffer)}`, acceptCounterOffer, true));
+    if (decision.canSubmitNewOffer) container.append(createAction('Tee uusi ehdotus', prepareNewOffer, false));
   }
   if (mode === 'rejected') {
     container.append(createAction('Jatka listahinnalla', (event) => beginPurchaseFlow(PURCHASE_PATH.DIRECT, event.currentTarget), true));
@@ -185,6 +202,27 @@ function renderDecisionActions(mode) {
     container.append(note);
   }
   container.append(createAction('Palaa auton tietoihin', closeFlow, false));
+}
+
+function prepareNewOffer() {
+  const form = document.getElementById('priceForm');
+  const input = document.getElementById('priceInput');
+  document.getElementById('decisionActions').classList.add('hidden');
+  form.classList.remove('hidden');
+  input.disabled = false;
+  input.value = '';
+  updateDealSummary();
+  input.focus();
+}
+
+function acceptCounterOffer(event) {
+  const amount = state.latestCounterOffer;
+  if (!Number.isSafeInteger(amount)) return;
+  showAcceptedDealSummary(amount);
+  document.getElementById('priceForm').classList.add('hidden');
+  document.getElementById('decisionActions').classList.add('hidden');
+  addMessage('salesperson decision', `Hinnasta sovittu ${formatEuro(amount)}. Jatketaan ostoprosessiin.`);
+  beginPurchaseFlow(PURCHASE_PATH.NEGOTIATED, event.currentTarget);
 }
 
 function createAction(label, handler, primary) {
@@ -223,6 +261,9 @@ async function beginPurchaseFlow(purchasePath, trigger) {
     showDealAgreement(purchasePath);
   } catch (error) {
     const journey = document.getElementById('purchaseJourney');
+    document.getElementById('paymentMethods').classList.add('hidden');
+    document.getElementById('dealAgreement').classList.add('hidden');
+    document.getElementById('demoConfirmation').classList.add('hidden');
     journey.classList.remove('hidden');
     setPurchaseStatus('Ostoprosessia ei voitu aloittaa', 'Kaupan tietoja ei muutettu. Yritä uudelleen tai ota yhteys myyjään.');
     journey.focus();
@@ -503,7 +544,10 @@ function vehicleIdentity(vehicle) { return `${vehicle.makeModel} · ${vehicle.re
 
 const DEMO_STEPS = [
   ['condition', 'Kuntoraportti avattu'],
-  ['offer', 'Hintaehdotus'],
+  ['offer', 'Asiakas ehdottaa 92 500 €'],
+  ['counter-one', 'Digitaalinen automyyjä ehdottaa 94 700 €'],
+  ['offer-two', 'Asiakas ehdottaa 93 500 €'],
+  ['counter-two', 'Digitaalinen automyyjä ehdottaa 94 300 €'],
   ['agreement', `Hinnasta sovittu: ${formatEuro(DEMO_VEHICLE.agreedPrice)}`],
   ['payment', 'Maksutavaksi valittu käteinen / tilisiirto'],
   ['waiting', 'Auto on varattu. Maksua odotetaan. Varaus voimassa 22.7.2026 klo 18.00 asti.'],

@@ -88,7 +88,7 @@ test('keeps the generic vehicle media compact, proportional, and semantically ca
 
 test('keeps persona out of negotiation transport and contains no client pricing thresholds', () => {
   assert.equal(apiScript.includes('persona'), false);
-  for (const confidential of ['floorPrice', 'targetPrice', 'minimumNegotiableOffer', 'counterStep']) {
+  for (const confidential of ['floorPrice', 'targetPrice', 'minimumNegotiableOffer', 'counterStep', 'acceptanceFloor', 'minimumOfferForAutomation', 'counterSteps']) {
     assert.equal(apiScript.includes(confidential), false, confidential);
     assert.equal(uiScript.includes(confidential), false, confidential);
   }
@@ -119,8 +119,8 @@ test('uses one Alfa Romeo source throughout the standalone demo without Audi ass
   assert.match(demoVehicle, /makeModel: 'Alfa Romeo Giulia Quadrifoglio'/);
   assert.match(demoVehicle, /registration: 'XYZ-123'/);
   assert.match(demoVehicle, /listPrice: 95_000/);
-  assert.match(demoVehicle, /agreedPrice: 92_500/);
-  assert.match(html, /Hinnasta sovittu · 92 500 €/);
+  assert.match(demoVehicle, /agreedPrice: 94_300/);
+  assert.match(html, /Hinnasta sovittu · 94 300 €/);
   assert.match(uiScript, /import \{ DEMO_VEHICLE \} from '\.\/demo-vehicle\.js'/);
   assert.doesNotMatch(uiScript, /inventory\.json/);
   assert.match(landing, /src="js\/demo-landing\.js"/);
@@ -219,6 +219,17 @@ test('accepted manual offer locks input and changes summary to agreed price', ()
   assert.match(uiScript, /Hinnasta sovittu · \$\{formatEuro\(purchaseApi\.session\.agreedPrice\)\}/);
 });
 
+test('counter decision keeps negotiation available with accept and new-offer actions', () => {
+  assert.match(uiScript, /state\.latestCounterOffer = decision\.counterOffer/);
+  assert.match(uiScript, /Hyväksy \$\{formatEuro\(decision\.counterOffer\)\}/);
+  assert.match(uiScript, /createAction\('Tee uusi ehdotus', prepareNewOffer/);
+  assert.match(uiScript, /form\.classList\.remove\('hidden'\)/);
+  assert.match(uiScript, /input\.value = ''/);
+  assert.match(uiScript, /showAcceptedDealSummary\(amount\)/);
+  assert.match(uiScript, /beginPurchaseFlow\(PURCHASE_PATH\.NEGOTIATED/);
+  assert.match(vehicleStyles, /@media \(max-width: 639px\)/);
+});
+
 test('does not disguise transport failures as a commercial review decision', () => {
   assert.match(uiScript, /Hinnan tarkistaminen ei onnistunut juuri nyt\. Kaupan tietoja ei muutettu\./);
   assert.match(uiScript, /renderDecisionActions\('unavailable'\)/);
@@ -233,13 +244,20 @@ test('binds native browser fetch before storing it on API client instances', () 
 test('uses dealership language while checking, accepting, and escalating a price', () => {
   assert.match(uiScript, /Tarkistan, voimmeko tehdä kaupat tällä hinnalla\./);
   assert.match(uiScript, /En voi vahvistaa kauppaa tällä hinnalla suoraan\. Tarkistutan vielä, voimmeko tulla hinnassa vastaan\./);
-  assert.match(uiScript, /Lähin hinta, jolla voimme tehdä kaupat/);
+  assert.match(uiScript, /Kiitos ehdotuksestasi\. Tällä hinnalla emme vielä voi tehdä kauppaa/);
+  assert.match(uiScript, /Olemme jo lähempänä/);
+  assert.match(uiScript, /Voimme tehdä vielä viimeisen tarkistuksen/);
+  assert.doesNotMatch(uiScript, /Lähin hinta|alin hinta|vähimmäishinta|hintalattia/);
   assert.doesNotMatch(`${html}\n${uiScript}`, /Tarjouksesi|hyväksytty tarjous|vastatarjous|bid accepted|offer accepted|auction/i);
 });
 
-test('Run Demo remains pinned to its separate 92 500 euro price', () => {
-  assert.match(demoVehicle, /agreedPrice: 92_500/);
-  assert.match(html, /Hinnasta sovittu · 92 500 €/);
+test('Run Demo illustrates the stepped policy and ends at an allowed counter price', () => {
+  assert.match(demoVehicle, /agreedPrice: 94_300/);
+  assert.match(html, /Hinnasta sovittu · 94 300 €/);
+  assert.match(uiScript, /Asiakas ehdottaa 92 500 €/);
+  assert.match(uiScript, /Digitaalinen automyyjä ehdottaa 94 700 €/);
+  assert.match(uiScript, /Asiakas ehdottaa 93 500 €/);
+  assert.match(uiScript, /Digitaalinen automyyjä ehdottaa 94 300 €/);
   assert.match(html, /data-demo-step="condition"[^>]*><span[^>]*>○<\/span>Kuntoraportti avattu/);
   assert.match(uiScript, /async function runDemo\(\) \{[\s\S]*markPreNegotiationReportOpened\(\)/);
   assert.match(html, /id="journeyDemoTitle">Koko asiakaspolku/);
@@ -260,4 +278,12 @@ test('static demo does not serve backend pricing policy files to the browser', (
   assert.match(staticServer, /app\.use\('\/js'/);
   assert.match(staticServer, /response\.status\(404\)/);
   assert.doesNotMatch(uiScript, /93900|93_900|acceptanceThreshold/);
+});
+
+test('persists only an opaque negotiation session id in browser session storage', () => {
+  assert.match(apiScript, /sessionStorage/);
+  assert.match(apiScript, /getItem\(this\.storageKey\(vehicleId\)\)/);
+  assert.match(apiScript, /GET/);
+  assert.match(apiScript, /setItem\(this\.storageKey\(vehicleId\), this\.session\.id\)/);
+  assert.doesNotMatch(apiScript, /JSON\.stringify\(this\.session\)/);
 });

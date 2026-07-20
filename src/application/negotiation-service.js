@@ -12,7 +12,7 @@ class NegotiationService {
 
   async create({ tenantId, actorId, vehicleId }) {
     const [policy, vehicle] = await Promise.all([
-      this.policies.getForVehicle(vehicleId),
+      this.policies.getForVehicle(vehicleId, tenantId),
       this.inventory.getById(vehicleId),
     ]);
     if (!policy) throw new ApplicationError('POLICY_NOT_FOUND', 'Negotiation requires human review', 409);
@@ -39,7 +39,7 @@ class NegotiationService {
     if (offer.vehicleId !== session.vehicleId) throw new ApplicationError('VEHICLE_MISMATCH', 'Offer vehicle does not match session', 400);
 
     const [policy, vehicle] = await Promise.all([
-      this.policies.getForVehicle(session.vehicleId),
+      this.policies.getForVehicle(session.vehicleId, tenantId),
       this.inventory.getById(session.vehicleId),
     ]);
     if (!policy || policy.policyVersion !== session.policyVersion) {
@@ -49,7 +49,11 @@ class NegotiationService {
 
     const occurredAt = this.clock().toISOString();
     const decisionId = this.idGenerator();
-    const decision = decideNegotiation({ policy, vehicle, offerAmount: offer.offerAmount, currency: offer.currency, round: session.nextRound });
+    const decision = decideNegotiation({
+      policy, vehicle, offerAmount: offer.offerAmount, currency: offer.currency, round: session.nextRound,
+      previousCustomerOffers: session.decisions.map((entry) => entry.offerAmount),
+      previousCounterOffers: session.decisions.filter((entry) => Number.isSafeInteger(entry.counterAmount)).map((entry) => entry.counterAmount),
+    });
     const updated = recordDecision(session, { commandId, decisionId, offerAmount: offer.offerAmount, currency: offer.currency, decision, occurredAt });
     await this.negotiations.save(updated, expectedVersion);
     await this.audit('NEGOTIATION_DECIDED', updated, actorId, occurredAt, {

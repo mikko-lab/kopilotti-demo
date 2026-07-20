@@ -25,7 +25,7 @@ function fixture(currentReport = reportV1, overrides = {}) {
     },
     conditionReports: { getCurrentForVehicle: async () => report },
     inventory: overrides.inventory || { getById: async () => ({ id: 'veh-0001', availability: 'available', listPrice: 30686 }) },
-    negotiations: overrides.negotiations || { get: async () => ({ vehicleId: 'veh-0001', status: 'ACCEPTED', decisions: [{ status: 'ACCEPT', approvedAmount: 29200 }] }) },
+    negotiations: overrides.negotiations || { get: async () => ({ vehicleId: 'veh-0001', status: 'ACCEPTED', updatedAt: '2026-07-20T09:59:00.000Z', decisions: [{ status: 'ACCEPT', offerAmount: 29200, approvedAmount: 29200 }] }) },
     handoverPolicies: overrides.handoverPolicies || { getCurrent: async () => handoverPolicy, getByVersion: async () => handoverPolicy },
     paymentProvider: overrides.paymentProvider || { startPayment: async ({sessionId}) => ({providerReference:`DEMO-PAYMENT-${sessionId}`,simulated:true}), verifyCallback: async p => p },
     financingProvider: overrides.financingProvider || { startApplication: async ({sessionId}) => ({providerReference:`DEMO-FINANCING-${sessionId}`,simulated:true}), verifyCallback: async p => p },
@@ -77,13 +77,14 @@ test('direct and negotiated purchases enter the same downstream state model', as
   assert.equal(negotiated.status, 'PRICE_AGREED');
   assert.equal(direct.agreedPrice, 30686);
   assert.equal(negotiated.agreedPrice, 29200);
+  assert.deepEqual(negotiated.negotiationHistory.customerOffers, [29200]);
 });
 
 test('accepted 94 100 euro Sales demo price is retained through payment start', async () => {
   let providerAmount = null;
   const context = fixture(reportV1, {
     inventory: { getById: async () => ({ id: 'veh-0001', availability: 'available', listPrice: 95_000 }) },
-    negotiations: { get: async () => ({ vehicleId: 'veh-0001', status: 'ACCEPTED', decisions: [{ status: 'ACCEPT', approvedAmount: 94_100 }] }) },
+    negotiations: { get: async () => ({ vehicleId: 'veh-0001', status: 'ACCEPTED', updatedAt: '2026-07-20T09:59:00.000Z', decisions: [{ status: 'ACCEPT', offerAmount: 94_100, approvedAmount: 94_100 }] }) },
     paymentProvider: {
       startPayment: async ({ sessionId, amount }) => {
         providerAmount = amount;
@@ -95,6 +96,7 @@ test('accepted 94 100 euro Sales demo price is retained through payment start', 
   const session = await context.service.create({ tenantId: 'dealer-1', actorId: 'customer', vehicleId: 'veh-0001', purchasePath: PURCHASE_PATH.NEGOTIATED, negotiationSessionId: 'sales-negotiation-1', correlationId: 'correlation-sales-1' });
   assert.equal(session.status, 'PRICE_AGREED');
   assert.equal(session.agreedPrice, 94_100);
+  assert.equal(session.negotiationHistory.agreedPrice, 94_100);
   assert.equal(context.events.at(-1).payload.agreedPrice, 94_100);
 
   const opened = await context.service.openConditionReport({ tenantId: 'dealer-1', actorId: 'customer', sessionId: session.id, expectedVersion: 1, correlationId: 'correlation-sales-2' });
@@ -105,6 +107,33 @@ test('accepted 94 100 euro Sales demo price is retained through payment start', 
   const pending = await context.service.startProvider({ tenantId: 'dealer-1', actorId: 'customer', sessionId: selected.id, expectedVersion: 5, correlationId: 'correlation-sales-6' });
   assert.equal(pending.agreedPrice, 94_100);
   assert.equal(providerAmount, 94_100);
+});
+
+test('accepting a counter stores exactly that amount and the negotiation history', async () => {
+  const negotiation = {
+    vehicleId: 'veh-0001', status: 'OPEN', updatedAt: '2026-07-20T09:59:00.000Z',
+    decisions: [
+      { status: 'COUNTER', offerAmount: 92_500, counterAmount: 94_700 },
+      { status: 'COUNTER', offerAmount: 93_300, counterAmount: 94_300 },
+    ],
+  };
+  const context = fixture(reportV1, {
+    inventory: { getById: async () => ({ id: 'veh-0001', availability: 'available', listPrice: 95_000 }) },
+    negotiations: {
+      get: async () => negotiation,
+      agreeLatestCounter: async () => ({ ...negotiation, status: 'PRICE_AGREED', agreedPrice: 94_300 }),
+    },
+  });
+  const session = await context.service.create({ tenantId: 'dealer-1', actorId: 'customer', vehicleId: 'veh-0001', purchasePath: PURCHASE_PATH.NEGOTIATED, negotiationSessionId: 'negotiation-counter', correlationId: 'counter-correlation-1' });
+  assert.equal(session.agreedPrice, 94_300);
+  assert.deepEqual(session.negotiationHistory, {
+    negotiationRound: 2,
+    customerOffers: [92_500, 93_300],
+    counterOffers: [94_700, 94_300],
+    latestDecision: 'ACCEPTED_COUNTER',
+    agreedPrice: 94_300,
+    updatedAt: '2026-07-20T09:59:00.000Z',
+  });
 });
 
 test('missing report requires human review and blocks progression', async () => {

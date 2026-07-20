@@ -1,0 +1,27 @@
+[
+  {
+    "policyVersion": "sales-demo-handover-v1",
+    "cashPurchase": {
+      "requireConditionReportAcknowledged": true,
+      "requirePaymentConfirmed": true,
+      "requireFinancingConfirmed": false,
+      "requireContractSigned": false,
+      "requireIdentityVerified": false,
+      "requireRegistrationCompleted": false,
+      "requireInsuranceInformationReceived": false,
+      "requireVehiclePrepared": false,
+      "requireManualApproval": false
+    },
+    "financedPurchase": {
+      "requireConditionReportAcknowledged": true,
+      "requirePaymentConfirmed": false,
+      "requireFinancingConfirmed": true,
+      "requireContractSigned": false,
+      "requireIdentityVerified": false,
+      "requireRegistrationCompleted": false,
+      "requireInsuranceInformationReceived": false,
+      "requireVehiclePrepared": false,
+      "requireManualApproval": false
+    }
+  }
+]

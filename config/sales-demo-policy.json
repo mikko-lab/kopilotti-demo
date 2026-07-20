@@ -1,12 +1,25 @@
 [
   {
+    "dealerId": "demo-dealership",
     "vehicleId": "veh-0001",
     "listPrice": 95000,
     "targetPrice": 93900,
     "floorPrice": 92500,
-    "maxRounds": 4,
+    "maxRounds": 3,
+    "maxAutomatedRounds": 3,
     "minimumNegotiableOffer": 93900,
     "counterStep": 1200,
+    "acceptanceFloor": 93900,
+    "minimumOfferForAutomation": 92000,
+    "counterSteps": [
+      { "round": 1, "counterPrice": 94700 },
+      { "round": 2, "counterPrice": 94300 },
+      { "round": 3, "counterPrice": 93900 }
+    ],
+    "escalationRules": {
+      "repeatedOrLowerOffer": "ESCALATE",
+      "roundsExhausted": "ESCALATE"
+    },
     "reservationEligible": true,
     "policyVersion": "sales-demo-v1"
   }

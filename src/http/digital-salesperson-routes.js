@@ -3,7 +3,7 @@
 const express = require('express');
 const { adaptExtractedOffer } = require('../adapters/llm-offer-adapter');
 const { ApplicationError } = require('../application/errors');
-const { publicCustomerDecision, publicSession } = require('../security/public-negotiation-view');
+const { publicCustomerDecision, publicCustomerSession } = require('../security/public-negotiation-view');
 const { asyncRoute } = require('./http-response');
 
 const DEMO_TENANT_ID = 'demo-dealership';
@@ -20,7 +20,12 @@ function createDigitalSalespersonRouter(service) {
 
   router.post('/sessions', asyncRoute(async (req, res) => {
     const session = await service.create({ tenantId: DEMO_TENANT_ID, actorId: DEMO_ACTOR_ID, vehicleId: req.body?.vehicleId });
-    res.status(201).json(publicSession(session));
+    res.status(201).json(publicCustomerSession(session));
+  }));
+
+  router.get('/sessions/:sessionId', asyncRoute(async (req, res) => {
+    const session = await service.get({ tenantId: DEMO_TENANT_ID, sessionId: req.params.sessionId });
+    res.json(publicCustomerSession(session));
   }));
 
   router.post('/sessions/:sessionId/offers', asyncRoute(async (req, res) => {

@@ -59,3 +59,30 @@ test('enforces tenant isolation and optimistic session versions', async () => {
   const offer = adaptExtractedOffer({ vehicleId: 'veh-0001', offerAmount: 28900, currency: 'EUR', evidence: 'offer' });
   await assert.rejects(service.submitOffer({ tenantId: 'dealer-1', actorId: 'seller-1', sessionId: session.id, commandId: 'c1', expectedVersion: 99, offer }), { code: 'VERSION_CONFLICT' });
 });
+
+test('persists stepped offer history and does not reward a repeated offer', async () => {
+  const steppedPolicy = {
+    ...policy,
+    dealerId: 'dealer-1',
+    maxRounds: 3,
+    maxAutomatedRounds: 3,
+    acceptanceFloor: 29_200,
+    minimumOfferForAutomation: 28_500,
+    counterSteps: [
+      { round: 1, counterPrice: 30_000 },
+      { round: 2, counterPrice: 29_600 },
+      { round: 3, counterPrice: 29_200 },
+    ],
+    escalationRules: { repeatedOrLowerOffer: 'ESCALATE', roundsExhausted: 'ESCALATE' },
+  };
+  const { service, sessions } = fixture();
+  service.policies = { getForVehicle: async () => steppedPolicy };
+  const session = await service.create({ tenantId: 'dealer-1', actorId: 'seller-1', vehicleId: 'veh-0001' });
+  const first = await service.submitOffer({ tenantId: 'dealer-1', actorId: 'seller-1', sessionId: session.id, commandId: 'step-command-1', expectedVersion: 1, offer: adaptExtractedOffer({ vehicleId: 'veh-0001', offerAmount: 28_900, currency: 'EUR', evidence: '28 900' }) });
+  assert.equal(first.counterAmount, 30_000);
+  const repeated = await service.submitOffer({ tenantId: 'dealer-1', actorId: 'seller-1', sessionId: session.id, commandId: 'step-command-2', expectedVersion: 2, offer: adaptExtractedOffer({ vehicleId: 'veh-0001', offerAmount: 28_900, currency: 'EUR', evidence: '28 900 uudelleen' }) });
+  assert.equal(repeated.status, 'ESCALATE');
+  const persisted = sessions.get(session.id);
+  assert.deepEqual(persisted.decisions.map((entry) => entry.offerAmount), [28_900, 28_900]);
+  assert.deepEqual(persisted.decisions.filter((entry) => entry.counterAmount).map((entry) => entry.counterAmount), [30_000]);
+});
