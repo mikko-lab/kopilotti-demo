@@ -23,7 +23,8 @@ Kopilotti Sales on auton ostajalle tarkoitettu digitaalinen automyyjä. Se kesku
 
 ```text
 Ajoneuvo
-  → keskustele hinnasta
+  → vahvistettu tutustuminen ajoneuvon tietoihin ja kuntoraporttiin
+  → tee hintaehdotus
   → hinnasta sovittu
   → tutustu kuntoraporttiin
   → valitse maksutapa
@@ -32,9 +33,9 @@ Ajoneuvo
   → valmis noudettavaksi
 ```
 
-Asiakkaalle näytetään autokaupan käsitteitä, ei teknisiä tilakoneen nimiä. Kun hinnasta sovitaan, keskustelunäkymä päättyy ja käyttöliittymä vaihtuu ostoprosessiksi. Keskustelukanava voi tämän jälkeen välittää tietoa, mutta se ei enää voi muuttaa sovittua hintaa, ajoneuvoa tai kaupan ehtoja.
+Asiakkaalle näytetään autokaupan käsitteitä, ei teknisiä tilakoneen nimiä. Kun hinnasta sovitaan, neuvottelunäkymä päättyy ja käyttöliittymä vaihtuu ostoprosessiksi. Tämän jälkeen asiakas ei voi muuttaa sovittua hintaa, ajoneuvoa tai kaupan ehtoja neuvottelun kautta.
 
-Suora **Osta / Varaa** -polku säilyy listahintaisena vaihtoehtona. **Digitaalinen automyyjä** on sen rinnalla palvelu autosta ja hinnasta keskustelemiseen. Laura- ja Mika-palvelutyylit vaikuttavat vain sanamuotoihin, eivät hintaan tai kaupallisiin päätöksiin.
+Sales-demon ainoa ensisijainen toimintopolku on **Hintaehdotus**. Käyttöliittymä näyttää listahinnan ja valmiiksi vahvistetun demotilan ajoneuvon tietoihin sekä kuntoraporttiin tutustumisesta ennen hinnan neuvottelua. **Run Demo** säilyy erillisenä, visuaalisesti toissijaisena läpikävelynä.
 
 ## Arkkitehtuuri
 
@@ -95,7 +96,7 @@ Ajoneuvosivulla on automaattinen **Run Demo** -läpikävely:
 
 ```text
 Alfa Romeo Giulia Quadrifoglio · XYZ-123 · 95 000 €
-  → keskustelu hinnasta
+  → hintaehdotus
   → hinnasta sovittu 92 500 €
   → maksutapa valittu
   → maksu odottaa vahvistusta

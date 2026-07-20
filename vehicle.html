@@ -64,56 +64,18 @@
 
       </section>
 
-      <aside class="purchase-column" aria-label="Osto- ja varausvaihtoehdot">
-        <section class="purchase-card journey-demo-card" aria-labelledby="journeyDemoTitle">
-          <div class="demo-vehicle-identity">
-            <p class="purchase-eyebrow">Kopilotti Sales</p>
-            <p class="demo-product-subtitle">Digital Car Salesperson</p>
-            <h2 id="journeyDemoTitle">Alfa Romeo Giulia Quadrifoglio</h2>
-            <p><strong id="journeyDemoRegistration">XYZ-123</strong><span id="journeyDemoListPrice">95 000 €</span></p>
-          </div>
-          <p>Näe, miten keskustelu muuttuu hinnan sopimisen jälkeen turvalliseksi ostoprosessiksi.</p>
-          <button class="btn btn-primary purchase-button" id="btnRunDemo" type="button" aria-controls="journeyDemoTimeline">Run Demo</button>
-          <div class="journey-demo-timeline hidden" id="journeyDemoTimeline" role="status" aria-live="polite" aria-atomic="true">
-            <div class="demo-now">
-              <strong id="journeyDemoStatus">Demo käynnistyy…</strong>
-              <span id="journeyDemoVehicle">Alfa Romeo Giulia Quadrifoglio · XYZ-123</span>
-            </div>
-            <ol aria-label="Demon eteneminen">
-              <li data-demo-step="conversation"><span aria-hidden="true">○</span>Keskustelu hinnasta</li>
-              <li data-demo-step="agreement"><span aria-hidden="true">○</span><span id="journeyDemoAgreedPrice">Hinnasta sovittu · 92 500 €</span></li>
-              <li data-demo-step="payment"><span aria-hidden="true">○</span>Maksutapa valittu</li>
-              <li data-demo-step="waiting"><span aria-hidden="true">○</span>Maksu odottaa vahvistusta</li>
-              <li data-demo-step="confirmed"><span aria-hidden="true">○</span>Maksu vahvistettu</li>
-              <li data-demo-step="ready"><span aria-hidden="true">○</span>Valmis noudettavaksi</li>
-            </ol>
-            <p class="purchase-fineprint">Ei-sitova käyttöliittymäesitys. Ei sisällä tuotantohinnoittelulogiikkaa, muodosta oikeaa kauppaa tai käsittele oikeaa maksua.</p>
-          </div>
-        </section>
-
-        <section class="purchase-card direct-purchase" aria-labelledby="directPurchaseTitle">
-          <p class="purchase-eyebrow">Nopea asiointi</p>
-          <h2 id="directPurchaseTitle">Osta / Varaa</h2>
-          <p>Voit edetä suoraan auton listahinnalla. Vahvista tietosi ja valitse osto tai varaus.</p>
-          <div class="purchase-price"><span>Auton hinta</span><strong id="directPrice">—</strong></div>
-          <button class="btn btn-primary purchase-button" id="btnDirectPurchase" type="button">Jatka ostoon tai varaukseen</button>
-          <p class="purchase-fineprint">Tämä konseptidemo ei tee sitovaa kauppaa tai oikeaa varausta.</p>
-        </section>
-
+      <aside class="purchase-column" aria-label="Hintaehdotus ja ostopolku">
         <section class="purchase-card digital-salesperson-card" aria-labelledby="digitalSalespersonTitle">
           <div class="service-heading">
             <span class="service-mark" aria-hidden="true">✦</span>
-            <div><p class="purchase-eyebrow">Palvelu verkossa</p><h2 id="digitalSalespersonTitle">Digitaalinen automyyjä</h2></div>
+            <div><p class="purchase-eyebrow">Digitaalinen automyyjä</p><h2 id="digitalSalespersonTitle">Hintaehdotus</h2></div>
           </div>
-          <h3>Haluatko neuvotella tämän auton hinnasta?</h3>
-          <span hidden>Haluatko keskustella tämän auton hinnasta?</span>
-          <p>Neuvottele kaupasta digitaalisen automyyjän kanssa. Saat vastauksen heti myös iltaisin ja viikonloppuisin.</p>
-          <ul class="service-benefits" aria-label="Palvelun mahdollisuudet">
-            <li>kysy autosta</li><li>keskustele hinnasta</li><li>varaa auto</li><li>etene kauppaan</li>
-          </ul>
-          <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-expanded="false">Aloita neuvottelu</button>
-          <span hidden>Aloita keskustelu</span>
-          <p class="service-promise">Digitaalinen automyyjä ei korvaa automyyjää. Se korvaa odottamisen.</p>
+          <p>Olet tutustunut auton tietoihin ja kuntoraporttiin.</p>
+          <div class="purchase-price"><span>Listahinta</span><strong id="offerListPrice">95 000 €</strong></div>
+          <p>Voit nyt tehdä hintaehdotuksen tästä autosta.</p>
+          <p class="verified-condition"><span aria-hidden="true">✓</span> Olen tutustunut ajoneuvon tietoihin ja kuntoraporttiin</p>
+          <p class="purchase-fineprint">Tarjouksen tekeminen edellyttää, että olet tutustunut ajoneuvon kuntoraporttiin. Tässä käyttöliittymädemossa ehto on valmiiksi vahvistettu.</p>
+          <button class="btn btn-primary purchase-button" id="btnStartDigitalSalesperson" type="button" aria-controls="digitalSalespersonFlow" aria-expanded="false">Aloita hinnan neuvottelu</button>
         </section>
 
         <section class="salesperson-flow hidden" id="digitalSalespersonFlow" aria-labelledby="flowTitle" tabindex="-1">
@@ -122,31 +84,13 @@
             <button class="flow-close" id="btnCloseFlow" type="button" aria-label="Sulje neuvottelu">×</button>
           </div>
 
-          <form id="personaForm" hidden aria-hidden="true">
-            <fieldset class="persona-fieldset">
-              <legend>Tekninen yhteensopivuusvalinta</legend>
-              <label class="persona-option">
-                <input type="radio" name="persona" value="laura" checked>
-                <span>Oletus</span>
-              </label>
-              <label class="persona-option">
-                <input type="radio" name="persona" value="mika">
-                <span>Vaihtoehto</span>
-              </label>
-            </fieldset>
-          </form>
-
           <section class="conversation hidden" id="conversation" aria-labelledby="conversationTitle">
-            <h3 class="visually-hidden" id="conversationTitle">Neuvottelu auton hinnasta</h3>
+            <h3 class="visually-hidden" id="conversationTitle">Hinnan neuvottelu</h3>
             <div class="conversation-status"><span class="status-dot active" aria-hidden="true"></span><span id="personaStatus">Digitaalinen automyyjä</span></div>
             <div class="message-list" id="messageList" role="log" aria-live="polite" aria-relevant="additions"></div>
-            <div class="question-actions" id="questionActions" aria-label="Valmiit kysymykset">
-              <button type="button" data-question="condition">Kysy auton kunnosta</button>
-              <button type="button" data-question="finance">Kysy rahoituksesta</button>
-              <button type="button" data-question="price">Keskustele hinnasta</button>
-            </div>
-            <form class="price-discussion hidden" id="priceForm">
-              <label for="priceInput">Mikä olisi tarjoushintasi?</label>
+            <form class="price-discussion" id="priceForm">
+              <p class="offer-question">Mikä olisi tarjoushintasi?</p>
+              <label for="priceInput">Tarjoushinta</label>
               <div class="price-input-row">
                 <input id="priceInput" name="price" type="text" inputmode="numeric" autocomplete="off" placeholder="Esim. 92 500 €" aria-describedby="priceHelp priceError">
                 <button class="btn btn-primary" type="submit">Lähetä tarjous</button>
@@ -156,6 +100,31 @@
             </form>
             <div class="decision-actions hidden" id="decisionActions"></div>
           </section>
+        </section>
+
+        <section class="purchase-card journey-demo-card" aria-labelledby="journeyDemoTitle">
+          <div class="demo-vehicle-identity">
+            <p class="purchase-eyebrow">Run Demo</p>
+            <h2 id="journeyDemoTitle">Alfa Romeo Giulia Quadrifoglio</h2>
+            <p><strong id="journeyDemoRegistration">XYZ-123</strong><span id="journeyDemoListPrice">95 000 €</span></p>
+          </div>
+          <p>Katso koko ostopolku hintaehdotuksesta auton luovutukseen.</p>
+          <button class="btn btn-outline purchase-button" id="btnRunDemo" type="button" aria-controls="journeyDemoTimeline">Run Demo</button>
+          <div class="journey-demo-timeline hidden" id="journeyDemoTimeline" role="status" aria-live="polite" aria-atomic="true">
+            <div class="demo-now">
+              <strong id="journeyDemoStatus">Demo käynnistyy…</strong>
+              <span id="journeyDemoVehicle">Alfa Romeo Giulia Quadrifoglio · XYZ-123</span>
+            </div>
+            <ol aria-label="Demon eteneminen">
+              <li data-demo-step="offer"><span aria-hidden="true">○</span>Hintaehdotus</li>
+              <li data-demo-step="agreement"><span aria-hidden="true">○</span><span id="journeyDemoAgreedPrice">Hinnasta sovittu · 92 500 €</span></li>
+              <li data-demo-step="payment"><span aria-hidden="true">○</span>Maksutapa valittu</li>
+              <li data-demo-step="waiting"><span aria-hidden="true">○</span>Maksu odottaa vahvistusta</li>
+              <li data-demo-step="confirmed"><span aria-hidden="true">○</span>Maksu vahvistettu</li>
+              <li data-demo-step="ready"><span aria-hidden="true">○</span>Valmis noudettavaksi</li>
+            </ol>
+            <p class="purchase-fineprint">Ei-sitova käyttöliittymäesitys. Ei sisällä tuotantohinnoittelulogiikkaa, muodosta oikeaa kauppaa tai käsittele oikeaa maksua.</p>
+          </div>
         </section>
 
         <section class="condition-report-step hidden" id="conditionReportStep" aria-labelledby="conditionReportTitle" tabindex="-1">

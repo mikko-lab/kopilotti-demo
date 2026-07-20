@@ -9,10 +9,7 @@ const PURCHASE_PATH = { DIRECT: 'DIRECT_LIST_PRICE', NEGOTIATED: 'NEGOTIATED_PRI
 
 const SALES_EXPERIENCE = {
   name: 'Digitaalinen automyyjä',
-  greeting: (vehicle) => `Hei.\n\nAutan sinua ${vehicle.makeModel} -auton ostamisessa.\n\nVoit:\n• kysyä autosta\n• tehdä tarjoushinnan\n• edetä kauppaan`,
-  condition: (vehicle) => `${vehicle.makeModel} · ${vehicle.registration}. Ennen rahoitusta tai maksamista avataan ajoneuvokohtainen kuntoraportti tutustuttavaksi.`,
-  finance: () => 'Maksutavat ovat tilisiirto ja rahoitus. Lopulliset rahoitusehdot vahvistetaan erikseen.',
-  priceIntro: 'Mikä olisi tarjoushintasi?',
+  greeting: 'Olet tutustunut auton tietoihin ja kuntoraporttiin. Voit nyt tehdä hintaehdotuksen.',
 };
 
 async function loadVehicle() {
@@ -26,7 +23,7 @@ function renderVehicle(vehicle) {
   setText('vehicleTitle', vehicle.makeModel);
   setText('vehicleSubtitle', vehicle.registration);
   setText('vehiclePrice', formatEuro(vehicle.listPrice));
-  setText('directPrice', formatEuro(vehicle.listPrice));
+  setText('offerListPrice', formatEuro(vehicle.listPrice));
   setText('vehicleMonthly', '');
   setText('vehicleAvailability', 'Demoajoneuvo');
   const image = document.getElementById('vehicleImage');
@@ -74,27 +71,8 @@ function startNegotiation() {
   state.negotiationStarted = true;
   document.getElementById('conversation').classList.remove('hidden');
   setText('personaStatus', SALES_EXPERIENCE.name);
-  addMessage('salesperson', SALES_EXPERIENCE.greeting(state.vehicle), SALES_EXPERIENCE.name);
-  document.querySelector('[data-question="price"]').focus();
-}
-
-function handleQuestion(event) {
-  const button = event.target.closest('button[data-question]');
-  if (!button) return;
-  const question = button.dataset.question;
-  if (question === 'condition') {
-    addMessage('customer', 'Millainen auton kunto on?', 'Sinä');
-    addMessage('salesperson', SALES_EXPERIENCE.condition(state.vehicle), SALES_EXPERIENCE.name);
-  } else if (question === 'finance') {
-    addMessage('customer', 'Onko tähän saatavilla rahoitus?', 'Sinä');
-    addMessage('salesperson', SALES_EXPERIENCE.finance(state.vehicle), SALES_EXPERIENCE.name);
-  } else if (question === 'price') {
-    addMessage('customer', 'Haluan keskustella hinnasta.', 'Sinä');
-    addMessage('salesperson', SALES_EXPERIENCE.priceIntro, SALES_EXPERIENCE.name);
-    document.getElementById('priceForm').classList.remove('hidden');
-    document.getElementById('priceInput').focus();
-  }
-  button.disabled = true;
+  addMessage('salesperson', SALES_EXPERIENCE.greeting, SALES_EXPERIENCE.name);
+  document.getElementById('priceInput').focus();
 }
 
 async function submitPrice(event) {
@@ -104,7 +82,7 @@ async function submitPrice(event) {
   const offerAmount = parseEuro(input.value);
   errorElement.textContent = '';
   if (!Number.isSafeInteger(offerAmount) || offerAmount <= 0) {
-    errorElement.textContent = 'Kirjoita hinta kokonaisina euroina, esimerkiksi 29 000.';
+    errorElement.textContent = 'Kirjoita tarjoushinta kokonaisina euroina, esimerkiksi 92 500.';
     input.focus();
     return;
   }
@@ -112,12 +90,12 @@ async function submitPrice(event) {
   const submitButton = event.currentTarget.querySelector('button[type="submit"]');
   submitButton.disabled = true;
   addMessage('customer', `Tarjoushintani on ${formatEuro(offerAmount)}.`, 'Sinä');
-  const waitingMessage = addMessage('salesperson pending', 'Tarkistan hintaehdotuksen…', SALES_EXPERIENCE.name);
+  const waitingMessage = addMessage('salesperson pending', 'Tarjouksesi on vastaanotettu.', SALES_EXPERIENCE.name);
   try {
     const decision = await api.discussPrice({
       vehicleId: state.vehicle.id,
       offerAmount,
-      evidence: `Asiakas haluaa keskustella hinnasta ${offerAmount} EUR.`,
+      evidence: `Asiakkaan hintaehdotus on ${offerAmount} EUR.`,
     });
     waitingMessage.remove();
     renderDecision(decision);
@@ -134,11 +112,10 @@ async function submitPrice(event) {
 function renderDecision(decision) {
   const salesperson = SALES_EXPERIENCE.name;
   if (decision.status === 'ACCEPT') {
-    document.getElementById('questionActions').classList.add('hidden');
-    addMessage('salesperson decision', `Hinnasta on sovittu. Voin vahvistaa hinnaksi ${formatEuro(decision.approvedAmount)}. ${vehicleIdentity(state.vehicle)}.`, salesperson);
+    addMessage('salesperson decision', `Tarjouksesi hyväksyttiin. Voimme hyväksyä hinnan ${formatEuro(decision.approvedAmount)}. ${vehicleIdentity(state.vehicle)}.`, salesperson);
     renderDecisionActions('reserve');
   } else if (decision.status === 'COUNTER') {
-    addMessage('salesperson decision', `Voimme jatkaa kauppaa hinnalla ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja tutustua seuraavaksi auton kuntoraporttiin?`, salesperson);
+    addMessage('salesperson decision', `Voimme jatkaa kauppaa hinnalla ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja jatkaa ostoprosessiin?`, salesperson);
     renderDecisionActions('counter');
   } else if (decision.status === 'REJECT') {
     addMessage('salesperson decision', 'Emme voi edetä ehdottamallasi hinnalla. Voit tehdä uuden hintaehdotuksen tai ostaa auton listahinnalla.', salesperson);
@@ -483,7 +460,7 @@ function setText(id, value) { document.getElementById(id).textContent = value; }
 function vehicleIdentity(vehicle) { return `${vehicle.makeModel} · ${vehicle.registration}`; }
 
 const DEMO_STEPS = [
-  ['conversation', 'Keskustelu hinnasta'],
+  ['offer', 'Hintaehdotus'],
   ['agreement', `Hinnasta sovittu: ${formatEuro(DEMO_VEHICLE.agreedPrice)}`],
   ['payment', 'Maksutavaksi valittu käteinen / tilisiirto'],
   ['waiting', 'Auto on varattu. Maksua odotetaan. Varaus voimassa 22.7.2026 klo 18.00 asti.'],
@@ -518,10 +495,8 @@ async function runDemo() {
 
 document.getElementById('btnStartDigitalSalesperson').addEventListener('click', openFlow);
 document.getElementById('btnCloseFlow').addEventListener('click', closeFlow);
-document.getElementById('btnDirectPurchase').addEventListener('click', (event) => beginPurchaseFlow(PURCHASE_PATH.DIRECT, event.currentTarget));
 document.getElementById('btnRunDemo').addEventListener('click', runDemo);
 document.getElementById('btnReviewCondition').addEventListener('click', continueToConditionReport);
-document.getElementById('questionActions').addEventListener('click', handleQuestion);
 document.getElementById('priceForm').addEventListener('submit', submitPrice);
 document.getElementById('conditionAcknowledgement').addEventListener('change', (event) => {
   document.getElementById('btnProceedAfterCondition').disabled = !event.currentTarget.checked;
