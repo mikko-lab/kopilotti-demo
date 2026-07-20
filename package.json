@@ -10,7 +10,7 @@
     "start": "node server.js",
     "start:metrics": "node src/transaction-core/metrics-server.ts",
     "dev": "node --watch server.js",
-    "dev:static": "npx --yes serve . -l 8090",
+    "dev:static": "node scripts/serve-static-demo.js",
     "generate:inventory": "node scripts/generate-inventory.js",
     "typecheck": "tsc --project tsconfig.json",
     "test": "npm run typecheck && node --test tests/**/*.test.js tests/**/*.test.ts",

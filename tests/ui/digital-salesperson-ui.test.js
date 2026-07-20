@@ -11,6 +11,8 @@ const demoVehicle = fs.readFileSync('js/demo-vehicle.js', 'utf8');
 const apiScript = fs.readFileSync('js/negotiation-api.js', 'utf8');
 const vehicleStyles = fs.readFileSync('styles/vehicle.css', 'utf8');
 const dealSummarySource = fs.readFileSync('js/deal-summary.js', 'utf8');
+const staticServer = fs.readFileSync('scripts/serve-static-demo.js', 'utf8');
+const packageManifest = fs.readFileSync('package.json', 'utf8');
 const dealSummaryModule = import(`data:text/javascript;base64,${Buffer.from(dealSummarySource).toString('base64')}`);
 
 test('presents one verified price-offer path without direct purchase competition', () => {
@@ -54,7 +56,7 @@ test('separates price agreement, provider confirmation, and handover status', ()
   assert.match(html, /aria-label="Ostopolun vaiheet"/);
   assert.match(html, /id="purchaseStatus" role="status" aria-live="polite"/);
   assert.match(html, /Ota yhteys myyjään/);
-  assert.match(uiScript, /Tarjouksesi hyväksyttiin/);
+  assert.match(uiScript, /Tarjouksesi \$\{formatEuro\(decision\.approvedAmount\)\} hyväksyttiin/);
   assert.match(uiScript, /Maksu odottaa vahvistusta/);
   assert.match(uiScript, /Rahoitushakemuksesi on käsittelyssä/);
   assert.match(uiScript, /Auton luovutuksen edellytykset ovat kunnossa/);
@@ -123,4 +125,25 @@ test('stacks summary before input by default and uses two columns on wide deskto
   assert.match(vehicleStyles, /@media \(min-width: 1100px\)/);
   assert.match(vehicleStyles, /grid-template-areas: 'input summary'/);
   assert.match(vehicleStyles, /\.deal-summary \{ grid-area: summary/);
+});
+
+test('accepted manual offer locks input and changes summary to agreed price', () => {
+  assert.match(html, /id="dealSummaryOfferLabel">Tarjoushinta/);
+  assert.match(uiScript, /setText\('dealSummaryOfferLabel', 'Sovittu hinta'\)/);
+  assert.match(uiScript, /priceInput'\)\.disabled = true/);
+  assert.match(uiScript, /Tarjouksesi \$\{formatEuro\(decision\.approvedAmount\)\} hyväksyttiin/);
+  assert.match(uiScript, /Hinnasta sovittu · \$\{formatEuro\(purchaseApi\.session\.agreedPrice\)\}/);
+});
+
+test('Run Demo remains pinned to its separate 92 500 euro price', () => {
+  assert.match(demoVehicle, /agreedPrice: 92_500/);
+  assert.match(html, /Hinnasta sovittu · 92 500 €/);
+});
+
+test('static demo does not serve backend pricing policy files to the browser', () => {
+  assert.match(packageManifest, /"dev:static": "node scripts\/serve-static-demo\.js"/);
+  assert.doesNotMatch(staticServer, /express\.static\(projectRoot/);
+  assert.match(staticServer, /app\.use\('\/js'/);
+  assert.match(staticServer, /response\.status\(404\)/);
+  assert.doesNotMatch(uiScript, /93900|93_900|acceptanceThreshold/);
 });

@@ -1,0 +1,13 @@
+[
+  {
+    "vehicleId": "veh-0001",
+    "listPrice": 95000,
+    "targetPrice": 93900,
+    "floorPrice": 92500,
+    "maxRounds": 4,
+    "minimumNegotiableOffer": 93900,
+    "counterStep": 1200,
+    "reservationEligible": true,
+    "policyVersion": "sales-demo-v1"
+  }
+]

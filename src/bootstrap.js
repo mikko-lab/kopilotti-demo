@@ -13,6 +13,7 @@ const { FileHandoverPolicyRepository } = require('./infrastructure/file-handover
 const { DisabledPaymentProvider } = require('./adapters/disabled-payment-provider');
 const { DisabledFinancingProvider } = require('./adapters/disabled-financing-provider');
 const { DeterministicDemoProvider } = require('./adapters/deterministic-demo-provider');
+const { DemoSalesInventory } = require('./adapters/demo-sales-inventory');
 
 function createNegotiationService({ projectRoot = path.join(__dirname, '..'), dataDirectory = process.env.NEGOTIATION_DATA_DIR } = {}) {
   return createBackendServices({ projectRoot, dataDirectory }).negotiationService;
@@ -20,12 +21,17 @@ function createNegotiationService({ projectRoot = path.join(__dirname, '..'), da
 
 function createBackendServices({ projectRoot = path.join(__dirname, '..'), dataDirectory = process.env.NEGOTIATION_DATA_DIR } = {}) {
   const durableDirectory = dataDirectory || path.join(projectRoot, '.data', 'negotiations');
-  // Policy values are intentionally external to the repository: this same
-  // repository is published by GitHub Pages, so a checked-in policy JSON
-  // would be directly downloadable by browsers.
-  const policyPath = process.env.NEGOTIATION_POLICY_PATH || path.join(projectRoot, 'config', 'demo-policy.json');
+  const customerDemoEnabled = process.env.ENABLE_CUSTOMER_NEGOTIATION_DEMO === 'true';
+  // Production can inject its confidential policy through NEGOTIATION_POLICY_PATH.
+  // The local static server exposes only allowlisted browser assets and never
+  // serves either policy file or this backend bootstrap module.
+  const defaultPolicyFile = customerDemoEnabled ? 'sales-demo-policy.json' : 'demo-policy.json';
+  const policyPath = process.env.NEGOTIATION_POLICY_PATH || path.join(projectRoot, 'config', defaultPolicyFile);
   const audits = new FileAuditRepository(path.join(durableDirectory, 'audit.json'));
-  const inventory = new FileInventoryRepository(path.join(projectRoot, 'inventory.json'));
+  const fileInventory = new FileInventoryRepository(path.join(projectRoot, 'inventory.json'));
+  const inventory = customerDemoEnabled
+    ? new DemoSalesInventory(fileInventory)
+    : fileInventory;
   const negotiationService = new NegotiationService({
     negotiations: new FileNegotiationRepository(path.join(durableDirectory, 'sessions.json')),
     audits,

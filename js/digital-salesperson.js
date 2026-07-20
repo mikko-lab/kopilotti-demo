@@ -63,6 +63,15 @@ function updateDealSummary() {
   setText('dealSummaryPercentage', summary ? formatSignedPercent(summary.percentageDifference) : '—');
 }
 
+function showAcceptedDealSummary(approvedAmount) {
+  const summary = calculateDealSummary(state.vehicle.listPrice, approvedAmount);
+  setText('dealSummaryOfferLabel', 'Sovittu hinta');
+  setText('dealSummaryOffer', formatEuro(approvedAmount));
+  setText('dealSummaryDifference', formatSignedEuro(summary.difference));
+  setText('dealSummaryPercentage', formatSignedPercent(summary.percentageDifference));
+  document.getElementById('priceInput').disabled = true;
+}
+
 function openFlow() {
   const flow = document.getElementById('digitalSalespersonFlow');
   flow.classList.remove('hidden');
@@ -123,7 +132,8 @@ async function submitPrice(event) {
 function renderDecision(decision) {
   const salesperson = SALES_EXPERIENCE.name;
   if (decision.status === 'ACCEPT') {
-    addMessage('salesperson decision', `Tarjouksesi hyväksyttiin. Voimme hyväksyä hinnan ${formatEuro(decision.approvedAmount)}. ${vehicleIdentity(state.vehicle)}.`, salesperson);
+    showAcceptedDealSummary(decision.approvedAmount);
+    addMessage('salesperson decision', `Tarjouksesi ${formatEuro(decision.approvedAmount)} hyväksyttiin. Voit nyt siirtyä valitsemaan maksutavan. ${vehicleIdentity(state.vehicle)}.`, salesperson);
     renderDecisionActions('reserve');
   } else if (decision.status === 'COUNTER') {
     addMessage('salesperson decision', `Voimme jatkaa kauppaa hinnalla ${formatEuro(decision.counterAmount)}. Haluatko hyväksyä hinnan ja jatkaa ostoprosessiin?`, salesperson);
@@ -208,7 +218,7 @@ function showDealAgreement(purchasePath) {
   journey.classList.remove('hidden');
   agreement.classList.remove('hidden');
   const negotiated = purchasePath === PURCHASE_PATH.NEGOTIATED;
-  setText('purchaseJourneyTitle', negotiated ? 'Hinnasta sovittu' : 'Ostopolku aloitettu');
+  setText('purchaseJourneyTitle', negotiated ? `Hinnasta sovittu · ${formatEuro(purchaseApi.session.agreedPrice)}` : 'Ostopolku aloitettu');
   setText('dealAgreementTitle', negotiated ? 'Hinnasta sovittu' : 'Listahinta valittu');
   setText('agreementPrice', formatEuro(purchaseApi.session.agreedPrice));
   setText('agreementVehicle', vehicleIdentity(state.vehicle));
