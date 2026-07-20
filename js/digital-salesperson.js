@@ -61,6 +61,7 @@ function renderVehicle(vehicle) {
   setText('journeyDemoRegistration', vehicle.registration);
   setText('journeyDemoListPrice', formatEuro(vehicle.listPrice));
   setText('journeyDemoAgreedPrice', `Hinnasta sovittu · ${formatEuro(vehicle.agreedPrice)}`);
+  setText('journeyDemoVehicle', vehicleIdentity(vehicle));
 }
 
 function openFlow() {
@@ -498,7 +499,7 @@ const DEMO_STEPS = [
   ['payment', 'Maksutavaksi valittu käteinen / tilisiirto'],
   ['waiting', 'Auto on varattu. Maksua odotetaan. Varaus voimassa 22.7.2026 klo 18.00 asti.'],
   ['confirmed', 'Maksu vahvistettu. Auto valmistellaan luovutukseen.'],
-  ['ready', `${DEMO_VEHICLE.makeModel} · ${DEMO_VEHICLE.registration} on valmis noudettavaksi.`],
+  ['ready', 'Valmis noudettavaksi'],
 ];
 
 async function runDemo() {

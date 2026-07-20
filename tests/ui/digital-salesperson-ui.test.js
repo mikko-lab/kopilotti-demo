@@ -71,3 +71,9 @@ test('uses one Alfa Romeo source throughout the standalone demo without Audi ass
     assert.doesNotMatch(surface, /audi/i);
   }
 });
+
+test('keeps the demo vehicle identity visible after the final status update', () => {
+  assert.match(html, /id="journeyDemoVehicle">Alfa Romeo Giulia Quadrifoglio · XYZ-123/);
+  assert.match(uiScript, /setText\('journeyDemoVehicle', vehicleIdentity\(vehicle\)\)/);
+  assert.match(uiScript, /setText\('journeyDemoStatus', 'Valmis noudettavaksi'\)/);
+});

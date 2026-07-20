@@ -75,7 +75,10 @@
           <p>Näe, miten keskustelu muuttuu hinnan sopimisen jälkeen turvalliseksi ostoprosessiksi.</p>
           <button class="btn btn-primary purchase-button" id="btnRunDemo" type="button" aria-controls="journeyDemoTimeline">Run Demo</button>
           <div class="journey-demo-timeline hidden" id="journeyDemoTimeline" role="status" aria-live="polite" aria-atomic="true">
-            <p class="demo-now" id="journeyDemoStatus">Demo käynnistyy…</p>
+            <div class="demo-now">
+              <strong id="journeyDemoStatus">Demo käynnistyy…</strong>
+              <span id="journeyDemoVehicle">Alfa Romeo Giulia Quadrifoglio · XYZ-123</span>
+            </div>
             <ol aria-label="Demon eteneminen">
               <li data-demo-step="conversation"><span aria-hidden="true">○</span>Keskustelu hinnasta</li>
               <li data-demo-step="agreement"><span aria-hidden="true">○</span><span id="journeyDemoAgreedPrice">Hinnasta sovittu · 92 500 €</span></li>

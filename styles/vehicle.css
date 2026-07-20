@@ -75,6 +75,8 @@
 .journey-demo-card > p { color: var(--text2); font-size: var(--text-sm); margin: 12px 0; }
 .journey-demo-timeline { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid rgba(22,163,74,.25); }
 .journey-demo-timeline .demo-now { min-height: 44px; margin: 0 0 12px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--white); color: var(--text); font-weight: 700; }
+.journey-demo-timeline .demo-now > * { display: block; }
+.journey-demo-timeline .demo-now span { margin-top: 3px; color: var(--text2); font-size: var(--text-xs); font-weight: 500; }
 .journey-demo-timeline ol { display: grid; gap: 3px; list-style: none; }
 .journey-demo-timeline li { display: grid; grid-template-columns: 22px 1fr; align-items: center; gap: 7px; padding: 7px 4px; color: var(--muted); font-size: var(--text-xs); }
 .journey-demo-timeline li.current { color: var(--primary-dark); font-weight: 700; }
