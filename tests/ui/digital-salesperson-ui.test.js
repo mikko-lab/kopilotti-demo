@@ -9,6 +9,7 @@ const landing = fs.readFileSync('index.html', 'utf8');
 const uiScript = fs.readFileSync('js/digital-salesperson.js', 'utf8');
 const demoVehicle = fs.readFileSync('js/demo-vehicle.js', 'utf8');
 const apiScript = fs.readFileSync('js/negotiation-api.js', 'utf8');
+const vehicleStyles = fs.readFileSync('styles/vehicle.css', 'utf8');
 
 test('presents the digital salesperson as an additional dealership purchase path', () => {
   assert.match(html, /<h2 id="directPurchaseTitle">Osta \/ Varaa<\/h2>/);
@@ -76,4 +77,9 @@ test('keeps the demo vehicle identity visible after the final status update', ()
   assert.match(html, /id="journeyDemoVehicle">Alfa Romeo Giulia Quadrifoglio · XYZ-123/);
   assert.match(uiScript, /setText\('journeyDemoVehicle', vehicleIdentity\(vehicle\)\)/);
   assert.match(uiScript, /setText\('journeyDemoStatus', 'Valmis noudettavaksi'\)/);
+});
+
+test('turns only the timeline marker into a check without hiding agreement text', () => {
+  assert.match(vehicleStyles, /li\.complete > span:first-child/);
+  assert.doesNotMatch(vehicleStyles, /journey-demo-timeline li\.complete span \{/);
 });

@@ -81,8 +81,8 @@
 .journey-demo-timeline li { display: grid; grid-template-columns: 22px 1fr; align-items: center; gap: 7px; padding: 7px 4px; color: var(--muted); font-size: var(--text-xs); }
 .journey-demo-timeline li.current { color: var(--primary-dark); font-weight: 700; }
 .journey-demo-timeline li.complete { color: var(--success-text); }
-.journey-demo-timeline li.complete span { font-size: 0; }
-.journey-demo-timeline li.complete span::after { content: '✓'; font-size: var(--text-sm); font-weight: 800; }
+.journey-demo-timeline li.complete > span:first-child { font-size: 0; }
+.journey-demo-timeline li.complete > span:first-child::after { content: '✓'; font-size: var(--text-sm); font-weight: 800; }
 
 .salesperson-flow { margin-top: 0; padding: 0; overflow: hidden; }
 .condition-report-step { margin-top: 0; padding: 0; overflow: hidden; }
