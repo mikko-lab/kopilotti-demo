@@ -8,6 +8,7 @@ const html = fs.readFileSync('vehicle.html', 'utf8');
 const landing = fs.readFileSync('index.html', 'utf8');
 const uiScript = fs.readFileSync('js/digital-salesperson.js', 'utf8');
 const demoVehicle = fs.readFileSync('js/demo-vehicle.js', 'utf8');
+const demoVehicleImage = fs.readFileSync('assets/cars/demo-vehicle-placeholder.svg', 'utf8');
 const apiScript = fs.readFileSync('js/negotiation-api.js', 'utf8');
 const purchaseApiScript = fs.readFileSync('js/purchase-flow-api.js', 'utf8');
 const vehicleStyles = fs.readFileSync('styles/vehicle.css', 'utf8');
@@ -19,6 +20,9 @@ const negotiationStart = html.indexOf('<section class="salesperson-flow');
 const negotiationEnd = html.indexOf('<section class="purchase-card journey-demo-card');
 const negotiationMarkup = html.slice(negotiationStart, negotiationEnd);
 const submitPriceSource = uiScript.slice(uiScript.indexOf('async function submitPrice'), uiScript.indexOf('function renderDecision('));
+const cardStart = html.indexOf('<section class="purchase-card digital-salesperson-card"');
+const cardEnd = html.indexOf('<section class="salesperson-flow', cardStart);
+const negotiationCardMarkup = html.slice(cardStart, cardEnd);
 
 test('presents one verified price-offer path without direct purchase competition', () => {
   assert.match(html, /<h2 id="digitalSalespersonTitle">Hinnan neuvottelu<\/h2>/);
@@ -46,7 +50,11 @@ test('requires the inspection report before enabling the accessible negotiation 
   assert.match(html, /id="btnOpenPreNegotiationReport"[^>]+type="button"[^>]*>Avaa kuntoraportti<\/button>/);
   assert.match(html, /id="btnStartDigitalSalesperson"[^>]+disabled/);
   assert.match(html, /id="negotiationGateStatus" role="status" aria-live="polite"/);
-  assert.match(html, /Tutustu auton tietoihin ja kuntoraporttiin ennen hinnan neuvottelua/);
+  assert.match(negotiationCardMarkup, /Tutustu auton tietoihin ja avaa kuntoraportti ennen hinnasta neuvottelua/);
+  assert.match(negotiationCardMarkup, /Kuntoraporttia ei ole vielä avattu/);
+  assert.equal((negotiationCardMarkup.match(/id="negotiationGateStatus"/g) || []).length, 1);
+  assert.equal((negotiationCardMarkup.match(/Millä hinnalla voimme tehdä kaupat\?/g) || []).length, 1);
+  assert.doesNotMatch(`${html}\n${uiScript}`, /Avaa kuntoraportti ennen hinnan neuvottelua\./);
   assert.doesNotMatch(html, /Olen tutustunut ajoneuvon tietoihin ja kuntoraporttiin/);
   assert.match(html, /Millä hinnalla voimme tehdä kaupat\?/);
   assert.match(html, /<label for="priceInput">Ehdottamasi kauppahinta<\/label>/);
@@ -64,6 +72,18 @@ test('opening the demo report records completion, enables negotiation, and resto
   assert.match(uiScript, /preNegotiationConditionReport'\)\.addEventListener\('close', restoreFocusAfterPreNegotiationReport\)/);
   assert.match(uiScript, /btnStartDigitalSalesperson'\)\.focus\(\)/);
   assert.match(uiScript, /if \(!state\.preNegotiationReportOpened\)/);
+});
+
+test('keeps the generic vehicle media compact, proportional, and semantically captioned', () => {
+  assert.match(html, /<figure class="vehicle-hero">[\s\S]*?<img id="vehicleImage"[^>]+alt="Geneerinen demoajoneuvon paikkamerkkikuva"[^>]+>[\s\S]*?<figcaption>Geneerinen demokuva — ei kuva yksittäisestä ajoneuvosta<\/figcaption>/);
+  assert.equal((html.match(/Geneerinen demokuva — ei kuva yksittäisestä ajoneuvosta/g) || []).length, 1);
+  assert.match(demoVehicleImage, />Ajoneuvon demokuva<\/text>/);
+  assert.doesNotMatch(html, />Geneerinen demoajoneuvon paikkamerkkikuva</);
+  assert.match(vehicleStyles, /\.vehicle-hero img \{[^}]*height: clamp\(210px, 34vw, 350px\)[^}]*object-fit: contain/);
+  assert.match(vehicleStyles, /\.vehicle-hero img \{[^}]*padding: clamp\(10px, 1\.5vw, 16px\) clamp\(8px, 1\.5vw, 16px\)/);
+  assert.doesNotMatch(vehicleStyles, /\.vehicle-hero img \{[^}]*object-fit: cover/);
+  assert.match(vehicleStyles, /\.vehicle-hero figcaption \{ padding: 6px 12px;[^}]*font-size: var\(--text-2xs\)/);
+  assert.match(vehicleStyles, /\.vehicle-hero img \{[^}]*width: 100%/);
 });
 
 test('keeps persona out of negotiation transport and contains no client pricing thresholds', () => {

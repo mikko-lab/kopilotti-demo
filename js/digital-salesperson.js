@@ -60,7 +60,7 @@ function showAcceptedDealSummary(approvedAmount) {
 
 function openFlow() {
   if (!state.preNegotiationReportOpened) {
-    setText('negotiationGateStatus', 'Avaa kuntoraportti ennen hinnan neuvottelua.');
+    setText('negotiationGateStatus', 'Kuntoraporttia ei ole vielä avattu.');
     document.getElementById('btnOpenPreNegotiationReport').focus();
     return;
   }
