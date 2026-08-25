@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: kopilotti-demo-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGIN
+        value: https://mikko-lab.github.io
+      - key: ANTHROPIC_TIMEOUT_MS
+        value: 15000
+      - key: ANALYZE_RATE_LIMIT_MAX
+        value: 10

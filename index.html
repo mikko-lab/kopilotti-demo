@@ -83,7 +83,8 @@
           <button class="btn btn-primary btn-sm" id="btnGiveConsent" type="button">✓ Asiakas hyväksyi</button>
         </div>
         <details class="crm-details">
-          <summary>Suostumusloki (JSON)</summary>
+          <summary>Istuntokohtainen suostumusloki (JSON)</summary>
+          <p class="consent-log-scope">Näkyy vain tässä selainistunnossa — ei tallennu, ei lähetetä minnekään. Ketjutettu hash tunnistaa merkinnän jälkikäteisen muokkauksen tässä istunnossa, ei todista mitään istunnon ulkopuolelle.</p>
           <pre id="consentAuditJson">—</pre>
         </details>
       </div>
@@ -115,13 +116,13 @@
       <!-- Scenarios -->
       <div class="scenario-bar">
         <h2 class="scenario-label">Demo-skenaariot</h2>
-        <button class="scenario-btn" type="button" data-scenario="hinta">💬 Hintaepäily</button>
-        <button class="scenario-btn" type="button" data-scenario="rahoitus">💳 Rahoitus</button>
-        <button class="scenario-btn" type="button" data-scenario="perhe">👨‍👩‍👧 Perhe</button>
-        <button class="scenario-btn" type="button" data-scenario="osto">🤝 Ostovalmis</button>
-        <button class="scenario-btn" type="button" data-scenario="vaihto">🔄 Vaihto</button>
-        <button class="scenario-btn" type="button" data-scenario="pakettiauto">📦 Pakettiauto</button>
-        <button class="scenario-btn" type="button" data-scenario="whatsapp">📱 WhatsApp</button>
+        <button class="scenario-btn" type="button" data-scenario="hinta" disabled>💬 Hintaepäily</button>
+        <button class="scenario-btn" type="button" data-scenario="rahoitus" disabled>💳 Rahoitus</button>
+        <button class="scenario-btn" type="button" data-scenario="perhe" disabled>👨‍👩‍👧 Perhe</button>
+        <button class="scenario-btn" type="button" data-scenario="osto" disabled>🤝 Ostovalmis</button>
+        <button class="scenario-btn" type="button" data-scenario="vaihto" disabled>🔄 Vaihto</button>
+        <button class="scenario-btn" type="button" data-scenario="pakettiauto" disabled>📦 Pakettiauto</button>
+        <button class="scenario-btn" type="button" data-scenario="whatsapp" disabled>📱 WhatsApp</button>
       </div>
 
       <!-- Transcript -->
