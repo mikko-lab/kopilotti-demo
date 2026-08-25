@@ -23,6 +23,10 @@ describe('suomenkielinen käyttöliittymä', () => {
     const document = new JSDOM(indexHtml).window.document;
     const visibleText = document.body.textContent.replace(/\s+/g, ' ').trim();
 
+    expect(
+      Array.from(document.querySelectorAll('.header-pipeline .pipeline-step'), (element) => element.textContent)
+    ).toEqual(['Puhe', 'Tekoälyanalyysi', 'Tunnistetut asiakastiedot', 'CRM/ERP']);
+
     for (const text of [
       'Tekoälyavusteinen myyntiapuri',
       'Esimerkkitilanteet',
@@ -43,6 +47,9 @@ describe('suomenkielinen käyttöliittymä', () => {
       'Vehicle Lookup',
       'Pending',
       'Speech',
+      'Kielimalli',
+      'Rakenteinen tieto',
+      'CRM/ERP-integraatio',
       'Demo-skenaariot',
       'Integraatiotriggerit',
     ]) {
