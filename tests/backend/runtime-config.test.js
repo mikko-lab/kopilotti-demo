@@ -18,17 +18,67 @@ describe('runtime configuration', () => {
     expect(config.trustProxy).toBe(false);
   });
 
-  it('requires explicit credentials and origins in production', () => {
+  it('requires an explicit ALLOWED_ORIGIN in production regardless of analysis state', () => {
+    // No ANALYSIS_ENABLED at all -> defaults to false -> no key required,
+    // but ALLOWED_ORIGIN is still mandatory in production either way.
     expect(() => readRuntimeConfig({ NODE_ENV: 'production' })).toThrow(
-      'ANTHROPIC_API_KEY is required in production'
+      'ALLOWED_ORIGIN is required in production'
     );
 
     expect(() =>
       readRuntimeConfig({
         NODE_ENV: 'production',
+        ANALYSIS_ENABLED: 'true',
         ANTHROPIC_API_KEY: 'test-key',
       })
     ).toThrow('ALLOWED_ORIGIN is required in production');
+  });
+
+  it('production + analysis disabled + no key: configuration is accepted', () => {
+    const config = readRuntimeConfig({
+      NODE_ENV: 'production',
+      ALLOWED_ORIGIN: 'https://demo.example',
+    });
+
+    expect(config.analysisEnabled).toBe(false);
+    expect(config.anthropicApiKey).toBe('');
+    expect(config.isProduction).toBe(true);
+  });
+
+  it('analysis enabled + no key: startup fails closed', () => {
+    expect(() =>
+      readRuntimeConfig({
+        NODE_ENV: 'production',
+        ALLOWED_ORIGIN: 'https://demo.example',
+        ANALYSIS_ENABLED: 'true',
+      })
+    ).toThrow('ANTHROPIC_API_KEY is required when ANALYSIS_ENABLED is true');
+
+    // Same rule outside production too - analysis cost/abuse exposure is
+    // never environment-conditional, only ANALYSIS_ENABLED-conditional.
+    expect(() =>
+      readRuntimeConfig({ NODE_ENV: 'development', ANALYSIS_ENABLED: 'true' })
+    ).toThrow('ANTHROPIC_API_KEY is required when ANALYSIS_ENABLED is true');
+  });
+
+  it('analysis enabled + key: configuration is accepted', () => {
+    const config = readRuntimeConfig({
+      NODE_ENV: 'production',
+      ALLOWED_ORIGIN: 'https://demo.example',
+      ANALYSIS_ENABLED: 'true',
+      ANTHROPIC_API_KEY: 'test-key',
+    });
+
+    expect(config.analysisEnabled).toBe(true);
+    expect(config.anthropicApiKey).toBe('test-key');
+  });
+
+  it('rejects any ANALYSIS_ENABLED value other than exactly "true" or "false"', () => {
+    for (const invalid of ['1', '0', 'yes', 'no', 'True', 'FALSE', ' true', 'true ']) {
+      expect(() => readRuntimeConfig({ ANALYSIS_ENABLED: invalid })).toThrow(
+        'ANALYSIS_ENABLED must be exactly "true" or "false"'
+      );
+    }
   });
 
   it('parses a deduplicated comma-separated production allowlist', () => {

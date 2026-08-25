@@ -4,6 +4,19 @@ services:
     runtime: node
     plan: free
     region: frankfurt
+    # Temporary, explicit bootstrap pin: without this, a first-time Blueprint
+    # sync can default to the repo's main branch. Pinning to the exact
+    # integration branch means the very first deploy is provably built from
+    # this reviewed, tested commit - not whatever main happens to be at sync
+    # time. Remove both this and repo below (falling back to the connected
+    # repo/main) once the service exists and the branch has been
+    # deliberately switched over.
+    #
+    # repo is required alongside an explicit branch - `render blueprints
+    # validate` rejects branch without it (confirmed empirically: "repo is
+    # required for git-based services").
+    repo: https://github.com/mikko-lab/kopilotti-demo
+    branch: fix/trust-safety-phase-a-integration
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
@@ -11,8 +24,14 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: ANTHROPIC_API_KEY
-        sync: false
+      # Analysis stays off for this bootstrap: no key is requested or
+      # required to create/smoke-test the service. See ANALYSIS_ENABLED in
+      # lib/runtime-config.js - flipping this to "true" (and adding
+      # ANTHROPIC_API_KEY back below, via the Render dashboard, sync: false,
+      # never a literal value here) is a deliberate, separate step once
+      # /health, vehicle lookup, and CORS have been smoke-tested for real.
+      - key: ANALYSIS_ENABLED
+        value: "false"
       - key: ALLOWED_ORIGIN
         value: https://mikko-lab.github.io
       - key: ANTHROPIC_TIMEOUT_MS
