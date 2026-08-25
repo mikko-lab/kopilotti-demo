@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Minimum permission this workflow needs: it only ever reads the checked-out
+# repository and installs dependencies from the committed lockfile. It never
+# comments on PRs, writes deployment statuses, touches Pages/Render, or
+# needs any secret - Anthropic calls are stubbed in tests/backend, never
+# made for real here.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (Node 22.23.2)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history so the PR-diff git diff --check step below has
+          # both comparison endpoints available locally.
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.2'
+
+      - name: Install dependencies (frozen lockfile)
+        run: npm ci
+
+      - name: Backend syntax checks
+        run: npm run check:backend
+
+      - name: Run test suite (backend + frontend)
+        run: npm test
+
+      - name: git diff --check on the PR diff
+        if: github.event_name == 'pull_request'
+        run: git diff --check "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
