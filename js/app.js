@@ -108,7 +108,18 @@ const SCENARIOS = {
   }
 };
 
-let sessionActive=false, consentGiven=false, timer=null, secs=0;
+// Explicit three-state consent state machine (unknown -> accepted | denied).
+// A plain boolean can't represent "customer refused" as distinct from
+// "not asked yet" — both used to collapse to `false`, which is what let a
+// denied customer's session silently behave the same as one who was never
+// asked. Session-only by design: never persisted to localStorage or any
+// other storage that would survive a page reload, matching a real consent
+// gate's own scope (this tab, this visit).
+export const CONSENT_STATE = Object.freeze({ UNKNOWN: 'unknown', ACCEPTED: 'accepted', DENIED: 'denied' });
+export let consentState = CONSENT_STATE.UNKNOWN;
+function isConsentAccepted() { return consentState === CONSENT_STATE.ACCEPTED; }
+
+let sessionActive=false, timer=null, secs=0;
 let hints=[], signals=0, currentTranscript='', currentScenario=null;
 let recognition=null;
 
@@ -191,37 +202,84 @@ function checkConsentBoxExposed(el) {
   return { exposed: reasons.length === 0, reasons };
 }
 
+// Enables/disables every control this consent gate covers, in one place, so
+// there is exactly one source of truth for "is this control reachable right
+// now" instead of scattered ad-hoc disabled= assignments. Native `disabled`
+// (not a CSS class / aria-disabled alone) so keyboard tab order and screen
+// readers reflect the blocked state for free — a visually "disabled-looking"
+// button that's still focusable/activatable would satisfy nothing here.
+function applyConsentGateUI() {
+  const accepted = isConsentAccepted();
+  document.getElementById('btnStart').disabled = !accepted;
+  document.getElementById('btnPaste').disabled = !accepted;
+  document.querySelectorAll('.scenario-btn[data-scenario]').forEach(btn => { btn.disabled = !accepted; });
+  // btnAnalyze's own enabled state otherwise follows the session lifecycle
+  // (startSession()/startPasteSession() enable it, an in-flight request
+  // temporarily disables it) — only ever force it off here, never force it
+  // on, so this gate can't re-enable it ahead of a session actually existing.
+  if (!accepted) document.getElementById('btnAnalyze').disabled = true;
+}
+
+// Only ever wired to btnGiveConsent's own click handler (see wireEvents) —
+// no scenario/session/analysis function may call this itself. That's what
+// makes "customer pressed the explicit accept button" the one and only path
+// to CONSENT_STATE.ACCEPTED, per spec.
 async function giveConsent() {
+  // Idempotent guard against a double-invocation (e.g. a rapid double-click
+  // before the button's own disabled state below takes visual effect)
+  // logging two PASS entries for one user action. Set synchronously, before
+  // any `await` below, so a second call queued on the event loop always
+  // observes ACCEPTED here and returns before reaching the log append.
+  if (isConsentAccepted()) return;
+
   const consentBox = document.getElementById('consentBox');
   const exposure = checkConsentBoxExposed(consentBox);
 
   if (!exposure.exposed) {
     // Refuse rather than silently accept a consent we can't prove was seen —
-    // same "refuse-don't-guess" stance as the other guardrail checks.
+    // same "refuse-don't-guess" stance as the other guardrail checks. State
+    // stays exactly as it was (unknown or denied) — this is not a grant.
     await consentAuditLog.append({ eventType: 'customer_consent', stage: 'CONSENT_GIVEN', verdict: 'BLOCK', payload: { reasons: exposure.reasons } });
     renderConsentAuditLog();
     showToast('⚠️ Suostumusnäkymä ei ollut näkyvissä — suostumusta ei voitu vahvistaa');
     return;
   }
 
+  consentState = CONSENT_STATE.ACCEPTED;
   await consentAuditLog.append({ eventType: 'customer_consent', stage: 'CONSENT_GIVEN', verdict: 'PASS', payload: { reasons: ['consent box exposed and acknowledged'] } });
   renderConsentAuditLog();
 
-  consentGiven=true;
   consentBox.style.display='none';
-  document.getElementById('btnStart').disabled=false;
-  document.getElementById('btnPaste').disabled=false;
   document.getElementById('statusSub').textContent='Suostumus saatu — valmis';
+  applyConsentGateUI();
   showToast('✅ Suostumus kirjattu');
 }
 
 async function denyConsent() {
+  consentState = CONSENT_STATE.DENIED;
   await consentAuditLog.append({ eventType: 'customer_consent', stage: 'CONSENT_DENIED', verdict: 'BLOCK', payload: { reasons: ['asiakas kieltäytyi'] } });
   renderConsentAuditLog();
+
+  // Defensive cleanup, not just a state flip: denial can in principle arrive
+  // while a session is already active (e.g. a customer revoking mid-session
+  // in a future UI), so stopSession()'s own timer/recognition/auto-analyze
+  // teardown must actually run here rather than assuming today's UI flow is
+  // the only way this function is ever reached.
+  if (sessionActive) stopSession();
+  if (autoAnalyzeTimer) { clearTimeout(autoAnalyzeTimer); autoAnalyzeTimer = null; }
+
+  // denied stays locked out of every gated control until the customer's own
+  // explicit accept click — applyConsentGateUI() re-disables everything
+  // since consentState is no longer 'accepted'.
+  applyConsentGateUI();
   showToast('❌ Suostumus kieltäytyi — sessio peruutettu');
 }
 
 function startSession() {
+  // Defense in depth alongside btnStart's own disabled= state — a direct
+  // call (devtools, a future caller) must fail closed too, never start the
+  // microphone without an accepted consent.
+  if (!isConsentAccepted()) return;
   sessionActive=true;
 
   // Reset live-mic session state: currentTranscript is a module-level
@@ -280,6 +338,8 @@ function startSession() {
 // live WhatsApp Business API webhook is a separate, much larger piece of
 // work than this.
 function startPasteSession() {
+  // Same defense-in-depth stance as startSession() — see its comment.
+  if (!isConsentAccepted()) return;
   sessionActive=true;
   currentScenario=null;
 
@@ -326,6 +386,10 @@ function startPasteSession() {
 // AUTO_ANALYZE_DEBOUNCE_MS before triggering analysis, same as speech
 // pausing.
 function handlePasteInput() {
+  // Same defense-in-depth stance as startSession() — pasted text must never
+  // be picked up for analysis without an accepted consent, regardless of
+  // whether the paste box happens to be reachable.
+  if (!isConsentAccepted()) return;
   currentScenario=null;
   currentTranscript = document.getElementById('pasteInput').value;
   scheduleAutoAnalyze();
@@ -369,6 +433,10 @@ function startRecognition() {
 }
 
 function scheduleAutoAnalyze() {
+  // Auto-analyze is explicitly one of the gated actions (spec section 3) —
+  // guarded here too, not just at its callers, so no future call site can
+  // silently reintroduce an analysis timer without an accepted consent.
+  if (!isConsentAccepted()) return;
   if (autoAnalyzeTimer) clearTimeout(autoAnalyzeTimer);
   autoAnalyzeTimer = setTimeout(() => {
     autoAnalyzeTimer = null;
@@ -405,7 +473,16 @@ function showTranscript(text) {
 }
 
 async function runScenario(key) {
-  if(!sessionActive){ if(!consentGiven) giveConsent(); startSession(); }
+  // Never grants consent itself, under any circumstance — the customer's own
+  // explicit accept click (giveConsent(), wired only to btnGiveConsent) is
+  // the sole path to CONSENT_STATE.ACCEPTED. A scenario button is also kept
+  // `disabled` while not accepted (applyConsentGateUI), so this is defense
+  // in depth for a direct call, not the only guard.
+  if (!isConsentAccepted()) {
+    showToast('⚠️ Pyydä asiakkaalta suostumus ensin');
+    return;
+  }
+  if(!sessionActive){ startSession(); }
   // Defensive, not just startSession()'s own reset: a demo scenario can be
   // launched while a paste-mode session is already active (sessionActive
   // true, so the startSession() call above is skipped) — without this, the
@@ -429,6 +506,11 @@ async function runScenario(key) {
 }
 
 async function analyzeScenario(s) {
+  // Reached from runScenario() (already gated) and from analyzeNow()'s
+  // currentScenario branch (also already gated) — checked again here so
+  // this function is safe to call directly too, never analyzing without an
+  // accepted consent regardless of call path.
+  if (!isConsentAccepted()) return;
   hints=[]; signals=0;
   businessSignals=[];
   document.getElementById('statHints').textContent='0';
@@ -455,6 +537,10 @@ async function analyzeScenario(s) {
 }
 
 async function analyzeNow() {
+  // "Analyysin käynnistäminen" is explicitly gated — checked here directly
+  // (not just via btnAnalyze's disabled state) so a direct call can never
+  // trigger analysis, local or backend, without an accepted consent.
+  if (!isConsentAccepted()) return;
   if(currentScenario) { analyzeScenario(SCENARIOS[currentScenario]); return; }
   if(currentTranscript.length<10) return;
 
@@ -492,6 +578,11 @@ async function analyzeNow() {
 }
 
 async function analyzeWithSSE(transcript) {
+  // The actual backend network call this whole gate exists to prevent
+  // without consent — checked here directly (not only at analyzeScenario()/
+  // analyzeNow()) so `fetch` is provably never reached on a denied/unknown
+  // consent, independent of which caller reached this function.
+  if (!isConsentAccepted()) return false;
   document.getElementById('analyzing').classList.add('visible');
   document.getElementById('btnAnalyze').disabled=true;
   let sawServerError = false;
@@ -672,6 +763,15 @@ async function addHint(h) {
 // action: red (urgent) > yellow (warning) > green (opportunity) > blue (info).
 const HINT_URGENCY = { red: 3, yellow: 2, green: 1, blue: 0 };
 
+// A hint's `type` can originate from Claude's own SSE response (see
+// handleSSEEvent's 'hint' case) — never trusted as a literal CSS class name
+// without going through this allowlist first, in case a future backend/
+// prompt change ever emits something outside the four known values below.
+const HINT_TYPE_CLASSES = new Set(['blue', 'yellow', 'green', 'red']);
+function safeHintTypeClass(type) {
+  return HINT_TYPE_CLASSES.has(type) ? type : 'blue';
+}
+
 function pickSuggestedAction(hintList) {
   if (!hintList.length) return null;
   return hintList.reduce((best, h) =>
@@ -683,7 +783,10 @@ async function renderSuggestedAction(hintList) {
   const container = document.getElementById('suggestedActionContainer');
   const top = pickSuggestedAction(hintList);
   if (!top) {
-    container.innerHTML = '<div class="signals-empty">Ei vielä ehdotuksia</div>';
+    const empty = document.createElement('div');
+    empty.className = 'signals-empty';
+    empty.textContent = 'Ei vielä ehdotuksia';
+    container.replaceChildren(empty);
     return;
   }
   // Same generic conflict check as addHint()'s timeline entry, applied
@@ -723,24 +826,50 @@ async function renderSuggestedAction(hintList) {
   // Claude assigned) and the wording makes clear the claim below is
   // unverified, not a second, independent, confirmed fact.
   const isFlagged = !!conflictLine;
-  const cardType = isFlagged ? 'yellow' : top.type;
+  // top.icon/top.action/top.text/top.type can all originate from Claude's
+  // SSE response (see handleSSEEvent's 'hint' case) — every one of them goes
+  // through textContent/an allowlisted class below, never through an HTML
+  // string, regardless of what the backend/model returns.
+  const cardType = isFlagged ? 'yellow' : safeHintTypeClass(top.type);
   const card = document.createElement('div');
   card.className = `suggested-action ${cardType}`;
-  card.innerHTML = `
-    <div class="suggested-action-body">
-      ${isFlagged ? `<div class="suggested-action-conflict">⚠ AI:n ehdotus EI täsmää varastoon — ${conflictLine}. Alla oleva peruste on tekoälyn oma, tarkistamaton väite:</div>` : ''}
-      <div class="suggested-action-title">${top.icon} ${top.action}</div>
-      <div class="suggested-action-why"><strong>Miksi:</strong> ${top.text}</div>
-    </div>
-    <button class="suggested-action-use" type="button">Käytä tätä</button>
-  `;
-  container.innerHTML = '';
-  container.appendChild(card);
-  card.querySelector('.suggested-action-use').addEventListener('click', (e) => {
+
+  const body = document.createElement('div');
+  body.className = 'suggested-action-body';
+
+  if (isFlagged) {
+    const conflictDiv = document.createElement('div');
+    conflictDiv.className = 'suggested-action-conflict';
+    conflictDiv.textContent = `⚠ AI:n ehdotus EI täsmää varastoon — ${conflictLine}. Alla oleva peruste on tekoälyn oma, tarkistamaton väite:`;
+    body.appendChild(conflictDiv);
+  }
+
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'suggested-action-title';
+  titleDiv.textContent = `${top.icon || ''} ${top.action || ''}`.trim();
+  body.appendChild(titleDiv);
+
+  const whyDiv = document.createElement('div');
+  whyDiv.className = 'suggested-action-why';
+  const whyLabel = document.createElement('strong');
+  whyLabel.textContent = 'Miksi:';
+  whyDiv.append(whyLabel, document.createTextNode(` ${top.text || ''}`));
+  body.appendChild(whyDiv);
+
+  card.appendChild(body);
+
+  const useBtn = document.createElement('button');
+  useBtn.className = 'suggested-action-use';
+  useBtn.type = 'button';
+  useBtn.textContent = 'Käytä tätä';
+  useBtn.addEventListener('click', (e) => {
     logEvent(`Vihje käytetty: ${top.action}`, 'ok');
     e.target.disabled = true;
     e.target.textContent = '✓ Käytetty';
   });
+  card.appendChild(useBtn);
+
+  container.replaceChildren(card);
 }
 
 // price_sensitivity is the one signal type that means "objection/hesitation"
@@ -755,6 +884,10 @@ const SIGNAL_BADGE_META = {
   insurance: { icon: '✓', label: 'Vakuutuskiinnostus', variant: 'positive' },
 };
 
+// variant only ever needs to be one of these two known CSS classes — the
+// fallback branch below (an unrecognized signal type) still gets whitelisted
+// here rather than trusting SIGNAL_BADGE_META's own fallback object shape.
+const SIGNAL_BADGE_VARIANTS = new Set(['positive', 'caution']);
 function renderDetectedSignals(signalList) {
   const row = document.getElementById('signalsRow');
   const distinctTypes = [...new Set(signalList.map(s => s.type))];
@@ -764,10 +897,14 @@ function renderDetectedSignals(signalList) {
     return;
   }
   row.className = 'signals-row';
-  row.innerHTML = distinctTypes.map(type => {
+  row.replaceChildren(...distinctTypes.map(type => {
     const meta = SIGNAL_BADGE_META[type] || { icon: '•', label: type, variant: 'positive' };
-    return `<span class="signal-badge ${meta.variant}">${meta.icon} ${meta.label}</span>`;
-  }).join('');
+    const variant = SIGNAL_BADGE_VARIANTS.has(meta.variant) ? meta.variant : 'positive';
+    const span = document.createElement('span');
+    span.className = `signal-badge ${variant}`;
+    span.textContent = `${meta.icon} ${meta.label}`;
+    return span;
+  }));
 }
 
 function updateMeter(val,desc) {
@@ -777,6 +914,42 @@ function updateMeter(val,desc) {
 }
 
 const AVAILABILITY_LABEL_FI = { available: 'Heti saatavilla', reserved: 'Varattu', incoming: 'Tulossa' };
+
+// v.available is used directly as a CSS class name below — restricted to
+// these three known values (inventory.json is local demo data today, but
+// treated as an untrusted source here per spec, same as the image path).
+function safeAvailabilityClass(value) {
+  return Object.prototype.hasOwnProperty.call(AVAILABILITY_LABEL_FI, value) ? value : 'available';
+}
+
+// Vehicle photos may only come from this app's own known local asset
+// filenames — never an arbitrary inventory.json string used verbatim as an
+// <img src>, which could otherwise point at an external URL, a data:/
+// javascript: URI, or a path outside assets/cars/. Anything not an exact
+// match falls back to a small inline SVG placeholder (no network fetch of
+// its own, so it can never itself become an exfiltration or injection
+// vector).
+const VEHICLE_IMAGE_ALLOWED = new Set([
+  'assets/cars/audi-a4.jpg', 'assets/cars/audi-q5.jpg', 'assets/cars/bmw-320.jpg', 'assets/cars/bmw-x3.jpg',
+  'assets/cars/citroen-berlingo.jpg', 'assets/cars/ford-focus.jpg', 'assets/cars/ford-kuga.jpg',
+  'assets/cars/hyundai-i30.jpg', 'assets/cars/hyundai-tucson.jpg', 'assets/cars/kia-niro.jpg',
+  'assets/cars/kia-sportage.jpg', 'assets/cars/mazda-3.jpg', 'assets/cars/mazda-cx-5.jpg',
+  'assets/cars/mercedes-benz-c-class.jpg', 'assets/cars/mercedes-benz-glc.jpg', 'assets/cars/mercedes-benz-sprinter.jpg',
+  'assets/cars/nissan-leaf.jpg', 'assets/cars/nissan-qashqai.jpg', 'assets/cars/peugeot-208.jpg',
+  'assets/cars/peugeot-3008.jpg', 'assets/cars/renault-trafic.jpg', 'assets/cars/skoda-fabia.jpg',
+  'assets/cars/skoda-kodiaq.jpg', 'assets/cars/skoda-octavia.jpg', 'assets/cars/toyota-corolla.jpg',
+  'assets/cars/toyota-rav4.jpg', 'assets/cars/toyota-yaris.jpg', 'assets/cars/volkswagen-golf.jpg',
+  'assets/cars/volkswagen-passat.jpg', 'assets/cars/volkswagen-tiguan.jpg', 'assets/cars/volkswagen-transporter.jpg',
+  'assets/cars/volvo-v60.jpg', 'assets/cars/volvo-v90.jpg', 'assets/cars/volvo-xc60.jpg',
+]);
+const VEHICLE_IMAGE_FALLBACK = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" viewBox="0 0 64 48">'
+  + '<rect width="64" height="48" fill="#e2e8f0"/>'
+  + '<text x="32" y="30" font-size="20" text-anchor="middle">🚗</text></svg>'
+);
+function safeVehicleImageSrc(src) {
+  return VEHICLE_IMAGE_ALLOWED.has(src) ? src : VEHICLE_IMAGE_FALLBACK;
+}
 
 // Renders the output of the deterministic inventory-matching engine
 // (js/inventory-engine.js via business-rules.js) — replaces the old static
@@ -796,8 +969,13 @@ function renderRecommendations(vehicles, signals, preferences) {
     // unexplained, all three read as broken to anyone skimming the demo.
     const unmatched = unmatchedSignalLabels(signals);
     const excludedByPreferences = preferencesExcludedEverything(vehicles, signals, preferences);
+    const placeholder = document.createElement('div');
+    placeholder.className = 'cars-placeholder';
     if (unmatched) {
-      list.innerHTML = `<div class="cars-placeholder">Tunnistetut signaalit (${unmatched.join(', ')}) kertovat ostoprosessin vaiheesta, eivät automieltymyksestä — siksi ajoneuvoehdotusta ei näytetä tässä kohtaa.</div>`;
+      // unmatched entries are Signal labels, which for a Claude-sourced hint
+      // are the hint's own raw title (see signals.js's signalsFromHint) —
+      // textContent, never string-built HTML, regardless of what Claude sent.
+      placeholder.textContent = `Tunnistetut signaalit (${unmatched.join(', ')}) kertovat ostoprosessin vaiheesta, eivät automieltymyksestä — siksi ajoneuvoehdotusta ei näytetä tässä kohtaa.`;
     } else if (excludedByPreferences) {
       const stated = [];
       if (preferences.bodyType) stated.push(preferences.bodyType);
@@ -806,36 +984,94 @@ function renderRecommendations(vehicles, signals, preferences) {
       if (preferences.priceMin != null || preferences.priceMax != null) stated.push(`${preferences.priceMin ?? '–'}–${preferences.priceMax ?? '–'} €`);
       if (preferences.maxMileage != null) stated.push(`alle ${preferences.maxMileage.toLocaleString('fi-FI')} km`);
       if (preferences.minYear != null) stated.push(`vuosimalli ${preferences.minYear}+`);
-      list.innerHTML = `<div class="cars-placeholder">Asiakkaan toiveilla (${stated.join(', ')}) ei löydy tarkkaa osumaa varastosta juuri nyt.</div>`;
+      placeholder.textContent = `Asiakkaan toiveilla (${stated.join(', ')}) ei löydy tarkkaa osumaa varastosta juuri nyt.`;
     } else {
-      list.innerHTML = '<div class="cars-placeholder">Suositukset ilmestyvät kun keskustelusta on tunnistettu signaaleja</div>';
+      placeholder.textContent = 'Suositukset ilmestyvät kun keskustelusta on tunnistettu signaaleja';
     }
+    list.replaceChildren(placeholder);
     return;
   }
-  list.innerHTML = '<div class="rec-list"></div>';
-  const container = list.querySelector('.rec-list');
+
+  const container = document.createElement('div');
+  container.className = 'rec-list';
   vehicles.forEach(v => {
+    // Every field below comes from inventory.json — treated as an untrusted
+    // source per spec (a demo-local file today, but the same rendering code
+    // would run against a real backend-fed catalog tomorrow). All text goes
+    // through textContent; the one place a value becomes markup-adjacent
+    // (the image src, the availability CSS class) goes through its own
+    // allowlist above instead of being used verbatim.
     const card = document.createElement('div');
     card.className = 'rec-card';
-    card.innerHTML = `
-      <div class="rec-top">
-        <img class="rec-icon" src="${v.image}" alt="${v.brand} ${v.model}" loading="lazy">
-        <div class="rec-info">
-          <div class="rec-name">${v.brand} ${v.model} ${v.trim}</div>
-          <div class="rec-meta">${v.year} · ${v.transmission} · ${v.mileage.toLocaleString('fi-FI')} km · ${v.dealershipLocation}</div>
-        </div>
-        <div class="rec-match"><span class="rec-match-val">${v.matchScore}%</span><span class="rec-match-lbl">osuvuus</span></div>
-      </div>
-      <div class="rec-pricing">
-        <span class="rec-price">${v.price.toLocaleString('fi-FI')} €</span>
-        <span class="rec-monthly">${v.estimatedMonthlyPayment} €/kk</span>
-        <span class="rec-availability ${v.available}">${AVAILABILITY_LABEL_FI[v.available] || v.available}</span>
-      </div>
-      ${v.vatDeductible ? `<div class="rec-vat-badge">🧾 ALV-vähennyskelpoinen <span class="rec-vat-caveat">— edellyttää ajopäiväkirjaa ja liiketoimintakäyttöä</span></div>` : ''}
-      <div class="rec-explanation">${v.explanation}</div>
-    `;
+
+    const top = document.createElement('div');
+    top.className = 'rec-top';
+
+    const img = document.createElement('img');
+    img.className = 'rec-icon';
+    img.src = safeVehicleImageSrc(v.image);
+    img.alt = `${v.brand} ${v.model}`;
+    img.loading = 'lazy';
+    top.appendChild(img);
+
+    const info = document.createElement('div');
+    info.className = 'rec-info';
+    const name = document.createElement('div');
+    name.className = 'rec-name';
+    name.textContent = `${v.brand} ${v.model} ${v.trim}`;
+    const meta = document.createElement('div');
+    meta.className = 'rec-meta';
+    meta.textContent = `${v.year} · ${v.transmission} · ${v.mileage.toLocaleString('fi-FI')} km · ${v.dealershipLocation}`;
+    info.append(name, meta);
+    top.appendChild(info);
+
+    const match = document.createElement('div');
+    match.className = 'rec-match';
+    const matchVal = document.createElement('span');
+    matchVal.className = 'rec-match-val';
+    matchVal.textContent = `${v.matchScore}%`;
+    const matchLbl = document.createElement('span');
+    matchLbl.className = 'rec-match-lbl';
+    matchLbl.textContent = 'osuvuus';
+    match.append(matchVal, matchLbl);
+    top.appendChild(match);
+
+    card.appendChild(top);
+
+    const pricing = document.createElement('div');
+    pricing.className = 'rec-pricing';
+    const price = document.createElement('span');
+    price.className = 'rec-price';
+    price.textContent = `${v.price.toLocaleString('fi-FI')} €`;
+    const monthly = document.createElement('span');
+    monthly.className = 'rec-monthly';
+    monthly.textContent = `${v.estimatedMonthlyPayment} €/kk`;
+    const availabilityClass = safeAvailabilityClass(v.available);
+    const availability = document.createElement('span');
+    availability.className = `rec-availability ${availabilityClass}`;
+    availability.textContent = AVAILABILITY_LABEL_FI[availabilityClass] || availabilityClass;
+    pricing.append(price, monthly, availability);
+    card.appendChild(pricing);
+
+    if (v.vatDeductible) {
+      const vatBadge = document.createElement('div');
+      vatBadge.className = 'rec-vat-badge';
+      vatBadge.append('🧾 ALV-vähennyskelpoinen ');
+      const caveat = document.createElement('span');
+      caveat.className = 'rec-vat-caveat';
+      caveat.textContent = '— edellyttää ajopäiväkirjaa ja liiketoimintakäyttöä';
+      vatBadge.appendChild(caveat);
+      card.appendChild(vatBadge);
+    }
+
+    const explanation = document.createElement('div');
+    explanation.className = 'rec-explanation';
+    explanation.textContent = v.explanation;
+    card.appendChild(explanation);
+
     container.appendChild(card);
   });
+  list.replaceChildren(container);
 }
 
 // Preserved as-is (same trigger logic as before the redesign) — only the
@@ -923,6 +1159,49 @@ async function syncToCRM() {
 // classes doing double duty — a 404 ("this plate genuinely has no match" —
 // notfound) and a network failure ("couldn't even ask" — error) are
 // different situations for the salesperson and read differently here.
+// Builds a single-line plate-result state node (loading/notfound/error) —
+// `text` may be a backend error message (data.error), rendered as text only,
+// never as HTML, per spec.
+function buildPlateStateNode(stateClass, role, text) {
+  const div = document.createElement('div');
+  div.className = `plate-result ${stateClass}`;
+  if (role) div.setAttribute('role', role);
+  div.textContent = text;
+  return div;
+}
+
+function buildPlateSuccessNode(data) {
+  const div = document.createElement('div');
+  div.className = 'plate-result ok';
+  const icon = document.createElement('span');
+  icon.className = 'plate-result-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = '🚗';
+
+  const body = document.createElement('div');
+  body.className = 'plate-result-body';
+
+  const title = document.createElement('div');
+  title.className = 'plate-result-title';
+  const titleStrong = document.createElement('strong');
+  titleStrong.textContent = `${data.make} ${data.model}`;
+  title.append(titleStrong, document.createTextNode(` (${data.year})`));
+
+  const meta = document.createElement('div');
+  meta.className = 'plate-result-meta';
+  meta.textContent = `${data.plate} · ${data.mileage.toLocaleString('fi-FI')} km`;
+
+  const value = document.createElement('div');
+  value.className = 'plate-result-value';
+  const valueStrong = document.createElement('strong');
+  valueStrong.textContent = `${data.estimatedTradeInValue.toLocaleString('fi-FI')} €`;
+  value.append('Arvioitu vaihtoarvo: ', valueStrong);
+
+  body.append(title, meta, value);
+  div.append(icon, body);
+  return div;
+}
+
 async function lookupVehicle(e) {
   e.preventDefault();
   const input = document.getElementById('plateInput');
@@ -930,33 +1209,27 @@ async function lookupVehicle(e) {
   const resultEl = document.getElementById('plateResult');
   if (!plate) return false;
 
-  resultEl.innerHTML = '<div class="plate-result loading" role="status">🔍 Haetaan…</div>';
+  resultEl.replaceChildren(buildPlateStateNode('loading', 'status', '🔍 Haetaan…'));
 
   try {
     const res = await fetch(`${BACKEND_URL}/api/vehicle/${encodeURIComponent(plate)}`);
     const data = await res.json();
+    // data.error is the backend's own error message — shown as text only,
+    // never interpreted as HTML, regardless of what the backend returns.
     if (res.status === 404) {
-      resultEl.innerHTML = `<div class="plate-result notfound" role="alert">${data.error || 'Ajoneuvoa ei löytynyt'}</div>`;
+      resultEl.replaceChildren(buildPlateStateNode('notfound', 'alert', data.error || 'Ajoneuvoa ei löytynyt'));
       logEvent(`Rekisterihaku: ${plate} ei löytynyt`, 'pending');
       return false;
     }
     if (!res.ok) {
-      resultEl.innerHTML = `<div class="plate-result error" role="alert">${data.error || 'Haku epäonnistui'}</div>`;
+      resultEl.replaceChildren(buildPlateStateNode('error', 'alert', data.error || 'Haku epäonnistui'));
       logEvent(`Rekisterihaku epäonnistui: ${plate}`, 'pending');
       return false;
     }
-    resultEl.innerHTML = `
-      <div class="plate-result ok">
-        <span class="plate-result-icon" aria-hidden="true">🚗</span>
-        <div class="plate-result-body">
-          <div class="plate-result-title"><strong>${data.make} ${data.model}</strong> (${data.year})</div>
-          <div class="plate-result-meta">${data.plate} · ${data.mileage.toLocaleString('fi-FI')} km</div>
-          <div class="plate-result-value">Arvioitu vaihtoarvo: <strong>${data.estimatedTradeInValue.toLocaleString('fi-FI')} €</strong></div>
-        </div>
-      </div>`;
+    resultEl.replaceChildren(buildPlateSuccessNode(data));
     logEvent(`Vaihtoauton rekisterihaku valmis: ${data.make} ${data.model}`, 'ok');
   } catch (err) {
-    resultEl.innerHTML = '<div class="plate-result error" role="alert">⚠️ Backend ei tavoitettavissa — rekisterihaku vaatii yhteyden palvelimeen (demo-data ei toimi paikallisesti)</div>';
+    resultEl.replaceChildren(buildPlateStateNode('error', 'alert', '⚠️ Backend ei tavoitettavissa — rekisterihaku vaatii yhteyden palvelimeen (demo-data ei toimi paikallisesti)'));
     logEvent('Rekisterihaku epäonnistui: backend ei tavoitettavissa', 'pending');
   }
   return false;
@@ -983,8 +1256,16 @@ function logEvent(text, status = 'ok') {
   const entry = document.createElement('div');
   entry.className = 'timeline-entry';
   const time = new Date().toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  entry.innerHTML = `<span class="timeline-time">${time}</span><span class="timeline-text"></span><span class="timeline-status ${status}">${status === 'ok' ? 'OK' : 'Pending'}</span>`;
-  entry.querySelector('.timeline-text').textContent = text; // textContent, not innerHTML — text may include unescaped user/vehicle data
+  const timeSpan = document.createElement('span');
+  timeSpan.className = 'timeline-time';
+  timeSpan.textContent = time;
+  const textSpan = document.createElement('span');
+  textSpan.className = 'timeline-text';
+  textSpan.textContent = text; // may include unescaped user/vehicle/AI data — textContent only
+  const statusSpan = document.createElement('span');
+  statusSpan.className = `timeline-status ${status === 'ok' ? 'ok' : 'pending'}`;
+  statusSpan.textContent = status === 'ok' ? 'OK' : 'Pending';
+  entry.append(timeSpan, textSpan, statusSpan);
   list.insertBefore(entry, list.firstChild);
   timelineEntryCount++;
   document.getElementById('timelineCount').textContent = timelineEntryCount;
@@ -1022,7 +1303,36 @@ function initGauges() {
 
 wireEvents();
 initGauges();
+// Sets the initial disabled= state for every consent-gated control
+// (scenario buttons included) before any user interaction is possible —
+// consentState starts at CONSENT_STATE.UNKNOWN, so everything gated starts
+// blocked, matching spec requirement 1.
+applyConsentGateUI();
 // Warm the inventory cache at load time — a hint can never arrive before at
 // least one full Claude API round-trip, so this local JSON fetch has ample
 // time to resolve before checkNamedModelClaim() (in addHint()) needs it.
 loadInventory().catch(() => {}); // failure handled by that check's own null-cache fallback, not here
+
+// --- Test-only exports (frontend regression tests, tests/frontend/) ---
+// The functions/state below have no other consumer; production behavior is
+// entirely driven by wireEvents()'s own DOM listeners and the calls above,
+// which run unconditionally on module load exactly as before this file had
+// any exports. Exporting them doesn't change runtime behavior — it only
+// makes them reachable from a test module that imports this file directly.
+export {
+  runScenario,
+  giveConsent,
+  denyConsent,
+  startSession,
+  startPasteSession,
+  handlePasteInput,
+  analyzeNow,
+  analyzeWithSSE,
+  addHint,
+  renderSuggestedAction,
+  renderRecommendations,
+  showTranscript,
+  lookupVehicle,
+  safeVehicleImageSrc,
+  consentAuditLog,
+};

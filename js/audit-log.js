@@ -1,11 +1,18 @@
 /**
- * Hash-chained, append-only audit log — same principle as the
- * ai-transparency-gate proto's auditLog.ts: every entry commits to the
- * SHA-256 hash of the previous entry, so a tampered or deleted entry breaks
- * the chain and is detectable by verifyChain(). Used here to make the
- * customer consent step (see giveConsent()/denyConsent() in app.js)
- * provable after the fact, rather than a plain "consent recorded" toast
- * that asserts something no one can actually verify happened.
+ * Hash-chained, in-memory, session-only consent log — same chaining
+ * principle as the ai-transparency-gate proto's auditLog.ts: every entry
+ * commits to the SHA-256 hash of the previous entry, so verifyChain() can
+ * detect an entry that was edited or removed from this array AFTER being
+ * appended, WITHIN the current browser tab's session.
+ *
+ * Scope, stated plainly so this is never read as more than it is: `#entries`
+ * lives only in this page's JS memory. It is never written to localStorage
+ * or any other storage, never sent to a server, and is gone on reload. It
+ * is not a permanent record and not something any party outside this tab
+ * can independently verify — it only lets giveConsent()/denyConsent() (see
+ * app.js) show, and detect in-session tampering of, what was recorded
+ * during THIS visit, in place of a plain "consent recorded" toast that
+ * asserted something no one could check at all.
  */
 
 const GENESIS_HASH = '0'.repeat(64);
