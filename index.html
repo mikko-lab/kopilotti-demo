@@ -7,9 +7,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kopilotti — Myyjän co-pilot</title>
+<title>Kopilotti — Myyjän tekoälyapuri</title>
 <meta name="description" content="Reaaliaikainen tekoälyassistentti autokaupan myyjille. Tunnistaa ostosignaalit ja tarjoaa vihjeitä kesken asiakaskohtaamisen.">
-<meta property="og:title" content="Kopilotti — Myyjän co-pilot">
+<meta property="og:title" content="Kopilotti — Myyjän tekoälyapuri">
 <meta property="og:description" content="Reaaliaikainen tekoälyassistentti autokaupan myyjille. Tunnistaa ostosignaalit ja tarjoaa vihjeitä kesken asiakaskohtaamisen.">
 <meta property="og:url" content="https://mikko-lab.github.io/kopilotti-demo/">
 <meta property="og:type" content="website">
@@ -25,32 +25,26 @@
 <!-- Header: brand left, pipeline breadcrumb center, live/connection status + user right -->
 <header class="header">
   <div class="header-left">
-    <div class="logo-mark" aria-hidden="true">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.7"/>
-        <circle cx="12" cy="12" r="2.1" fill="white"/>
-        <path d="M12 3v4.3M12 16.7V21M3 12h4.3M16.7 12H21" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
-      </svg>
-    </div>
+    <img class="logo-mark" src="assets/kopilotti-mark-on-dark.svg" alt="" width="34" height="34" aria-hidden="true">
     <div class="logo-texts">
       <div class="logo-name">Kopilotti</div>
-      <div class="logo-sub">AI Sales Copilot</div>
+      <div class="logo-sub">Tekoälyavusteinen myyntiapuri</div>
     </div>
   </div>
 
   <div class="header-pipeline" aria-hidden="true">
-    <span class="pipeline-step">Speech</span><span class="pipeline-arrow">→</span>
-    <span class="pipeline-step">LLM</span><span class="pipeline-arrow">→</span>
-    <span class="pipeline-step">Structured JSON</span><span class="pipeline-arrow">→</span>
-    <span class="pipeline-step">CRM / ERP Integration</span>
+    <span class="pipeline-step">Puhe</span><span class="pipeline-arrow">→</span>
+    <span class="pipeline-step">Tekoälyanalyysi</span><span class="pipeline-arrow">→</span>
+    <span class="pipeline-step">Tunnistetut asiakastiedot</span><span class="pipeline-arrow">→</span>
+    <span class="pipeline-step">CRM/ERP</span>
   </div>
 
   <div class="header-right">
     <div class="live-indicator" id="liveIndicator">
-      <span class="conn-dot" aria-hidden="true"></span> Live
+      <span class="conn-dot" aria-hidden="true"></span> Valmiina
     </div>
     <div class="status-badges">
-      <span class="conn-badge" id="badgeSpeech"><span class="conn-dot" aria-hidden="true"></span><span class="conn-icon" aria-hidden="true">🎤</span>Speech</span>
+      <span class="conn-badge" id="badgeSpeech"><span class="conn-dot" aria-hidden="true"></span><span class="conn-icon" aria-hidden="true">🎤</span>Puhe</span>
       <span class="conn-badge" id="badgeClaude"><span class="conn-dot" aria-hidden="true"></span><span class="conn-icon" aria-hidden="true">◐</span>Claude</span>
       <span class="conn-badge" id="badgeCRM"><span class="conn-dot" aria-hidden="true"></span><span class="conn-icon" aria-hidden="true">🗄</span>CRM</span>
     </div>
@@ -65,7 +59,7 @@
 </header>
 
 <main class="app" id="main-content">
-<h1 class="visually-hidden">Kopilotti — AI Sales Copilot</h1>
+<h1 class="visually-hidden">Kopilotti — myyjän tekoälyapuri</h1>
 <div class="main-cols">
 
   <!-- Left / main -->
@@ -77,13 +71,14 @@
       <!-- Consent -->
       <div class="consent-box" id="consentBox">
         <div class="consent-label">🛡 Asiakkaan suostumus</div>
-        <div class="consent-text">Pyydä asiakkaalta lupa ennen sessiota. Ääntä ei tallenneta — vain teksti analysoidaan.</div>
+        <div class="consent-text">Pyydä asiakkaalta lupa ennen istuntoa. Ääntä ei tallenneta — vain teksti analysoidaan.</div>
         <div class="consent-btns">
           <button class="btn btn-outline btn-sm" id="btnDenyConsent" type="button">Kieltäytyi</button>
           <button class="btn btn-primary btn-sm" id="btnGiveConsent" type="button">✓ Asiakas hyväksyi</button>
         </div>
         <details class="crm-details">
-          <summary>Suostumusloki (JSON)</summary>
+          <summary>Istuntokohtainen suostumusloki (JSON)</summary>
+          <p class="consent-log-scope">Näkyy vain tässä selainistunnossa — ei tallennu, ei lähetetä minnekään. Ketjutettu tiiviste tunnistaa merkinnän jälkikäteisen muokkauksen tässä istunnossa, ei todista mitään istunnon ulkopuolelle.</p>
           <pre id="consentAuditJson">—</pre>
         </details>
       </div>
@@ -114,19 +109,19 @@
 
       <!-- Scenarios -->
       <div class="scenario-bar">
-        <h2 class="scenario-label">Demo-skenaariot</h2>
-        <button class="scenario-btn" type="button" data-scenario="hinta">💬 Hintaepäily</button>
-        <button class="scenario-btn" type="button" data-scenario="rahoitus">💳 Rahoitus</button>
-        <button class="scenario-btn" type="button" data-scenario="perhe">👨‍👩‍👧 Perhe</button>
-        <button class="scenario-btn" type="button" data-scenario="osto">🤝 Ostovalmis</button>
-        <button class="scenario-btn" type="button" data-scenario="vaihto">🔄 Vaihto</button>
-        <button class="scenario-btn" type="button" data-scenario="pakettiauto">📦 Pakettiauto</button>
-        <button class="scenario-btn" type="button" data-scenario="whatsapp">📱 WhatsApp</button>
+        <h2 class="scenario-label">Esimerkkitilanteet</h2>
+        <button class="scenario-btn" type="button" data-scenario="hinta" disabled>💬 Hintaepäily</button>
+        <button class="scenario-btn" type="button" data-scenario="rahoitus" disabled>💳 Rahoitus</button>
+        <button class="scenario-btn" type="button" data-scenario="perhe" disabled>👨‍👩‍👧 Perhe</button>
+        <button class="scenario-btn" type="button" data-scenario="osto" disabled>🤝 Ostovalmis</button>
+        <button class="scenario-btn" type="button" data-scenario="vaihto" disabled>🔄 Vaihto</button>
+        <button class="scenario-btn" type="button" data-scenario="pakettiauto" disabled>📦 Pakettiauto</button>
+        <button class="scenario-btn" type="button" data-scenario="whatsapp" disabled>📱 WhatsApp</button>
       </div>
 
       <!-- Transcript -->
       <div class="transcript" id="transcriptArea">
-        <div class="transcript-placeholder" id="transcriptPlaceholder">Kuuntelu ei käynnissä. Valitse skenaario tai aloita sessio.</div>
+        <div class="transcript-placeholder" id="transcriptPlaceholder">Kuuntelu ei käynnissä. Valitse esimerkkitilanne tai aloita istunto.</div>
         <div id="transcriptText" class="hidden"></div>
       </div>
 
@@ -173,11 +168,11 @@
          things that already happen. -->
     <div class="card">
       <div class="card-header">
-        <h2 class="card-title">Live Events</h2>
+        <h2 class="card-title">Tapahtumat</h2>
         <span id="timelineCount" style="font-size:12px;color:var(--muted);font-weight:600;">0</span>
       </div>
       <div class="timeline-list" id="timelineList" role="log" aria-live="polite" aria-atomic="false" tabindex="0">
-        <div class="timeline-empty">Tapahtumat ilmestyvät kun sessio on käynnissä</div>
+        <div class="timeline-empty">Tapahtumat ilmestyvät, kun istunto on käynnissä</div>
       </div>
     </div>
   </section>
@@ -188,7 +183,7 @@
     <!-- AI Insights: Purchase Intent + Confidence gauges, Detected Signals, Suggested Next Action -->
     <div class="card">
       <div class="card-header">
-        <h2 class="card-title">AI Insights</h2>
+        <h2 class="card-title">Tekoälyn havainnot</h2>
       </div>
       <div class="gauges-row">
         <div class="gauge-wrap" id="gaugeIntentWrap"></div>
@@ -213,17 +208,17 @@
     <div class="card-pair">
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">CRM Integration</h2>
+          <h2 class="card-title">CRM-integraatio</h2>
         </div>
         <div class="crm-state" id="crmStateRow" aria-live="polite">
           <span class="crm-state-icon" id="crmStateIcon" aria-hidden="true">⏳</span>
           <div class="crm-state-info">
-            <div class="crm-state-label" id="crmStateLabel">Pending</div>
+            <div class="crm-state-label" id="crmStateLabel">Odottaa</div>
             <div class="crm-state-desc" id="crmStateDesc">Ei vielä lähetetty</div>
           </div>
         </div>
         <details class="crm-details">
-          <summary>Integraatiotriggerit (JSON)</summary>
+          <summary>Integraation tapahtumat (JSON)</summary>
           <pre id="crmTriggersJson">—</pre>
         </details>
       </div>
@@ -231,7 +226,7 @@
       <!-- Vehicle Lookup (vaihtoauto rekisterinumerolla) -->
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Vehicle Lookup</h2>
+          <h2 class="card-title">Rekisterihaku</h2>
         </div>
         <form class="plate-form" id="plateForm">
           <label class="visually-hidden" for="plateInput">Rekisterinumero</label>
@@ -241,19 +236,6 @@
         <div class="plate-hint" id="plateHint">Vaihtoauton merkki/malli/vuosimalli rekisterinumerolla. Kokeile: ABC-123</div>
         <div id="plateResult"></div>
       </div>
-    </div>
-
-    <!-- Automation Status: visual pipeline, animate only the active step -->
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Automation Status</h2>
-      </div>
-      <ol class="automation-steps" id="automationSteps">
-        <li class="automation-step" data-step="crm"><span class="automation-dot" aria-hidden="true"></span><span class="automation-label">CRM Updated</span><span class="automation-sublabel">Liidi &amp; muistiinpanot</span></li>
-        <li class="automation-step" data-step="erp"><span class="automation-dot" aria-hidden="true"></span><span class="automation-label">ERP Notified</span><span class="automation-sublabel">Rahoitusmalline</span></li>
-        <li class="automation-step" data-step="followup"><span class="automation-dot" aria-hidden="true"></span><span class="automation-label">Follow-up Created</span><span class="automation-sublabel">Tehtävä ajastettu</span></li>
-        <li class="automation-step" data-step="tradein"><span class="automation-dot" aria-hidden="true"></span><span class="automation-label">Trade-in Workflow Started</span><span class="automation-sublabel">Arviointi käynnistetty</span></li>
-      </ol>
     </div>
 
   </aside>

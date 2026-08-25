@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: kopilotti-demo-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    # Steady state, post-bootstrap: this is the target committed to the repo
+    # for the eventual production wiring, once the branch is deliberately
+    # switched over on the live Render service (see "Known limitations" in
+    # PR #2 - this repo file alone does not change that live setting; the
+    # Blueprint's Auto Sync stays off until that switch is a deliberate,
+    # separately authorized step).
+    #
+    # repo stays explicit alongside branch - `render blueprints validate`
+    # rejects branch without it (confirmed empirically during the bootstrap
+    # slice: "repo is required for git-based services").
+    repo: https://github.com/mikko-lab/kopilotti-demo
+    branch: main
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Analysis stays off for this bootstrap: no key is requested or
+      # required to create/smoke-test the service. See ANALYSIS_ENABLED in
+      # lib/runtime-config.js - flipping this to "true" (and adding
+      # ANTHROPIC_API_KEY back below, via the Render dashboard, sync: false,
+      # never a literal value here) is a deliberate, separate step once
+      # /health, vehicle lookup, and CORS have been smoke-tested for real.
+      - key: ANALYSIS_ENABLED
+        value: "false"
+      - key: ALLOWED_ORIGIN
+        value: https://mikko-lab.github.io
+      - key: ANTHROPIC_TIMEOUT_MS
+        value: 15000
+      - key: ANALYZE_RATE_LIMIT_MAX
+        value: 10
