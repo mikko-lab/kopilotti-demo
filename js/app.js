@@ -85,7 +85,7 @@ const SCENARIOS = {
     // is a workflow reminder, not a condition verdict).
     text: 'Hei! Minua kiinnostaa auto rekisterinumerolla: HJK-482 - Toimipiste: Tampere. Onko se vielä myynnissä? Myyjä: Hei ja kiitos viestistä! Kyllä on, Skoda Octavia Combi ladattava hybridi. Miten voin auttaa? Asiakas: Etsimme farmaria, pitää olla ladattava hybridi jos mahdollista. Hintaluokka 30-45 000 euroa, automaatti ja ajokilometrejä alle 100 000 km. Voisitko lähettää kuvia renkaista, tuulilasista ja huoltokirjasta ennen kuin tulemme koeajolle? Myyjä: Toki, hetkinen. Myyjä lähetti kuvan renkaista edestä ja takaa. Myyjä lähetti kuvan tuulilasista. Myyjä lähetti kuvan huoltokirjan viimeisimmästä sivusta. Myyjä lähetti lyhyen videon autosta. Tässä kuvat ja video, kaikki näyttää siistiltä mutta katsothan itsekin. Asiakas: Kiitos nopeasta vastauksesta, näyttää hyvältä! Paljonko kuukausierä olisi rahoituksella? Myyjä: Lasketaan heti tarjous ja lähetetään tänne. Asiakas: Hyvä, jos numerot näyttää järkeviltä niin voidaan sopia koeajo jo tällä viikolla.',
     hints: [
-      { type: 'blue', icon: '📸', title: 'KUVAT JA VIDEO VASTAANOTETTU', text: 'Asiakas pyysi kuvia renkaista, tuulilasista ja huoltokirjasta ennen koeajoa — myyjä lähetti ne. Tarkista itse ennen lähetystä että kuvat vastaavat nykykuntoa, älä luota pelkkään AI-yhteenvetoon.', action: 'Tarkista kuvat' },
+      { type: 'blue', icon: '📸', title: 'KUVAT JA VIDEO VASTAANOTETTU', text: 'Asiakas pyysi kuvia renkaista, tuulilasista ja huoltokirjasta ennen koeajoa — myyjä lähetti ne. Tarkista itse ennen lähetystä että kuvat vastaavat nykykuntoa, älä luota pelkkään tekoäly-yhteenvetoon.', action: 'Tarkista kuvat' },
       { type: 'green', icon: '💳', title: 'RAHOITUSKIINNOSTUS', text: 'Asiakas kysyi kuukausierää heti kuvien jälkeen — vahva ostosignaali etäkaupassa. Lähetä rahoituslaskelma samaan WhatsApp-ketjuun.', action: 'Lähetä rahoituslaskelma' },
       { type: 'green', icon: '🤝', title: 'KOEAJOPYYNTÖ', text: 'Asiakas on jo valmis sopimaan koeajon tällä viikolla. Varaa aika heti ketjussa kiinni — älä jätä asiakasta odottamaan puhelua.', action: 'Varaa koeajo' },
     ],
@@ -143,7 +143,7 @@ let businessSignals = [];
 // of a DOM node (the old linear meter's #meterVal/#meterDesc no longer exist
 // now that Purchase Intent is a gauge — see updateMeter()).
 let currentPurchaseIntent = 0;
-let currentMeterDesc = 'Sessio ei käynnissä';
+let currentMeterDesc = 'Istunto ei käynnissä';
 
 let gaugeIntent = null;
 let gaugeConfidence = null;
@@ -285,7 +285,7 @@ async function denyConsent() {
   // explicit accept click — applyConsentGateUI() re-disables everything
   // since consentState is no longer 'accepted'.
   applyConsentGateUI();
-  showToast('❌ Suostumus kieltäytyi — sessio peruutettu');
+  showToast('❌ Asiakas kieltäytyi — istunto peruutettu');
 }
 
 function startSession() {
@@ -317,7 +317,7 @@ function startSession() {
   document.getElementById('pasteInput').value='';
 
   document.getElementById('statusDot').classList.add('active');
-  document.getElementById('statusTitle').textContent='Sessio käynnissä';
+  document.getElementById('statusTitle').textContent='Istunto käynnissä';
   document.getElementById('statusSub').textContent='Kuuntelen...';
   document.getElementById('btnStart').classList.add('hidden');
   document.getElementById('btnPaste').classList.add('hidden');
@@ -335,8 +335,8 @@ function startSession() {
   if ('SpeechRecognition' in window||'webkitSpeechRecognition' in window) {
     startRecognition();
   } else {
-    showToast('⚠️ Selain ei tue puheentunnistusta — käytä demo-skenaarioita alla');
-    document.getElementById('statusSub').textContent='Puheentunnistus ei tuettu — käytä demo-skenaarioita';
+    showToast('⚠️ Selain ei tue puheentunnistusta — käytä esimerkkitilanteita alla');
+    document.getElementById('statusSub').textContent='Puheentunnistus ei ole tuettu — käytä esimerkkitilanteita';
   }
 }
 
@@ -374,7 +374,7 @@ function startPasteSession() {
   pasteInput.focus();
 
   document.getElementById('statusDot').classList.add('active');
-  document.getElementById('statusTitle').textContent='Sessio käynnissä';
+  document.getElementById('statusTitle').textContent='Istunto käynnissä';
   document.getElementById('statusSub').textContent='Liitä-tila — päivitä keskustelua tekstikenttään sitä mukaa kun se etenee';
   document.getElementById('btnStart').classList.add('hidden');
   document.getElementById('btnPaste').classList.add('hidden');
@@ -468,14 +468,14 @@ function stopSession() {
   if (autoAnalyzeTimer) { clearTimeout(autoAnalyzeTimer); autoAnalyzeTimer=null; }
   if(recognition) recognition.stop();
   document.getElementById('statusDot').classList.remove('active');
-  document.getElementById('statusTitle').textContent='Sessio päättynyt';
+  document.getElementById('statusTitle').textContent='Istunto päättynyt';
   document.getElementById('statusSub').textContent=`Kesto: ${document.getElementById('statTime').textContent}`;
   document.getElementById('btnStop').classList.add('hidden');
   document.getElementById('btnStart').classList.remove('hidden');
   document.getElementById('btnPaste').classList.remove('hidden');
   document.getElementById('wave').classList.add('hidden');
   setBadgeLive('badgeSpeech', false);
-  showToast('Sessio lopetettu');
+  showToast('Istunto lopetettu');
 }
 
 function showTranscript(text) {
@@ -509,7 +509,7 @@ async function runScenario(key) {
   const s=SCENARIOS[key];
   currentTranscript='';
   showTranscript('');
-  logEvent(`Skenaario käynnistetty: ${s.signal}`, 'ok');
+  logEvent(`Esimerkkitilanne käynnistetty: ${s.signal}`, 'ok');
   const words=s.text.split(' ');
   let i=0;
   const iv=setInterval(()=>{
@@ -661,7 +661,7 @@ async function analyzeWithSSE(transcript) {
   } catch(err) {
     console.warn('Backend ei tavoitettavissa, käytetään paikallista analyysiä:', err.message);
     setBadgeLive('badgeClaude', false);
-    logEvent('Backend ei tavoitettavissa — paikallinen analyysi', 'pending');
+    logEvent('Taustapalvelu ei tavoitettavissa — paikallinen analyysi', 'pending');
     showToast('Tekoälyanalyysi ei onnistunut — käytetään paikallista arviota');
     return false;
   } finally {
@@ -1089,8 +1089,8 @@ function renderRecommendations(vehicles, signals, preferences) {
 
 // Preserved as-is (same trigger logic as before the redesign) — only the
 // presentation changed: this used to feed a CRM-summary modal, now it
-// returns structured data that drives the CRM Integration state, the
-// Automation Status pipeline, and the Live Event Timeline instead.
+// returns structured data that drives the CRM integration state and the
+// event timeline instead.
 function buildTriggers() {
   const meter = currentPurchaseIntent;
   const triggers = [];
@@ -1104,10 +1104,10 @@ function buildTriggers() {
 }
 
 const CRM_STATE_META = {
-  pending: { icon: '⏳', label: 'Pending', desc: 'Ei vielä lähetetty' },
-  queued: { icon: '🕓', label: 'Queued', desc: 'Lähetys käynnissä…' },
-  synced: { icon: '✅', label: 'Synced', desc: 'Tiedot synkronoitu' },
-  failed: { icon: '⚠️', label: 'Failed', desc: 'Synkronointi epäonnistui' },
+  pending: { icon: '⏳', label: 'Odottaa', desc: 'Ei vielä lähetetty' },
+  queued: { icon: '🕓', label: 'Jonossa', desc: 'Lähetys käynnissä…' },
+  synced: { icon: '✅', label: 'Synkronoitu', desc: 'Tiedot synkronoitu' },
+  failed: { icon: '⚠️', label: 'Epäonnistui', desc: 'Synkronointi epäonnistui' },
 };
 
 function renderCrmState(state) {
@@ -1119,52 +1119,18 @@ function renderCrmState(state) {
   document.getElementById('crmStateDesc').textContent = meta.desc;
 }
 
-// Only two of the four steps are conditional on what buildTriggers() found —
-// CRM/ERP always complete once a sync runs (that's the base pipeline every
-// session goes through), Follow-up/Trade-in only complete if their specific
-// trigger actually fired, otherwise they're marked skipped (not left stuck
-// "pending" forever, which would misleadingly look like a hung queue).
-const AUTOMATION_STEP_CONDITIONS = {
-  crm: () => true,
-  erp: () => true,
-  followup: (triggers) => triggers.some(t => t.trigger === 'high_intent'),
-  tradein: (triggers) => triggers.some(t => t.trigger === 'trade_in'),
-};
-const AUTOMATION_STEP_EVENT_LABEL = {
-  crm: 'CRM päivitetty',
-  erp: 'ERP:lle ilmoitettu',
-  followup: 'Seurantatehtävä luotu',
-  tradein: 'Vaihtoauton arviointi käynnistetty',
-};
-
-// "Animate only the active step": at any given moment exactly one step
-// carries the .active pulsing state, the rest are already .done/.skipped or
-// still at rest — a sequential reveal, not everything animating at once.
-async function animateAutomationSteps(triggers) {
-  const steps = document.querySelectorAll('.automation-step');
-  for (const stepEl of steps) {
-    const key = stepEl.dataset.step;
-    stepEl.className = 'automation-step active';
-    await new Promise(r => setTimeout(r, 400));
-    const met = AUTOMATION_STEP_CONDITIONS[key](triggers);
-    stepEl.className = `automation-step ${met ? 'done' : 'skipped'}`;
-    if (met) logEvent(AUTOMATION_STEP_EVENT_LABEL[key], 'ok');
-  }
-}
-
 async function syncToCRM() {
   const triggers = buildTriggers();
   document.getElementById('crmTriggersJson').textContent =
     JSON.stringify({ timestamp: new Date().toISOString(), triggers }, null, 2);
 
   renderCrmState('queued');
-  logEvent('CRM-webhook jonossa', 'pending');
+  logEvent('CRM-siirto jonossa', 'pending');
   await new Promise(r => setTimeout(r, 700));
 
   renderCrmState('synced');
   setBadgeLive('badgeCRM', triggers.some(t => t.trigger !== 'none'));
 
-  await animateAutomationSteps(triggers);
   showToast('✅ Synkronoitu CRM:ään');
 }
 
@@ -1242,8 +1208,8 @@ async function lookupVehicle(e) {
     resultEl.replaceChildren(buildPlateSuccessNode(data));
     logEvent(`Vaihtoauton rekisterihaku valmis: ${data.make} ${data.model}`, 'ok');
   } catch (err) {
-    resultEl.replaceChildren(buildPlateStateNode('error', 'alert', '⚠️ Backend ei tavoitettavissa — rekisterihaku vaatii yhteyden palvelimeen (demo-data ei toimi paikallisesti)'));
-    logEvent('Rekisterihaku epäonnistui: backend ei tavoitettavissa', 'pending');
+    resultEl.replaceChildren(buildPlateStateNode('error', 'alert', '⚠️ Taustapalvelu ei tavoitettavissa — rekisterihaku vaatii yhteyden palvelimeen (esimerkkidata ei toimi paikallisesti)'));
+    logEvent('Rekisterihaku epäonnistui: taustapalvelu ei tavoitettavissa', 'pending');
   }
   return false;
 }
@@ -1277,7 +1243,7 @@ function logEvent(text, status = 'ok') {
   textSpan.textContent = text; // may include unescaped user/vehicle/AI data — textContent only
   const statusSpan = document.createElement('span');
   statusSpan.className = `timeline-status ${status === 'ok' ? 'ok' : 'pending'}`;
-  statusSpan.textContent = status === 'ok' ? 'OK' : 'Pending';
+  statusSpan.textContent = status === 'ok' ? 'Onnistui' : 'Odottaa';
   entry.append(timeSpan, textSpan, statusSpan);
   list.insertBefore(entry, list.firstChild);
   timelineEntryCount++;
@@ -1311,7 +1277,7 @@ function wireEvents() {
 
 function initGauges() {
   gaugeIntent = createGauge(document.getElementById('gaugeIntentWrap'), { label: 'Ostohalukkuus', value: 0, colorVar: '--success' });
-  gaugeConfidence = createGauge(document.getElementById('gaugeConfidenceWrap'), { label: 'Confidence', value: 0, colorVar: '--primary' });
+  gaugeConfidence = createGauge(document.getElementById('gaugeConfidenceWrap'), { label: 'Varmuus', value: 0, colorVar: '--primary' });
 }
 
 wireEvents();
