@@ -25,8 +25,8 @@
   two blind spots this hit directly — (1) it skips aria-hidden content
   entirely, and .header-pipeline's arrows are aria-hidden (decorative,
   correctly hidden from AT); (2) it doesn't reliably evaluate ::after
-  content-generated glyphs (the automation-dot checkmark). The
-  .pipeline-arrow fix in particular goes beyond what WCAG's letter actually
+  content-generated glyphs. The .pipeline-arrow fix in particular goes
+  beyond what WCAG's letter actually
   requires — an aria-hidden element has no exposed-to-AT contrast
   obligation under 1.4.3 — but low-vision sighted users still see it
   regardless of aria-hidden, so it was fixed anyway. Worth stating
@@ -151,15 +151,8 @@ body {
 .logo-mark {
   width: 34px;
   height: 34px;
-  background: var(--orange);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: var(--text-md);
-  letter-spacing: -0.5px;
+  display: block;
+  object-fit: contain;
   flex-shrink: 0;
 }
 
@@ -1119,92 +1112,10 @@ body {
   overflow-x: auto;
 }
 
-/* ============ Automation Status ============ */
-.automation-steps {
-  list-style: none;
-  padding: var(--space-4) var(--space-3) var(--space-3);
-  display: flex;
-  align-items: flex-start;
-}
-
-.automation-step {
-  position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 6px;
-  font-size: var(--text-xs);
+.consent-log-scope {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-2xs);
   color: var(--muted);
-  padding: 0 4px;
-}
-
-/* Connecting line between this step's dot and the previous one's. */
-.automation-step:not(:first-child)::before {
-  content: '';
-  position: absolute;
-  top: 17px;
-  left: 0;
-  width: 50%;
-  height: 2px;
-  background: var(--border);
-}
-.automation-step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 17px;
-  right: 0;
-  width: 50%;
-  height: 2px;
-  background: var(--border);
-}
-
-.automation-dot {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  position: relative;
-  z-index: 1;
-}
-
-.automation-label { font-weight: 600; color: var(--text2); }
-.automation-sublabel { font-size: var(--text-2xs); color: var(--muted); }
-
-.automation-step.done { color: var(--text); }
-.automation-step.done .automation-dot {
-  border-color: var(--success);
-  /* Raw --success as a fill with white text/checkmark on top measures
-     3.30:1 — fails 4.5:1 (this is the exact case the color-tokens comment
-     at the top of this file already warned about; missed here because
-     axe-core doesn't reliably check ::after content-generated glyphs).
-     --success-text is the pre-computed AA-safe companion (5.10:1 on white,
-     same ratio applies symmetrically as a background under white text). */
-  background: var(--success-text);
-  color: white;
-}
-.automation-step.done .automation-dot::after { content: '✓'; }
-.automation-step.done .automation-label { color: var(--text); }
-
-.automation-step.skipped .automation-dot::after { content: '–'; color: var(--muted); }
-
-.automation-step.active { color: var(--text); font-weight: 600; }
-.automation-step.active .automation-dot {
-  border-color: var(--primary);
-  animation: pulse-dot 1s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) { .automation-step.active .automation-dot { animation: none; } }
-
-@keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(31,77,184,0.3); }
-  50% { box-shadow: 0 0 0 5px rgba(31,77,184,0); }
 }
 
 /* ============ Live Event Timeline ============ */
