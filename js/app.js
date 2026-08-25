@@ -163,13 +163,26 @@ async function recomputeBusinessRules() {
   return result;
 }
 
-// Derive from the page's own origin instead of hardcoding one environment's URL —
-// a hardcoded string here previously got left pointed at localhost after local
-// testing and shipped that way by accident. localhost/127.0.0.1 -> local backend,
-// anything else (GitHub Pages, etc.) -> production Railway backend.
-const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-  ? 'http://localhost:3001'
-  : 'https://kopilotti-demo-production.up.railway.app';
+const LOCAL_BACKEND_URL = 'http://localhost:3001';
+// The Render service created and smoke-tested in the Safe Render Bootstrap
+// slice - see render.yaml. The previous production host stopped resolving
+// entirely and was replaced; see git history for that URL if ever needed.
+const PRODUCTION_BACKEND_URL = 'https://kopilotti-demo-api.onrender.com';
+
+// Pure function, deliberately separated from the module-level BACKEND_URL
+// constant below so it's directly unit-testable without needing to control
+// the real `location` global. Derives from the page's own origin instead of
+// a single hardcoded URL used everywhere — a hardcoded string here
+// previously got left pointed at localhost after local testing and shipped
+// that way by accident. localhost/127.0.0.1 -> local backend, anything else
+// (GitHub Pages, etc.) -> the production backend.
+function resolveBackendUrl(hostname) {
+  return hostname === 'localhost' || hostname === '127.0.0.1'
+    ? LOCAL_BACKEND_URL
+    : PRODUCTION_BACKEND_URL;
+}
+
+const BACKEND_URL = resolveBackendUrl(location.hostname);
 
 // Hash-chained so a tampered/removed entry is detectable after the fact
 // (verifyChain()) — makes "Suostumus kirjattu" an actual provable claim
@@ -1334,5 +1347,6 @@ export {
   showTranscript,
   lookupVehicle,
   safeVehicleImageSrc,
+  resolveBackendUrl,
   consentAuditLog,
 };

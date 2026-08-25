@@ -4,19 +4,18 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    # Temporary, explicit bootstrap pin: without this, a first-time Blueprint
-    # sync can default to the repo's main branch. Pinning to the exact
-    # integration branch means the very first deploy is provably built from
-    # this reviewed, tested commit - not whatever main happens to be at sync
-    # time. Remove both this and repo below (falling back to the connected
-    # repo/main) once the service exists and the branch has been
-    # deliberately switched over.
+    # Steady state, post-bootstrap: this is the target committed to the repo
+    # for the eventual production wiring, once the branch is deliberately
+    # switched over on the live Render service (see "Known limitations" in
+    # PR #2 - this repo file alone does not change that live setting; the
+    # Blueprint's Auto Sync stays off until that switch is a deliberate,
+    # separately authorized step).
     #
-    # repo is required alongside an explicit branch - `render blueprints
-    # validate` rejects branch without it (confirmed empirically: "repo is
-    # required for git-based services").
+    # repo stays explicit alongside branch - `render blueprints validate`
+    # rejects branch without it (confirmed empirically during the bootstrap
+    # slice: "repo is required for git-based services").
     repo: https://github.com/mikko-lab/kopilotti-demo
-    branch: fix/trust-safety-phase-a-integration
+    branch: main
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
