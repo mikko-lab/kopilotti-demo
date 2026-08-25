@@ -3,7 +3,11 @@ import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
 
 const require = createRequire(import.meta.url);
-const { createApp } = require('../../server');
+// Aliased: this file already has its own local createAnthropicClient()
+// helper below (a fake stream-capable stub for tests), unrelated to
+// server.js's real ANALYSIS_ENABLED-gated constructor.
+const { createAnthropicClient: buildAnthropicClient, createApp } = require('../../server');
+const { readRuntimeConfig } = require('../../lib/runtime-config');
 
 const VALID_ANALYSIS = {
   hints: [
@@ -297,5 +301,91 @@ describe('backend security boundary', () => {
       plate: 'ABC-123',
       make: 'Volkswagen',
     });
+  });
+});
+
+describe('server.js createAnthropicClient (ANALYSIS_ENABLED gate)', () => {
+  it('never constructs a client when analysis is disabled, even with a key present', () => {
+    expect(
+      buildAnthropicClient({ analysisEnabled: false, anthropicApiKey: '' })
+    ).toBeNull();
+
+    // The key being present in the environment must not matter on its own -
+    // only analysisEnabled decides whether a client is built.
+    expect(
+      buildAnthropicClient({
+        analysisEnabled: false,
+        anthropicApiKey: 'leftover-or-pre-provisioned-key',
+      })
+    ).toBeNull();
+  });
+
+  it('constructs a real client when analysis is enabled with a key', () => {
+    const client = buildAnthropicClient({
+      analysisEnabled: true,
+      anthropicApiKey: 'test-key',
+    });
+
+    expect(client).not.toBeNull();
+    expect(client.messages).toBeDefined();
+  });
+});
+
+describe('Safe Render bootstrap: ANALYSIS_ENABLED=false end to end', () => {
+  // A synthetic but otherwise real production environment - exactly the
+  // shape of env vars the Render bootstrap (render.yaml) sets, with no
+  // ANTHROPIC_API_KEY. Fed through the actual readRuntimeConfig() rather
+  // than a hand-built config object, so this test exercises the real
+  // parsing/validation path (NODE_ENV=production, the ALLOWED_ORIGIN
+  // requirement, ANALYSIS_ENABLED's own parsing) and would fail if that
+  // path ever stopped producing a startable, analysis-disabled config.
+  const DISABLED_ANALYSIS_PRODUCTION_ENV = {
+    NODE_ENV: 'production',
+    ALLOWED_ORIGIN: 'https://demo.example',
+    ANALYSIS_ENABLED: 'false',
+    ANTHROPIC_TIMEOUT_MS: '5000',
+    ANALYZE_RATE_LIMIT_MAX: '10',
+    PORT: '3001',
+    // Deliberately absent: ANTHROPIC_API_KEY - this is exactly the
+    // production-bootstrap-with-analysis-off case under test.
+  };
+
+  // Mirrors exactly what startServer() itself wires up: readRuntimeConfig()
+  // on a real env object, then server.js's own createAnthropicClient(config)
+  // feeding createApp() - no hand-built config or stub standing in for
+  // either step.
+  function createDisabledAnalysisApp() {
+    const config = readRuntimeConfig(DISABLED_ANALYSIS_PRODUCTION_ENV);
+    return createApp({
+      anthropicClient: buildAnthropicClient(config),
+      config,
+      analysisLimiter: noLimit,
+      logger: createLogger(),
+    });
+  }
+
+  it('serves /health and vehicle lookup normally with analysis disabled', async () => {
+    const app = createDisabledAnalysisApp();
+
+    const health = await request(app).get('/health').expect(200);
+    expect(health.body.status).toBe('ok');
+
+    const lookup = await request(app).get('/api/vehicle/ABC-123').expect(200);
+    expect(lookup.body).toMatchObject({ plate: 'ABC-123', make: 'Volkswagen' });
+  });
+
+  it('/api/analyze returns the managed 503 without ever invoking a provider', async () => {
+    const app = createDisabledAnalysisApp();
+
+    const response = await request(app)
+      .post('/api/analyze')
+      .send({ transcript: 'Asiakas kysyy toimitusajasta.' })
+      .expect(503);
+
+    expect(response.type).toBe('application/json');
+    expect(response.body.error).toBe('Analyysipalvelu ei ole käytettävissä.');
+    // No anthropicClient was ever constructed for this app (analysisEnabled
+    // is false) - there is no provider object in existence to have been
+    // called, not merely one that returned unused.
   });
 });

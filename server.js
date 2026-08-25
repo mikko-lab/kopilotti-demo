@@ -319,11 +319,23 @@ function createApp({
   return app;
 }
 
+// The ONLY place an Anthropic client is ever constructed. Gated on
+// config.analysisEnabled, not merely on whether a key happens to be present
+// - readRuntimeConfig() already guarantees a key exists whenever
+// analysisEnabled is true, but this function's own job is to guarantee the
+// converse just as strictly: analysisEnabled=false must never construct a
+// client, even if ANTHROPIC_API_KEY is set in the environment (e.g. left
+// over from a previous configuration, or set ahead of a deliberate future
+// enable). No network call happens here either way - constructing an
+// Anthropic client is local object setup, not a request.
+function createAnthropicClient(config) {
+  if (!config.analysisEnabled) return null;
+  return new Anthropic({ apiKey: config.anthropicApiKey });
+}
+
 function startServer({ env = process.env, logger = console } = {}) {
   const config = readRuntimeConfig(env);
-  const anthropicClient = config.anthropicApiKey
-    ? new Anthropic({ apiKey: config.anthropicApiKey })
-    : null;
+  const anthropicClient = createAnthropicClient(config);
   const app = createApp({ anthropicClient, config, logger });
 
   return app.listen(config.port, '0.0.0.0', () => {
@@ -342,6 +354,7 @@ if (require.main === module) {
 
 module.exports = {
   MOCK_VEHICLES,
+  createAnthropicClient,
   createApp,
   startServer,
 };
