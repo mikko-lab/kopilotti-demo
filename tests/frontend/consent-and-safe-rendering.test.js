@@ -181,6 +181,31 @@ describe('Consent gate: denial', () => {
   });
 });
 
+describe('Analysis fallback status', () => {
+  test('paikallinen arvio merkitään valmistuneeksi eikä odottavaksi', async () => {
+    const fetchMock = vi.fn((url) => {
+      if (String(url).includes('/api/analyze')) {
+        return Promise.resolve({ ok: false, status: 503 });
+      }
+      return Promise.reject(new Error('inventory unavailable in test'));
+    });
+    const app = await loadApp({ fetchImpl: fetchMock });
+    await app.giveConsent();
+
+    const result = await app.analyzeWithSSE('asiakas etsii perheelle farmaria');
+
+    expect(result).toBe(false);
+    expect(analysisCalls(fetchMock)).toHaveLength(1);
+
+    const newestEntry = document.querySelector('#timelineList .timeline-entry');
+    expect(newestEntry?.querySelector('.timeline-text')?.textContent)
+      .toBe('Tekoälyanalyysi ei käytettävissä — paikallinen arvio valmis');
+    expect(newestEntry?.querySelector('.timeline-status')?.textContent).toBe('Paikallinen');
+    expect(newestEntry?.querySelector('.timeline-status')?.classList.contains('local')).toBe(true);
+    expect(newestEntry?.textContent).not.toContain('Odottaa');
+  });
+});
+
 describe('Consent gate: runScenario never grants consent itself', () => {
   test('6. runScenario() ei koskaan myönnä suostumusta', async () => {
     const app = await loadApp();

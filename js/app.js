@@ -661,7 +661,7 @@ async function analyzeWithSSE(transcript) {
   } catch(err) {
     console.warn('Backend ei tavoitettavissa, käytetään paikallista analyysiä:', err.message);
     setBadgeLive('badgeClaude', false);
-    logEvent('Taustapalvelu ei tavoitettavissa — paikallinen analyysi', 'pending');
+    logEvent('Tekoälyanalyysi ei käytettävissä — paikallinen arvio valmis', 'local');
     showToast('Tekoälyanalyysi ei onnistunut — käytetään paikallista arviota');
     return false;
   } finally {
@@ -1224,6 +1224,12 @@ function showToast(msg) {
 // Live Event Timeline — append-only log of things that already happen
 // elsewhere (no new business logic). Newest entry on top.
 let timelineEntryCount = 0;
+const TIMELINE_STATUS_META = Object.freeze({
+  ok: { className: 'ok', label: 'Onnistui' },
+  pending: { className: 'pending', label: 'Odottaa' },
+  local: { className: 'local', label: 'Paikallinen' },
+});
+
 function logEvent(text, status = 'ok') {
   const list = document.getElementById('timelineList');
   const empty = list.querySelector('.timeline-empty');
@@ -1242,8 +1248,9 @@ function logEvent(text, status = 'ok') {
   textSpan.className = 'timeline-text';
   textSpan.textContent = text; // may include unescaped user/vehicle/AI data — textContent only
   const statusSpan = document.createElement('span');
-  statusSpan.className = `timeline-status ${status === 'ok' ? 'ok' : 'pending'}`;
-  statusSpan.textContent = status === 'ok' ? 'Onnistui' : 'Odottaa';
+  const statusMeta = TIMELINE_STATUS_META[status] || TIMELINE_STATUS_META.pending;
+  statusSpan.className = `timeline-status ${statusMeta.className}`;
+  statusSpan.textContent = statusMeta.label;
   entry.append(timeSpan, textSpan, statusSpan);
   list.insertBefore(entry, list.firstChild);
   timelineEntryCount++;

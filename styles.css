@@ -1167,6 +1167,7 @@ body {
 }
 .timeline-status.ok { background: var(--success-light); color: var(--success-text); }
 .timeline-status.pending { background: var(--warning-light); color: var(--warning-text); }
+.timeline-status.local { background: var(--primary-light); color: var(--primary-dark); }
 
 /* ============ Toast ============ */
 .toast {
