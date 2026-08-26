@@ -4,13 +4,13 @@
 
 Kopilotti on julkinen konseptidemo myyjän reaaliaikaisesta päätöksenteon tuesta. Se tunnistaa asiakaskeskustelusta ostosignaaleja, nostaa esiin seuraavia toimenpiteitä ja yhdistää asiakkaan tarpeet demovaraston autoihin.
 
-## [🚀 Kokeile julkista demoa](https://mikko-lab.github.io/kopilotti-demo/)
+## [🚀 Kokeile julkista demoa](https://kopilotti-demo.vercel.app/)
 
-> **Nykyinen julkinen tila:** käyttöliittymä on julkaistu GitHub Pagesissa ja taustapalvelu Renderissä. Maksullinen Anthropic-analyysi on tarkoituksella pois käytöstä (`ANALYSIS_ENABLED=false`). Kun mallianalyysi ei ole käytettävissä, selain kertoo siitä näkyvästi ja käyttää paikallista sääntöpohjaista arviota.
+> **Nykyinen julkinen tila:** käyttöliittymä on julkaistu Vercelissä ja taustapalvelu Renderissä. Maksullinen Anthropic-analyysi on tarkoituksella pois käytöstä (`ANALYSIS_ENABLED=false`). Kun mallianalyysi ei ole käytettävissä, selain kertoo siitä näkyvästi ja käyttää paikallista sääntöpohjaista arviota.
 
 > **Julkisen repon raja:** tämä repositorio sisältää konseptidemon käyttöliittymän, turvallisen analyysisopimuksen, paikallisen arvioinnin ja synteettisen demodatan. Se ei sisällä Kopilotti Salesin yksityistä päätösmoottoria, jälleenmyyjäkohtaisia liiketoimintasääntöjä, tuotantotunnuksia eikä oikeita CRM-/ERP-integraatioita.
 
-[![Kopilotin suomenkielinen käyttöliittymä: liitetty asiakaskeskustelu, ostohalukkuus ja varmuus, tunnistetut signaalit, myyntivihjeet sekä keskusteluun perustuvat autosuositukset](assets/screenshot.png)](https://mikko-lab.github.io/kopilotti-demo/)
+[![Kopilotin suomenkielinen käyttöliittymä: liitetty asiakaskeskustelu, ostohalukkuus ja varmuus, tunnistetut signaalit, myyntivihjeet sekä keskusteluun perustuvat autosuositukset](assets/screenshot.png)](https://kopilotti-demo.vercel.app/)
 
 ## Miksi Kopilotti on tehty
 
@@ -31,7 +31,7 @@ Samalla myynnin onnistuminen riippuu auton lisäksi oikea-aikaisista palveluista
 
 | Osa | Nykytila |
 | --- | --- |
-| Käyttöliittymä | Julkaistu GitHub Pagesissa, suomenkielinen ja responsiivinen |
+| Käyttöliittymä | Julkaistu Vercelissä, suomenkielinen ja responsiivinen |
 | Taustapalvelu | Renderissä; `/health` ja demoajoneuvon rekisterihaku käytettävissä |
 | Anthropic-analyysi | Tarkoituksella pois käytöstä; julkinen blueprint ei sisällä API-avainta |
 | Paikallinen arvio | Käytössä näkyvänä fallbackina, kun mallianalyysi ei ole saatavilla |
@@ -62,11 +62,11 @@ Taustapalvelun analyysipyyntö ja mallivastaus validoidaan Zod-skeemoilla. Malli
 
 ## Teknologiat
 
-Vanilla JavaScript · Web Speech API · Node.js 22.23.2 · Express · Server-Sent Events · Zod · Vitest · Render · GitHub Pages
+Vanilla JavaScript · Web Speech API · Node.js 22.23.2 · Express · Server-Sent Events · Zod · Vitest · Vercel · Render
 
 ## Kokeile demoa
 
-1. Avaa [julkinen demo](https://mikko-lab.github.io/kopilotti-demo/).
+1. Avaa [julkinen demo](https://kopilotti-demo.vercel.app/).
 2. Paina **✓ Asiakas hyväksyi**. Toiminnot pysyvät lukittuina ilman suostumusta.
 3. Valitse **Rahoitus**, **Perhe**, **Pakettiauto** tai **WhatsApp**, tai avaa **Liitä keskustelu** ja käytä vain synteettistä demotekstiä.
 4. Seuraa **Tekoälyn havainnot** -kortin ostohalukkuutta, varmuutta, signaaleja ja myyntivihjeitä.
