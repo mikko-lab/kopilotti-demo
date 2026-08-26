@@ -4,13 +4,13 @@
 
 Kopilotti is a public concept demonstrator for real-time decision support in automotive sales. It recognizes buying signals in a customer conversation, surfaces useful next actions and matches the customer's needs with vehicles in a synthetic demo inventory.
 
-## [🚀 Try the public demo](https://mikko-lab.github.io/kopilotti-demo/)
+## [🚀 Try the public demo](https://kopilotti-demo.vercel.app/)
 
-> **Current public state:** the frontend is live on GitHub Pages and the backend is live on Render. Paid Anthropic analysis is intentionally disabled (`ANALYSIS_ENABLED=false`). When model analysis is unavailable, the browser makes that visible and uses a local rules-based assessment.
+> **Current public state:** the frontend is live on Vercel and the backend is live on Render. Paid Anthropic analysis is intentionally disabled (`ANALYSIS_ENABLED=false`). When model analysis is unavailable, the browser makes that visible and uses a local rules-based assessment.
 
 > **Public repository boundary:** this repository contains the concept UI, a safety-hardened analysis contract, local assessment logic and synthetic demo data. It does not contain the private Kopilotti Sales decision engine, dealer-specific business rules, production credentials or real CRM/ERP integrations.
 
-[![Kopilotti's Finnish-language interface showing a pasted customer conversation, buying intent and confidence, detected signals, sales hints and conversation-based vehicle recommendations](assets/screenshot.png)](https://mikko-lab.github.io/kopilotti-demo/)
+[![Kopilotti's Finnish-language interface showing a pasted customer conversation, buying intent and confidence, detected signals, sales hints and conversation-based vehicle recommendations](assets/screenshot.png)](https://kopilotti-demo.vercel.app/)
 
 > The interactive demonstrator is currently presented in Finnish. This README provides the equivalent product and technical overview in English.
 
@@ -33,7 +33,7 @@ Sales outcomes also depend on timely services beyond the vehicle itself, includi
 
 | Component | Current state |
 | --- | --- |
-| Frontend | Live on GitHub Pages, Finnish-language and responsive |
+| Frontend | Live on Vercel, Finnish-language and responsive |
 | Backend | Live on Render; `/health` and demo vehicle lookup are available |
 | Anthropic analysis | Intentionally disabled; the public blueprint contains no API key |
 | Local assessment | Active as a visible fallback when model analysis is unavailable |
@@ -64,11 +64,11 @@ The backend validates both analysis requests and model responses against Zod sch
 
 ## Technology
 
-Vanilla JavaScript · Web Speech API · Node.js 22.23.2 · Express · Server-Sent Events · Zod · Vitest · Render · GitHub Pages
+Vanilla JavaScript · Web Speech API · Node.js 22.23.2 · Express · Server-Sent Events · Zod · Vitest · Vercel · Render
 
 ## Try the demo
 
-1. Open the [public demo](https://mikko-lab.github.io/kopilotti-demo/).
+1. Open the [public demo](https://kopilotti-demo.vercel.app/).
 2. Select **✓ Asiakas hyväksyi**. The controls remain locked without consent.
 3. Choose **Rahoitus**, **Perhe**, **Pakettiauto** or **WhatsApp**, or open **Liitä keskustelu** and use synthetic demo text only.
 4. Follow purchase intent, confidence, signals and hints in the **Tekoälyn havainnot** card.
